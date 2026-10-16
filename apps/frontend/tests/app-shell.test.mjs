@@ -6,7 +6,7 @@ const baseUrl = "http://localhost:3000";
 for (const [path, title, currentPage] of [
   ["/dashboard", "Dashboard", "Main"],
   ["/dashboard/main", "Dashboard", "Main"],
-  ["/dashboard/productivity", "Good morning, Arham.", "Productivity"],
+  ["/dashboard/productivity", "Good morning, Banu.", "Productivity"],
   ["/user", "User", "User"],
 ]) {
   test(`${path} renders one shared header and breadcrumb before the title`, async () => {
@@ -44,6 +44,23 @@ test("dashboard date control sits beside the page title", async () => {
   );
 });
 
+test("header places menu search after the sidebar toggle", async () => {
+  const response = await fetch(new URL("/dashboard/main", baseUrl));
+  assert.equal(response.status, 200);
+
+  const html = await response.text();
+  const header = html.match(/<header\b[^>]*>([\s\S]*?)<\/header>/)?.[1];
+  assert.ok(header);
+
+  const sidebarToggle = header.indexOf('data-slot="sidebar-trigger"');
+  const menuSearch = header.indexOf('aria-label="Search menu"');
+  const themeToggle = header.indexOf('aria-label="Toggle light and dark mode"');
+  assert.ok(sidebarToggle >= 0);
+  assert.ok(menuSearch > sidebarToggle);
+  assert.ok(themeToggle > menuSearch);
+  assert.doesNotMatch(header, /Command Palette/);
+});
+
 test("account menu appears after the theme toggle in the header", async () => {
   const response = await fetch(new URL("/user", baseUrl));
   assert.equal(response.status, 200);
@@ -54,7 +71,7 @@ test("account menu appears after the theme toggle in the header", async () => {
 
   const themeToggle = header.indexOf('aria-label="Toggle light and dark mode"');
   const accountMenu = header.indexOf(
-    'aria-label="Account menu for Arham Khan"',
+    'aria-label="Account menu for Banu Rusman"',
   );
   assert.ok(themeToggle >= 0);
   assert.ok(accountMenu > themeToggle);
@@ -67,6 +84,6 @@ test("account menu shows name initials instead of an avatar image", async () => 
   const html = await response.text();
   const header = html.match(/<header\b[^>]*>([\s\S]*?)<\/header>/)?.[1];
   assert.ok(header);
-  assert.match(header, /data-slot="avatar-fallback"[^>]*>AK<\/span>/);
+  assert.match(header, /data-slot="avatar-fallback"[^>]*>BR<\/span>/);
   assert.doesNotMatch(header, /data-slot="avatar-image"/);
 });

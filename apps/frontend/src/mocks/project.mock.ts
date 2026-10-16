@@ -1,0 +1,108 @@
+import type { Project } from "@/features/project/project-model";
+
+export const initialProjects: Project[] = [
+  {
+    id: "prj-001",
+    name: "Customer portal",
+    description:
+      "Satu tempat bagi pelanggan untuk mengelola akun, memantau pesanan, dan menghubungi tim support.",
+    client: "Acme Indonesia",
+    owner: "Nora Bennett",
+    status: "active",
+    priority: "high",
+    startDate: "2026-09-01",
+    dueDate: "2026-10-30",
+    progress: 68,
+  },
+  {
+    id: "prj-002",
+    name: "Website company profile",
+    description:
+      "Pembaruan website perusahaan dengan identitas visual baru dan pengalaman mobile yang lebih baik.",
+    client: "Studio Kreasi",
+    owner: "Clara Hughes",
+    status: "active",
+    priority: "high",
+    startDate: "2026-09-10",
+    dueDate: "2026-10-12",
+    progress: 82,
+  },
+  {
+    id: "prj-003",
+    name: "Dashboard operasional",
+    description:
+      "Menyatukan laporan operasional untuk membantu tim membuat keputusan harian.",
+    client: "Internal",
+    owner: "Arham Khan",
+    status: "active",
+    priority: "medium",
+    startDate: "2026-10-01",
+    dueDate: "2026-11-15",
+    progress: 35,
+  },
+  {
+    id: "prj-004",
+    name: "Aplikasi loyalty",
+    description:
+      "Program loyalitas pelanggan, mulai dari pengumpulan poin hingga penukaran reward.",
+    client: "Kopi Nusantara",
+    owner: "Rohan Iyer",
+    status: "planned",
+    priority: "high",
+    startDate: "2026-11-01",
+    dueDate: "2026-12-18",
+    progress: 0,
+  },
+  {
+    id: "prj-005",
+    name: "Integrasi pembayaran",
+    description:
+      "Penyederhanaan checkout dan rekonsiliasi pembayaran. Menunggu konfirmasi dari mitra pembayaran.",
+    client: "Acme Indonesia",
+    owner: "Ethan Brooks",
+    status: "on-hold",
+    priority: "medium",
+    startDate: "2026-09-15",
+    dueDate: "2026-11-05",
+    progress: 40,
+  },
+  {
+    id: "prj-006",
+    name: "Design system",
+    description:
+      "Komponen dan panduan visual bersama untuk menjaga konsistensi seluruh produk.",
+    client: "Internal",
+    owner: "Clara Hughes",
+    status: "completed",
+    priority: "medium",
+    startDate: "2026-08-01",
+    dueDate: "2026-10-01",
+    progress: 100,
+  },
+  {
+    id: "prj-007",
+    name: "Migrasi pusat bantuan",
+    description:
+      "Memindahkan dokumentasi ke pusat bantuan yang mudah dicari dan dikelola tim support.",
+    client: "Acme Indonesia",
+    owner: "Hannah Reed",
+    status: "planned",
+    priority: "low",
+    startDate: "2026-11-10",
+    dueDate: "2026-12-01",
+    progress: 0,
+  },
+  {
+    id: "prj-008",
+    name: "Onboarding karyawan",
+    description:
+      "Alur onboarding digital untuk dokumen, orientasi, dan kebutuhan karyawan baru.",
+    client: "Internal",
+    owner: "Nora Bennett",
+    status: "completed",
+    priority: "low",
+    startDate: "2026-08-15",
+    dueDate: "2026-09-25",
+    progress: 100,
+  },
+];

@@ -7,7 +7,7 @@ test("profile page shows the employee summary and all profile sections", async (
 
   assert.equal(response.status, 200);
   for (const text of [
-    "Arham Khan",
+    "Banu Rusman",
     "Software Engineer",
     "92% Complete",
     "About",

@@ -263,7 +263,7 @@ export function ProductivityDashboardPage() {
   return (
     <AppBody>
       <PageHeading
-        title="Good morning, Arham."
+        title="Good morning, Banu."
         currentPage="Productivity"
         parents={[{ label: "Dashboard", href: "/dashboard" }]}
         titleClassName="text-3xl leading-none tracking-tight"

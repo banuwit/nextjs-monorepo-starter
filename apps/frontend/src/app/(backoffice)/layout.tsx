@@ -8,7 +8,7 @@ export default function BackofficeLayout({
   return (
     <SidebarProvider>
       <AppSidebar />
-      <SidebarInset>
+      <SidebarInset className="min-w-0">
         <AppHeader />
         {children}
       </SidebarInset>

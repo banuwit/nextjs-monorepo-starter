@@ -25,7 +25,7 @@ export function PageHeading({
   children,
 }: PageHeadingProps) {
   return (
-    <div className="flex flex-col gap-2">
+    <div className="flex flex-col">
       <Breadcrumb>
         <BreadcrumbList className="text-xs">
           {parents?.map(({ label, href }) => (

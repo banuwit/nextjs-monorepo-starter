@@ -1,1 +1,4 @@
-export { UserPage as default } from "@/features/users/components/user-page"
+import { redirect } from "next/navigation";
+export default function Page() {
+  redirect("/users");
+}
