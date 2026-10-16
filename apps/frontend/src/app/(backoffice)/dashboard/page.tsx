@@ -1,1 +1,1 @@
-export { MainDashboardPage as default } from "@/features/dashboard/main/components/dashboard-page"
+export { MainDashboardPage as default } from "@/features/dashboard/main/components/dashboard-main-page"
