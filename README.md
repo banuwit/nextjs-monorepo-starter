@@ -16,6 +16,12 @@ npx create-turbo@latest
 
 ## What's inside?
 
+### Backoffice app shell
+
+[Backoffice layout](<./apps/frontend/src/app/(backoffice)/layout.tsx>) renders the shared sidebar and [AppHeader](./apps/frontend/src/components/app-sidebar-header.tsx) for every backoffice route. Use [PageHeading](./apps/frontend/src/components/page-heading.tsx) inside each page for its breadcrumb and `<h1>`; pass `parents` for linked ancestors and `children` for optional text or badges below the title.
+
+To check the shell, run `pnpm --filter frontend dev` and, in another terminal, `pnpm --filter frontend test:ui`.
+
 This Turborepo includes the following packages/apps:
 
 ### Apps and Packages

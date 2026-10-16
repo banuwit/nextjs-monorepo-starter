@@ -1,8 +1,6 @@
-import { AppSidebar } from "@/components/app-sidebar"
-import {
-  SidebarInset,
-  SidebarProvider,
-} from "@/components/ui/sidebar"
+import { AppSidebar } from "@/components/app-sidebar";
+import { AppHeader } from "@/components/app-sidebar-header";
+import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 
 export default function BackofficeLayout({
   children,
@@ -10,7 +8,10 @@ export default function BackofficeLayout({
   return (
     <SidebarProvider>
       <AppSidebar />
-      <SidebarInset>{children}</SidebarInset>
+      <SidebarInset>
+        <AppHeader />
+        {children}
+      </SidebarInset>
     </SidebarProvider>
-  )
+  );
 }
