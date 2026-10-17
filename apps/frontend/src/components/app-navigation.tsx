@@ -21,6 +21,10 @@ export const mainNavigation = [
       { title: "Productivity", url: "/dashboard/productivity" },
       { title: "Task", url: "/dashboard/task" },
       { title: "Project", url: "/dashboard/project" },
+      { title: "Calendar", url: "/dashboard/calendar" },
+      { title: "Invoice", url: "/dashboard/invoice" },
+      { title: "File Manager", url: "/dashboard/file-manager" },
+      { title: "Infrastructure", url: "/dashboard/infrastructure" },
     ],
   },
   {

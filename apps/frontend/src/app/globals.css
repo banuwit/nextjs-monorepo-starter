@@ -136,3 +136,35 @@
     cursor: pointer;
   }
 }
+
+[data-invoice-print-root] {
+  display: none;
+}
+
+@media print {
+  @page invoice {
+    size: letter;
+    margin: 0;
+  }
+
+  body:has([data-invoice-print-root]) {
+    background: white;
+  }
+
+  body:has([data-invoice-print-root]) > :not([data-invoice-print-root]) {
+    display: none !important;
+  }
+
+  [data-invoice-print-root] {
+    display: block;
+    color-scheme: light;
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+
+  [data-invoice-print-root] [data-invoice-paper] {
+    page: invoice;
+    width: 100% !important;
+    min-height: 11in !important;
+  }
+}

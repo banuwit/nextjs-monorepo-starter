@@ -2,6 +2,7 @@ import Link from "next/link"
 import { cn } from "cn"
 
 import { buttonVariants } from "@/components/ui/button"
+import { Checkbox } from "@/components/ui/checkbox"
 import {
   Field,
   FieldDescription,
@@ -15,28 +16,26 @@ export function LoginForm({
   ...props
 }: React.ComponentProps<"div">) {
   return (
-    <div className={cn("flex flex-col gap-6", className)} {...props}>
-      <FieldGroup>
-        <div className="flex flex-col items-center gap-1 text-center">
-          <h1 className="text-2xl font-bold">Login to your account</h1>
-          <p className="text-sm text-balance text-muted-foreground">
-            Enter your email below to login to your account
-          </p>
-        </div>
-        <Field>
-          <FieldLabel htmlFor="email">Email</FieldLabel>
-          <Input id="email" type="email" placeholder="m@example.com" />
+    <div className={cn("flex flex-col gap-4", className)} {...props}>
+      <FieldGroup className="gap-4">
+        <Field className="gap-1.5">
+          <FieldLabel htmlFor="email">Email Address</FieldLabel>
+          <Input id="email" type="email" placeholder="you@example.com" autoComplete="email" />
         </Field>
-        <Field>
+        <Field className="gap-1.5">
           <FieldLabel htmlFor="password">Password</FieldLabel>
-          <Input id="password" type="password" />
+          <Input id="password" type="password" placeholder="••••••••" autoComplete="current-password" />
+        </Field>
+        <Field orientation="horizontal" data-disabled>
+          <Checkbox id="remember" disabled aria-describedby="login-preview-description" />
+          <FieldLabel htmlFor="remember" className="font-normal">Remember me for 30 days</FieldLabel>
         </Field>
         <Field>
-          <Link href="/dashboard" className={buttonVariants({ className: "w-full" })}>
+          <Link href="/dashboard" aria-describedby="login-preview-description" className={buttonVariants({ className: "w-full" })}>
             Login
           </Link>
-          <FieldDescription className="text-center">
-            Pratinjau navigasi: email dan password belum diverifikasi.
+          <FieldDescription id="login-preview-description" className="text-center">
+            Pratinjau navigasi: email dan password belum diverifikasi. Sesi belum disimpan.
           </FieldDescription>
         </Field>
       </FieldGroup>
