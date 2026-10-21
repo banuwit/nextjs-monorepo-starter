@@ -2,12 +2,19 @@ import { addDays, format, isValid, parseISO } from "date-fns";
 import { z } from "zod";
 
 export const calendars = [
-  { value: "work", label: "Work" },
-  { value: "personal", label: "Personal" },
-  { value: "team", label: "Team" },
-  { value: "focus", label: "Focus time" },
+  { value: "work", label: "Work", color: "var(--calendar-work)" },
+  { value: "personal", label: "Personal", color: "var(--calendar-personal)" },
+  { value: "team", label: "Team", color: "var(--calendar-team)" },
+  { value: "focus", label: "Focus time", color: "var(--calendar-focus)" },
 ] as const;
 
+export const calendarOwners = [
+  { value: "me", label: "Me" },
+  { value: "alex", label: "Alex Morgan" },
+  { value: "sarah", label: "Sarah Chen" },
+] as const;
+
+export type CalendarOwner = (typeof calendarOwners)[number]["value"];
 export type CalendarId = (typeof calendars)[number]["value"];
 export type CalendarEvent = {
   id: string;
@@ -16,13 +23,20 @@ export type CalendarEvent = {
   end?: string;
   allDay?: boolean;
   display?: "background";
-  extendedProps: { calendar: CalendarId };
+  extendedProps: {
+    calendar: CalendarId;
+    owner?: CalendarOwner;
+    location?: string;
+    description?: string;
+    progress?: { completed: number; total: number };
+  };
 };
 
 export const eventFormSchema = z
   .object({
     title: z.string().trim().min(1, "Enter an event title.").max(120),
     calendar: z.enum(["work", "personal", "team", "focus"]),
+    owner: z.enum(["me", "alex", "sarah"]).default("me"),
     start: z
       .string()
       .refine((value) => isValid(parseISO(value)), "Enter a valid start date."),
@@ -72,17 +86,20 @@ export function createCalendarEvent(
       ? format(addDays(parseISO(value.end), 1), "yyyy-MM-dd")
       : value.end,
     allDay: value.allDay,
-    extendedProps: { calendar: value.calendar },
+    extendedProps: { calendar: value.calendar, owner: value.owner },
   };
 }
 
 export function filterEvents(
   events: CalendarEvent[],
   calendar: CalendarId | "all",
+  owner: CalendarOwner | "all" = "all",
 ) {
-  return calendar === "all"
-    ? events
-    : events.filter((event) => event.extendedProps.calendar === calendar);
+  return events.filter(
+    (event) =>
+      (calendar === "all" || event.extendedProps.calendar === calendar) &&
+      (owner === "all" || (event.extendedProps.owner ?? "me") === owner),
+  );
 }
 
 export function countEventsInRange(

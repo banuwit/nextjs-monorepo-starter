@@ -21,6 +21,7 @@ import {
 } from "@/components/ui/select";
 import {
   calendars,
+  calendarOwners,
   createCalendarEvent,
   eventFormSchema,
   type CalendarEvent,
@@ -106,6 +107,29 @@ export function EventFormDialog({
                   {calendars.map((calendar) => (
                     <SelectItem key={calendar.value} value={calendar.value}>
                       {calendar.label}
+                    </SelectItem>
+                  ))}
+                </SelectGroup>
+              </SelectContent>
+            </Select>
+          </Field>
+          <Field>
+            <FieldLabel htmlFor="event-owner">Owner</FieldLabel>
+            <Select
+              items={calendarOwners}
+              value={value.owner}
+              onValueChange={(owner) => {
+                if (owner) setValue({ ...value, owner });
+              }}
+            >
+              <SelectTrigger id="event-owner" className="w-full">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectGroup>
+                  {calendarOwners.map((owner) => (
+                    <SelectItem key={owner.value} value={owner.value}>
+                      {owner.label}
                     </SelectItem>
                   ))}
                 </SelectGroup>

@@ -2,10 +2,7 @@
 import { useCrudData } from "@/mocks/use-crud-data";
 import { getMockMenuItems } from "@/mocks/crud-model";
 import {
-  BookOpenIcon,
-  BotIcon,
   LayoutDashboardIcon,
-  Settings2Icon,
   TerminalSquareIcon,
   DatabaseIcon,
 } from "lucide-react";
@@ -25,6 +22,10 @@ export const mainNavigation = [
       { title: "Invoice", url: "/dashboard/invoice" },
       { title: "File Manager", url: "/dashboard/file-manager" },
       { title: "Infrastructure", url: "/dashboard/infrastructure" },
+      { title: "Flow Structure", url: "/dashboard/flow-structure" },
+      { title: "Flow Process", url: "/dashboard/flow-process" },
+      { title: "Timeline Workflow", url: "/dashboard/timeline-workflow" },
+      { title: "Timeline Activity", url: "/dashboard/timeline-activity" },
     ],
   },
   {
@@ -32,56 +33,28 @@ export const mainNavigation = [
     url: "#",
     icon: <TerminalSquareIcon />,
     items: [
-      { title: "History", url: "#" },
-      { title: "Starred", url: "#" },
-      { title: "Settings", url: "#" },
-    ],
-  },
-  {
-    title: "Models",
-    url: "#",
-    icon: <BotIcon />,
-    items: [
-      { title: "Genesis", url: "#" },
-      { title: "Explorer", url: "#" },
-      { title: "Quantum", url: "#" },
-    ],
-  },
-  {
-    title: "Documentation",
-    url: "#",
-    icon: <BookOpenIcon />,
-    items: [
-      { title: "Introduction", url: "#" },
-      { title: "Get Started", url: "#" },
-      { title: "Tutorials", url: "#" },
-      { title: "Changelog", url: "#" },
-    ],
-  },
-  {
-    title: "Settings",
-    url: "#",
-    icon: <Settings2Icon />,
-    items: [
-      { title: "General", url: "#" },
-      { title: "Team", url: "#" },
-      { title: "Billing", url: "#" },
-      { title: "Limits", url: "#" },
+      { title: "Rich Text Editor", url: "/playground/rich-text-editor" },
+      { title: "Notes", url: "/playground/notes" },
+      { title: "Whiteboard", url: "/whiteboard" },
+      { title: "Wizard", url: "/playground/wizard" },
     ],
   },
 ];
 
 export function useAppNavigation() {
   const { data } = useCrudData();
+  const masterDataItems = getMockMenuItems(data.menus, "admin");
   return [
     mainNavigation[0]!,
-    {
-      title: "Master Data",
-      url: "#",
-      icon: <DatabaseIcon />,
-      isActive: true,
-      items: getMockMenuItems(data.menus, "admin"),
-    },
+    ...(masterDataItems.length
+      ? [{
+          title: "Pages",
+          url: "#",
+          icon: <DatabaseIcon />,
+          isActive: true,
+          items: masterDataItems,
+        }]
+      : []),
     ...mainNavigation.slice(1),
   ];
 }

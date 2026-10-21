@@ -1,8 +1,40 @@
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { test } from "node:test";
 
 const baseUrl = "http://localhost:3000";
+
+test("sidebar links lead to implemented pages without sample menus", async () => {
+  const response = await fetch(new URL("/dashboard", baseUrl));
+  assert.equal(response.status, 200);
+
+  const html = await response.text();
+  const sidebar = html.slice(
+    html.indexOf('data-slot="sidebar-header"'),
+    html.indexOf('data-slot="sidebar-inset"'),
+  );
+  const links = [...sidebar.matchAll(/href="(\/[^"#?]+)"/g)].map((match) => match[1]);
+  const navigationSource = readFileSync(
+    new URL("../src/components/app-navigation.tsx", import.meta.url),
+    "utf8",
+  );
+  const staticLinks = [...navigationSource.matchAll(/\burl: "(\/[^"#?]+)"/g)].map(
+    (match) => match[1],
+  );
+
+  assert.ok(links.includes("/dashboard"));
+  assert.ok(links.includes("/users"));
+  assert.ok(staticLinks.includes("/playground/notes"));
+  assert.match(sidebar, />Pages</);
+  assert.match(sidebar, />Playground</);
+  for (const link of new Set([...links, ...staticLinks])) {
+    assert.ok(
+      existsSync(new URL(`../src/app/(backoffice)${link}/page.tsx`, import.meta.url)),
+      `Missing page for sidebar link ${link}`,
+    );
+  }
+  assert.doesNotMatch(sidebar, /Acme Inc|Design Engineering|Models|Documentation|History|Starred/);
+});
 
 test("collapsed desktop navigation exposes its children in a right-side menu", () => {
   const source = readFileSync(

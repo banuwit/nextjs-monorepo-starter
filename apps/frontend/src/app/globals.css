@@ -1,6 +1,25 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
+/* React Flow stays scoped to the dashboard theme. */
+.flow-structure {
+  --xy-background-color: transparent;
+  --xy-node-color: var(--foreground);
+  --xy-edge-stroke: var(--border);
+  --xy-handle-background-color: var(--foreground);
+  --xy-handle-border-color: var(--background);
+  --xy-attribution-background-color: var(--background);
+}
+.flow-structure .react-flow__handle { width: 4px; height: 4px; min-width: 4px; min-height: 4px; }
+.flow-structure .flow-edge-add { opacity: 0; }
+.flow-structure .react-flow__edgelabel-renderer > div:hover .flow-edge-add,
+.flow-structure .flow-edge-add:focus-visible { opacity: 1; }
+@media (hover: none) { .flow-structure .flow-edge-add { opacity: 1; } }
+.flow-app-icon[data-app="Stripe"] { color: #635bff; }
+.flow-app-icon[data-app="Neon"] { color: #0d9f76; }
+.flow-app-icon[data-app="Claude"] { color: #c26a4a; }
+.flow-app-icon[data-app="ClickUp"] { color: #b84fe8; }
+.flow-app-icon[data-app="Slack"] { color: #1697ad; }
 
 @custom-variant dark (&:is(.dark *));
 
@@ -236,6 +255,62 @@ html[data-scale="large"] {
 [data-invoice-print-root] {
   display: none;
 }
+
+.rich-text-editor,
+.rich-text-highlights {
+  --editor-highlight-yellow: light-dark(#fef08a, #635719);
+  --editor-highlight-green: light-dark(#bbf7d0, #205537);
+  --editor-highlight-blue: light-dark(#bfdbfe, #254e78);
+  --editor-highlight-pink: light-dark(#fbcfe8, #713454);
+  --editor-highlight-purple: light-dark(#e9d5ff, #593b7a);
+  color-scheme: light;
+}
+
+.dark .rich-text-editor,
+.dark .rich-text-highlights {
+  color-scheme: dark;
+}
+
+.rich-text-prose {
+  min-height: 22rem;
+  color: var(--foreground);
+  font-size: 0.875rem;
+  line-height: 1.8;
+  overflow-wrap: anywhere;
+  outline: none;
+}
+
+.rich-text-prose:focus-visible {
+  border-radius: var(--radius);
+  outline: 2px solid var(--ring);
+  outline-offset: 8px;
+}
+
+.rich-text-prose > * + * { margin-top: 1rem; }
+.rich-text-prose h1 { font-size: 1.5rem; font-weight: 650; line-height: 1.4; }
+.rich-text-prose h2 { margin-top: 1.8rem; font-size: 1.125rem; font-weight: 600; line-height: 1.5; }
+.rich-text-prose h3 { margin-top: 1.5rem; font-size: 1rem; font-weight: 600; }
+.rich-text-prose ul { list-style: disc; padding-left: 1.3rem; }
+.rich-text-prose ol { list-style: decimal; padding-left: 1.3rem; }
+.rich-text-prose li + li { margin-top: 0.25rem; }
+.rich-text-prose li::marker { color: var(--muted-foreground); }
+.rich-text-prose li p { margin: 0; }
+.rich-text-prose li > ul, .rich-text-prose li > ol { margin-top: 0.5rem; }
+.rich-text-prose blockquote { border-left: 2px solid var(--border); padding-left: 1rem; color: var(--muted-foreground); }
+.rich-text-prose a { color: var(--foreground); text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+.rich-text-prose mark { color: inherit; border-radius: 2px; padding: 0.05em 0.1em; }
+.rich-text-prose code { border-radius: var(--radius-sm); background: var(--muted); padding: 0.15em 0.3em; font-family: var(--font-geist-mono), monospace; font-size: 0.9em; }
+.rich-text-prose pre { overflow-x: auto; border: 1px solid var(--border); border-radius: var(--radius); background: var(--muted); padding: 1rem; }
+.rich-text-prose pre code { padding: 0; background: none; }
+.rich-text-prose hr { margin-block: 1.5rem; border-color: var(--border); }
+.rich-text-prose ul[data-type="taskList"] { list-style: none; padding: 0; }
+.rich-text-prose li[data-type="taskItem"] { display: flex; align-items: flex-start; gap: 0.65rem; }
+.rich-text-prose li[data-type="taskItem"] > label { display: flex; padding-top: 0.4rem; }
+.rich-text-prose li[data-type="taskItem"] > div { flex: 1; min-width: 0; }
+.rich-text-prose input[type="checkbox"] { width: 1rem; height: 1rem; accent-color: var(--primary); cursor: pointer; }
+.rich-text-prose[contenteditable="false"] input[type="checkbox"] { pointer-events: none; }
+.rich-text-prose li[data-checked="true"] > div > p { color: var(--muted-foreground); text-decoration: line-through; }
+.rich-text-prose p.is-editor-empty:first-child::before { content: attr(data-placeholder); color: var(--muted-foreground); float: left; height: 0; pointer-events: none; }
 
 @media print {
   @page invoice {

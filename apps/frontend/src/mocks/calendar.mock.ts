@@ -1,63 +1,83 @@
-import { format, startOfMonth } from "date-fns";
+import { addDays, format, startOfWeek } from "date-fns";
 import type {
   CalendarEvent,
   CalendarId,
 } from "@/features/calendar/calendar-model";
 
-// Demo events adapted from Studio Admin; see features/calendar/LICENSE.
+// Keep the sample schedule in the opening week, including month/year boundaries.
 export function createDemoEvents(today: Date): CalendarEvent[] {
-  const month = format(startOfMonth(today), "yyyy-MM");
-  const day = (value: number) => `${month}-${String(value).padStart(2, "0")}`;
+  const monday = startOfWeek(today, { weekStartsOn: 1 });
+  const day = (offset: number) => format(addDays(monday, offset), "yyyy-MM-dd");
   const event = (
     id: string,
     title: string,
-    start: string,
+    offset: number,
+    start: string | null,
+    end: string | null,
     calendar: CalendarId,
-    extra: Partial<CalendarEvent> = {},
+    details: Omit<CalendarEvent["extendedProps"], "calendar"> = {},
   ): CalendarEvent => ({
     id,
     title,
-    start,
-    extendedProps: { calendar },
-    ...extra,
+    start: start ? `${day(offset)}T${start}` : day(offset),
+    end: end ? `${day(offset)}T${end}` : day(offset + 1),
+    allDay: !start,
+    extendedProps: { calendar, owner: "me", ...details },
   });
   return [
-    event("planning", "Monthly planning", `${day(1)}T09:30`, "work", {
-      end: `${day(1)}T10:30`,
+    event("launch", "Website launch checklist", 0, null, null, "work", {
+      progress: { completed: 7, total: 8 },
+      description:
+        "Final checks for the new website: content, accessibility, and release readiness.",
     }),
-    event("design", "Design review", `${day(3)}T11:00`, "work", {
-      end: `${day(3)}T12:00`,
+    event("handoff", "Design handoff", 2, null, null, "team", {
+      owner: "alex",
+      progress: { completed: 4, total: 6 },
+      description:
+        "Prepare the approved screens and interaction notes for the engineering team.",
     }),
-    event("client", "Client check-in", `${day(4)}T15:00`, "work", {
-      end: `${day(4)}T15:45`,
+    event("report", "Monthly report due", 4, null, null, "work", {
+      owner: "sarah",
+      progress: { completed: 3, total: 5 },
+      description:
+        "Review the monthly results and share the final summary with the team.",
     }),
-    event("workshop", "Product workshop", day(7), "team", {
-      end: day(9),
-      allDay: true,
+    event("planning", "Weekly planning", 0, "09:00", "10:30", "work", {
+      location: "Meeting room A",
+      progress: { completed: 2, total: 4 },
     }),
-    event("standup-1", "Team standup", `${day(9)}T10:00`, "team"),
-    event("finance", "Finance sync", `${day(10)}T14:30`, "work", {
-      end: `${day(10)}T15:00`,
+    event("standup", "Team standup", 0, "13:00", "14:00", "team", {
+      owner: "alex",
+      location: "Google Meet",
     }),
-    event("focus", "Focus block", `${day(12)}T09:00`, "focus", {
-      end: `${day(12)}T12:00`,
-      display: "background",
+    event("client", "Client check-in", 1, "10:00", "11:30", "work", {
+      owner: "sarah",
+      location: "Google Meet",
+      description: "Share the latest delivery updates and confirm next steps.",
     }),
-    event("sprint", "Sprint planning", `${day(15)}T09:30`, "team", {
-      end: `${day(15)}T11:00`,
+    event("focus", "Product research", 1, "14:00", "16:00", "focus", {
+      location: "Focus time",
+      description: "Uninterrupted time for research and planning.",
     }),
-    event("standup-2", "Team standup", `${day(16)}T10:00`, "team"),
-    event("ops", "Ops handoff", `${day(18)}T16:00`, "work", {
-      end: `${day(18)}T16:45`,
+    event("design", "Design review", 2, "09:00", "10:30", "team", {
+      owner: "alex",
+      location: "Design studio",
     }),
-    event("report", "Quarterly report due", day(24), "work", { allDay: true }),
-    event("reset", "Reset day", day(28), "personal", { allDay: true }),
-    event(
-      "birthday",
-      "Arham Khan Birthday",
-      `${today.getFullYear()}-09-06`,
-      "personal",
-      { allDay: true },
-    ),
+    event("walk", "Lunch & a walk", 2, "12:00", "13:00", "personal"),
+    event("sprint", "Sprint planning", 3, "10:00", "11:30", "team", {
+      owner: "alex",
+      progress: { completed: 3, total: 6 },
+    }),
+    event("finance", "Finance sync", 3, "14:00", "15:30", "work", {
+      owner: "sarah",
+      location: "Meeting room B",
+    }),
+    event("retro", "Weekly retrospective", 4, "09:00", "10:30", "team", {
+      location: "Google Meet",
+    }),
+    event("learning", "Learning & development", 4, "14:00", "16:00", "focus", {
+      description:
+        "Work through this week's learning goals and document useful takeaways.",
+    }),
   ];
 }

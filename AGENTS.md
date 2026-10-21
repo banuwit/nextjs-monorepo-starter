@@ -11,6 +11,7 @@
 - Gunakan `pnpm` (paket root menetapkan `pnpm@11.25.0` dan Node.js 24 atau lebih baru). Workspace didefinisikan dalam `pnpm-workspace.yaml`.
 - Skrip root yang tersedia saat ini adalah `pnpm dev`, `pnpm build`, `pnpm lint`, `pnpm check-types`, dan `pnpm format` (yang menulis ulang file). Aplikasi frontend berjalan pada port 3000. Pengujian, skrip database, dan `pnpm typecheck` masih merupakan target PRD dan belum dikonfigurasi.
 - Di frontend, gunakan `src/app/` untuk entry point rute, layout, dan Route Handler; simpan UI/logika halaman khusus fitur di `src/features/<fitur>/`. Komponen shadcn dan komponen lintas fitur tetap di `src/components/`; gunakan `packages/ui` hanya untuk komponen yang benar-benar dibagikan antar-aplikasi. Jaga impor antar-paket dan konfigurasi TypeScript/ESLint sesuai workspace saat ini.
+- Sebelum membuat atau mengubah halaman/komponen frontend, dashboard shell, tema, atau Preferences, baca dan ikuti [Panduan Preferences](.agents/rule/preferences.md). Gunakan provider, pembungkus konten, dan token tampilan yang sudah tersedia agar halaman mengikuti pengaturan global; ikuti aturan reset, persistensi, dan verifikasi dalam panduan tersebut.
 - Untuk pekerjaan API, Postman CLI tersedia di `/Users/banurusman/.local/bin/postman` (tidak ada di `PATH`).
 - Jalankan pemeriksaan yang relevan dengan file yang diubah, lalu laporkan perintah dan hasil sebenarnya. Pertahankan blok Turborepo yang dikelola di bawah ini; sebelum mengubah konfigurasi atau perintah Turborepo, ikuti petunjuk dokumentasi terpasangnya.
 

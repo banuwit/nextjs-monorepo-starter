@@ -1,0 +1,86 @@
+/* Load the drawing font before Excalidraw measures the demo text. */
+@font-face {
+  font-family: "Virgil";
+  src: url("../../../../node_modules/@excalidraw/excalidraw/dist/prod/fonts/Virgil/Virgil-Regular.woff2")
+    format("woff2");
+  font-display: block;
+}
+
+/* Excalidraw 0.18.1: retain native selection properties, zoom and undo/redo. */
+.whiteboard-canvas .excalidraw,
+.whiteboard-canvas .excalidraw.theme--dark {
+  --color-primary: var(--primary);
+  --color-primary-darker: var(--primary);
+  --color-primary-darkest: var(--primary);
+  --color-primary-light: var(--accent);
+  --color-primary-light-darker: var(--accent);
+  --color-on-primary-container: var(--accent-foreground);
+  --color-surface-primary: var(--background);
+  --color-surface-low: var(--muted);
+  --color-surface-mid: var(--accent);
+  --color-surface-high: var(--muted);
+  --color-on-surface: var(--foreground);
+  --island-bg-color: var(--background);
+  --default-bg-color: var(--background);
+  --text-primary-color: var(--foreground);
+  --icon-fill-color: var(--foreground);
+  --button-gray-1: var(--muted);
+  --button-gray-2: var(--accent);
+  --button-gray-3: var(--border);
+  --input-bg-color: var(--background);
+  --input-border-color: var(--border);
+  --popup-border: 1px solid var(--border);
+  --border-radius-lg: var(--radius-lg);
+  --border-radius-md: var(--radius-md);
+  --border-radius-sm: var(--radius-sm);
+  --ui-font: var(--font-sans);
+}
+
+.whiteboard-canvas .excalidraw .App-toolbar-container,
+.whiteboard-canvas .excalidraw .main-menu-trigger,
+.whiteboard-canvas .excalidraw .sidebar-trigger,
+.whiteboard-canvas .excalidraw .help-icon {
+  display: none !important;
+}
+
+.whiteboard-canvas .excalidraw .App-menu_top > .Stack_vertical {
+  margin-top: 3.75rem;
+}
+
+.whiteboard-canvas .excalidraw .layer-ui__wrapper__footer {
+  padding-right: 12rem;
+}
+
+.whiteboard-canvas .excalidraw .Island,
+.whiteboard-canvas .excalidraw .zoom-actions,
+.whiteboard-canvas .excalidraw .undo-redo-buttons {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+}
+
+.whiteboard-footer {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--background);
+  color: var(--foreground);
+  pointer-events: auto;
+}
+
+.whiteboard-mobile-controls {
+  display: none;
+}
+.whiteboard-canvas:has(.excalidraw--mobile) .whiteboard-mobile-controls {
+  display: block;
+}
+.whiteboard-canvas .excalidraw--mobile .App-bottom-bar {
+  bottom: 7rem;
+}
+
+@media (max-width: 48rem) {
+  .whiteboard-canvas .excalidraw .layer-ui__wrapper__footer {
+    bottom: 3.5rem;
+    padding-right: 0;
+    flex-wrap: wrap;
+    gap: 0.25rem;
+  }
+}
