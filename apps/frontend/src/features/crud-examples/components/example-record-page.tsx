@@ -1,10 +1,10 @@
 "use client";
+
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ArrowLeftIcon, PencilIcon } from "lucide-react";
 import { CrudPage } from "@/components/crud/crud-page";
-import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import {
   AlertDialog,
@@ -15,6 +15,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -24,50 +25,53 @@ import {
 } from "@/components/ui/card";
 import {
   Empty,
+  EmptyDescription,
   EmptyHeader,
   EmptyTitle,
-  EmptyDescription,
 } from "@/components/ui/empty";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useCrudData } from "@/mocks/use-crud-data";
-import { UserForm } from "./user-form";
-import { userColumns } from "./user-page";
+import { useCrudExamples } from "@/mocks/use-crud-examples";
+import { ExampleForm } from "./example-form";
+import { exampleColumns } from "./example-page";
 
-export function UserRecordPage({
+const basePath = "/crud/new-page";
+
+export function ExampleRecordPage({
   mode,
   id,
 }: {
   mode: "create" | "view" | "edit";
   id?: string;
 }) {
-  const { data, ready, error, reload, commit } = useCrudData();
+  const { data, ready, error, reload, commit } = useCrudExamples();
   const router = useRouter();
   const [dirty, setDirty] = useState(false);
   const [discard, setDiscard] = useState(false);
-  const user = data.users.find((user) => user.id === id);
+  const record = data.find((item) => item.id === id);
   const title =
     mode === "create"
-      ? "Tambah user"
+      ? "Tambah parameter contoh"
       : mode === "edit"
-        ? "Edit user"
-        : "Detail user";
-  const back = mode === "edit" ? `/users/${id}` : "/users";
+        ? "Edit parameter contoh"
+        : "Detail parameter contoh";
+  const back = mode === "edit" ? `${basePath}/${id}` : basePath;
+
   useEffect(() => {
     if (!dirty) return;
-    const prevent = (event: BeforeUnloadEvent) => {
-      event.preventDefault();
-    };
+    const prevent = (event: BeforeUnloadEvent) => event.preventDefault();
     window.addEventListener("beforeunload", prevent);
     return () => window.removeEventListener("beforeunload", prevent);
   }, [dirty]);
+
   function cancel() {
     if (dirty) setDiscard(true);
     else router.push(back);
   }
+
   return (
     <CrudPage
       title={title}
-      parent={{ label: "User", href: "/users" }}
+      parent={{ label: "New Page", href: basePath }}
       actions={
         <Button variant="outline" onClick={cancel}>
           <ArrowLeftIcon data-icon="inline-start" />
@@ -87,43 +91,43 @@ export function UserRecordPage({
       )}
       {!ready && !dirty ? (
         <Skeleton className="h-72 max-w-2xl" />
-      ) : mode !== "create" && !user && !dirty ? (
+      ) : mode !== "create" && !record && !dirty ? (
         <Empty>
           <EmptyHeader>
-            <EmptyTitle>User tidak ditemukan</EmptyTitle>
+            <EmptyTitle>Parameter contoh tidak ditemukan</EmptyTitle>
             <EmptyDescription>
               Data mungkin sudah dihapus dari browser ini.
             </EmptyDescription>
           </EmptyHeader>
-          <Button nativeButton={false} render={<Link href="/users" />}>
-            Kembali ke daftar user
+          <Button nativeButton={false} render={<Link href={basePath} />}>
+            Kembali ke daftar
           </Button>
         </Empty>
       ) : (
         <Card className="w-full max-w-2xl">
           <CardHeader>
             <CardTitle>
-              {mode === "view" ? user?.name : "Informasi user"}
+              {mode === "view" ? record?.key : "Informasi parameter"}
             </CardTitle>
             <CardDescription>
               {mode === "view"
-                ? "Detail profil dan akses workspace."
-                : "Lengkapi nama, email, role, dan status. Tanda * wajib diisi."}
+                ? "Detail data contoh yang digunakan oleh keempat pola CRUD."
+                : "Lengkapi key, tipe, nilai, dan status. Tanda * wajib diisi."}
             </CardDescription>
           </CardHeader>
           <CardContent>
-            {mode === "view" && user ? (
+            {mode === "view" && record ? (
               <div className="flex flex-col gap-6">
                 <dl className="grid gap-5 sm:grid-cols-2">
-                  {userColumns.map((column) => (
+                  {exampleColumns.map((column) => (
                     <div key={column.key}>
                       <dt className="mb-1 text-xs text-muted-foreground">
                         {column.label}
                       </dt>
                       <dd className="break-words text-sm">
                         {column.render
-                          ? column.render(user)
-                          : String(column.value(user))}
+                          ? column.render(record)
+                          : String(column.value(record))}
                       </dd>
                     </div>
                   ))}
@@ -132,7 +136,7 @@ export function UserRecordPage({
                       Dibuat
                     </dt>
                     <dd className="text-sm">
-                      {new Date(user.createdAt).toLocaleDateString("id-ID")}
+                      {new Date(record.createdAt).toLocaleDateString("id-ID")}
                     </dd>
                   </div>
                   <div>
@@ -140,39 +144,38 @@ export function UserRecordPage({
                       Diperbarui
                     </dt>
                     <dd className="text-sm">
-                      {new Date(user.updatedAt).toLocaleDateString("id-ID")}
+                      {new Date(record.updatedAt).toLocaleDateString("id-ID")}
                     </dd>
                   </div>
                 </dl>
                 <Button
                   className="w-fit"
                   nativeButton={false}
-                  render={<Link href={`/users/${user.id}/edit`} />}
+                  render={<Link href={`${basePath}/${record.id}/edit`} />}
                 >
                   <PencilIcon data-icon="inline-start" />
-                  Edit user
+                  Edit parameter
                 </Button>
               </div>
             ) : (
-              <UserForm
+              <ExampleForm
                 key={id ?? "new"}
-                record={mode === "edit" ? user : undefined}
+                record={mode === "edit" ? record : undefined}
                 error={error}
                 onDirty={() => setDirty(true)}
                 onCancel={cancel}
-                onSave={(record, original) => {
+                onSave={(next, original) => {
                   if (
                     !commit({
                       type: "save",
-                      resource: "users",
-                      record,
+                      record: next,
                       isNew: mode === "create",
                       expectedUpdatedAt: original?.updatedAt,
                     })
                   )
                     return false;
                   setDirty(false);
-                  router.push(`/users/${record.id}`);
+                  router.push(`${basePath}/${next.id}`);
                   return true;
                 }}
               />

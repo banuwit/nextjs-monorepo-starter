@@ -1,25 +1,19 @@
 "use client";
 
 import type { ReactNode } from "react";
-import { useCrudData } from "@/mocks/use-crud-data";
-import { getMockMenuItems } from "@/mocks/crud-model";
 import {
   ActivityIcon,
+  BlocksIcon,
   CalendarDaysIcon,
   FilePenLineIcon,
-  FileTextIcon,
   FolderKanbanIcon,
   FolderOpenIcon,
-  GlobeIcon,
   HouseIcon,
   ListTodoIcon,
-  ListTreeIcon,
   NotebookPenIcon,
   PresentationIcon,
   ReceiptIcon,
   ServerIcon,
-  SlidersHorizontalIcon,
-  UsersIcon,
   WorkflowIcon,
 } from "lucide-react";
 
@@ -115,25 +109,23 @@ export const mainNavigation: NavigationSection[] = [
 ];
 
 export function useAppNavigation(): NavigationSection[] {
-  const { data } = useCrudData();
-  const documentationIcons: Record<string, ReactNode> = {
-    "/users": <UsersIcon />,
-    "/countries": <GlobeIcon />,
-    "/menus": <ListTreeIcon />,
-    "/parameters": <SlidersHorizontalIcon />,
-  };
-  const documentationItems = getMockMenuItems(data.menus, "admin")
-    .filter((item) => item.url !== "/provinces" && item.url !== "/cities")
-    .map((item) => ({
-      ...item,
-      icon: documentationIcons[item.url] ?? <FileTextIcon />,
-    }));
-
   return [
     ...mainNavigation,
     {
       title: "Documentation",
-      items: documentationItems,
+      items: [
+        {
+          title: "CRUD",
+          url: "#",
+          icon: <BlocksIcon />,
+          items: [
+            { title: "New Page", url: "/crud/new-page" },
+            { title: "Modal", url: "/crud/modal" },
+            { title: "Sheet", url: "/crud/sheet" },
+            { title: "Panel Inline", url: "/crud/panel-inline" },
+          ],
+        },
+      ],
     },
   ];
 }

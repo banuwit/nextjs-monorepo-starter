@@ -23,6 +23,9 @@ import type { CrudFormProps, CrudRecord } from "./crud-form";
 type Panel<T> = { mode: "create" } | { mode: "view" | "edit"; record: T };
 export function CrudResource<T extends CrudRecord>({
   title,
+  heading,
+  parent,
+  description,
   pattern,
   basePath,
   rows,
@@ -37,6 +40,9 @@ export function CrudResource<T extends CrudRecord>({
   onDelete,
 }: {
   title: string;
+  heading?: string;
+  parent?: { label: string; href: string };
+  description?: string;
   pattern: "page" | "dialog" | "sheet" | "inline";
   basePath?: string;
   rows: T[];
@@ -136,7 +142,8 @@ export function CrudResource<T extends CrudRecord>({
     ) : null;
   return (
     <CrudPage
-      title={title}
+      title={heading ?? title}
+      parent={parent}
       sidePanel={
         pattern === "inline" && panel ? (
           <CrudInlinePanel
@@ -181,6 +188,9 @@ export function CrudResource<T extends CrudRecord>({
         )
       }
     >
+      {description && (
+        <p className="text-sm text-muted-foreground">{description}</p>
+      )}
       {error && (
         <Alert variant="destructive">
           <AlertDescription className="flex flex-wrap items-center justify-between gap-2">
@@ -191,7 +201,10 @@ export function CrudResource<T extends CrudRecord>({
           </AlertDescription>
         </Alert>
       )}
-      <p role="status" className={notice ? "text-sm text-primary-text" : "sr-only"}>
+      <p
+        role="status"
+        className={notice ? "text-sm text-primary-text" : "sr-only"}
+      >
         {notice}
       </p>
       <CrudList

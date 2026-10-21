@@ -5,6 +5,7 @@
 - Kode aplikasi masih berupa starter Turborepo: `apps/frontend` adalah aplikasi contoh Next.js, `packages/ui` berisi komponen UI yang dapat dipakai ulang, sedangkan `packages/eslint-config` dan `packages/typescript-config` berisi konfigurasi bersama.
 - [PRD Tahap 1](apps/frontend/prd.md) adalah spesifikasi yang disetujui untuk `app-monorepo-starter` yang akan dibangun. Dokumen tersebut menjelaskan arsitektur target dan milestone, bukan fitur yang sudah tersedia di repositori ini. Baca seluruh isinya sebelum mengerjakan produk dan ikuti keputusan yang ditandai **DIKUNCI** serta urutan milestone Tahap 1. [PRD Tahap 2](apps/mobile/prd.md) dan [PRD Tahap 3](apps/backend/prd.md) masih berupa roadmap; jangan mulai implementasinya kecuali diminta pengguna.
 - Starter saat ini berbeda dari PRD dalam nama aplikasi, paket, skrip, dan fungsionalitas. Periksa file yang benar-benar ada sebelum melaporkan progres; jangan menyatakan milestone selesai hanya berdasarkan PRD.
+- Sesuai amendemen UI terbaru, navigasi Documentation berisi empat contoh pola CRUD di `/crud/*`. Halaman frontend User, Country, Menu, Parameter, Province, dan City telah dihapus; rujuk amendemen pada PRD sebelum memakai peta halaman baseline.
 
 ## Bekerja di repositori ini
 

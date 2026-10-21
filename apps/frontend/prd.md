@@ -9,6 +9,8 @@
 
 > **Amendemen UI, 21 Oktober 2026:** Sesuai keputusan pengguna terbaru, halaman dan entri navigasi Province (`/provinces`) serta City (`/cities`) dihapus dari scope frontend. Rujukan halaman Province/City pada baseline di bawah tidak lagi berlaku. Model data mock geografis tetap tersedia; keputusan ini tidak mengubah rencana API atau database.
 
+> **Amendemen UI, 21 Oktober 2026 (contoh CRUD):** Setelah empat contoh pola tersedia di `/crud/new-page`, `/crud/modal`, `/crud/sheet`, dan `/crud/panel-inline`, pengguna meminta halaman dan entri navigasi User (`/users`), Country (`/countries`), Menu (`/menus`), serta Parameter (`/parameters`) dihapus. Rujukan halaman tersebut pada baseline di bawah adalah riwayat rancangan, bukan scope frontend saat ini. Contoh CRUD memakai salinan data mock Parameter yang terpisah. Keputusan ini tidak menghapus model mock maupun menetapkan perubahan API/database Tahap 1.
+
 Roadmap tahap berikutnya: [Tahap 2 (Mobile)](../mobile/prd.md) dan [Tahap 3 (Backend)](../backend/prd.md). Kedua dokumen tersebut belum memberi izin untuk memulai implementasinya.
 
 ---
