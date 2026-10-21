@@ -5,7 +5,7 @@ Halaman mengikuti perilaku [referensi](https://github.com/banuwit/template-nextj
 | Halaman                                                   | Pola                                       |
 | --------------------------------------------------------- | ------------------------------------------ |
 | `/users`, `/users/new`, `/users/[id]`, `/users/[id]/edit` | Multi-page                                 |
-| `/countries`, `/provinces`, `/cities`                     | Dialog                                     |
+| `/countries`                                              | Dialog                                     |
 | `/menus`                                                  | Sheet                                      |
 | `/parameters`                                             | Panel inline; daftar tetap dapat digunakan |
 
@@ -37,8 +37,7 @@ Gunakan Node 24+ dan pnpm workspace:
 ```sh
 pnpm --filter frontend check-types
 pnpm --filter frontend lint
-pnpm --filter frontend test:ui
 pnpm --filter frontend build
 ```
 
-Tes UI lama membutuhkan dev server pada port 3000. Untuk aturan CRUD saja: `pnpm --filter frontend exec node --test tests/crud.test.mjs`.
+Periksa alur CRUD secara manual melalui dev server pada port 3000.

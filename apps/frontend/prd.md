@@ -7,6 +7,8 @@
 > **Bahasa implementasi utama:** TypeScript  
 > **Nama repository baru:** `app-monorepo-starter`
 
+> **Amendemen UI, 21 Oktober 2026:** Sesuai keputusan pengguna terbaru, halaman dan entri navigasi Province (`/provinces`) serta City (`/cities`) dihapus dari scope frontend. Rujukan halaman Province/City pada baseline di bawah tidak lagi berlaku. Model data mock geografis tetap tersedia; keputusan ini tidak mengubah rencana API atau database.
+
 Roadmap tahap berikutnya: [Tahap 2 (Mobile)](../mobile/prd.md) dan [Tahap 3 (Backend)](../backend/prd.md). Kedua dokumen tersebut belum memberi izin untuk memulai implementasinya.
 
 ---

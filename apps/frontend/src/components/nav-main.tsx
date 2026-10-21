@@ -1,12 +1,17 @@
-"use client"
+"use client";
 
-import Link from "next/link"
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import type {
+  NavigationItem,
+  NavigationSection,
+} from "@/components/app-navigation";
 
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
-} from "@/components/ui/collapsible"
+} from "@/components/ui/collapsible";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -14,7 +19,7 @@ import {
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+} from "@/components/ui/dropdown-menu";
 import {
   SidebarGroup,
   SidebarGroupLabel,
@@ -25,88 +30,148 @@ import {
   SidebarMenuSubButton,
   SidebarMenuSubItem,
   useSidebar,
-} from "@/components/ui/sidebar"
-import { ChevronRightIcon } from "lucide-react"
+} from "@/components/ui/sidebar";
+import { ChevronRightIcon } from "lucide-react";
 
-export function NavMain({
-  items,
-}: {
-  items: {
-    title: string
-    url: string
-    icon?: React.ReactNode
-    isActive?: boolean
-    items?: {
-      title: string
-      url: string
-    }[]
-  }[]
-}) {
-  const { state, isMobile } = useSidebar()
+function isActiveItem(item: NavigationItem, pathname: string): boolean {
+  if (item.items?.length) {
+    return item.items.some((child) => isActiveItem(child, pathname));
+  }
 
   return (
-    <SidebarGroup>
-      <SidebarGroupLabel>Platform</SidebarGroupLabel>
+    item.url.startsWith("/") &&
+    (pathname === item.url || pathname.startsWith(`${item.url}/`))
+  );
+}
+
+export function NavMain({ items }: { items: NavigationSection[] }) {
+  const { state, isMobile } = useSidebar();
+  const pathname = usePathname();
+  const activePath = pathname === "/dashboard" ? "/dashboard/main" : pathname;
+
+  return items.map((section) => (
+    <SidebarGroup key={section.title}>
+      <SidebarGroupLabel className="group-data-[collapsible=icon]:hidden">
+        {section.title}
+      </SidebarGroupLabel>
       <SidebarMenu>
-        {items.map((item) =>
-          state === "collapsed" && !isMobile && item.items?.length ? (
-            <SidebarMenuItem key={item.title}>
-              <DropdownMenu>
-                <DropdownMenuTrigger
+        {section.items.map((item) =>
+          item.items?.length ? (
+            state === "collapsed" && !isMobile ? (
+              <SidebarMenuItem key={item.title}>
+                <DropdownMenu>
+                  <DropdownMenuTrigger
+                    render={
+                      <SidebarMenuButton
+                        aria-label={item.title}
+                        isActive={isActiveItem(item, activePath)}
+                        tooltip={item.title}
+                      />
+                    }
+                  >
+                    {item.icon}
+                    <span className="group-data-[collapsible=icon]:hidden">
+                      {item.title}
+                    </span>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent
+                    side="right"
+                    align="start"
+                    className="w-48"
+                  >
+                    <DropdownMenuGroup>
+                      <DropdownMenuLabel>{item.title}</DropdownMenuLabel>
+                      {item.items.map((child) => (
+                        <DropdownMenuItem
+                          key={child.title}
+                          className="data-[active=true]:bg-accent data-[active=true]:text-accent-foreground"
+                          data-active={isActiveItem(child, activePath)}
+                          render={
+                            <Link
+                              href={child.url}
+                              aria-current={
+                                isActiveItem(child, activePath)
+                                  ? "page"
+                                  : undefined
+                              }
+                            />
+                          }
+                        >
+                          {child.title}
+                        </DropdownMenuItem>
+                      ))}
+                    </DropdownMenuGroup>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </SidebarMenuItem>
+            ) : (
+              <Collapsible
+                key={`${item.title}:${activePath}`}
+                defaultOpen={isActiveItem(item, activePath)}
+                className="group/collapsible"
+                render={<SidebarMenuItem />}
+              >
+                <CollapsibleTrigger
                   render={
                     <SidebarMenuButton
-                      aria-label={item.title}
-                      tooltip={item.title}
+                      isActive={isActiveItem(item, activePath)}
                     />
                   }
                 >
                   {item.icon}
-                  <span>{item.title}</span>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent side="right" align="start" className="w-48">
-                  <DropdownMenuGroup>
-                    <DropdownMenuLabel>{item.title}</DropdownMenuLabel>
-                    {item.items.map((subItem) => (
-                      <DropdownMenuItem
-                        key={subItem.title}
-                        render={<Link href={subItem.url} />}
-                      >
-                        {subItem.title}
-                      </DropdownMenuItem>
+                  <span className="min-w-0 flex-1 truncate">{item.title}</span>
+                  <ChevronRightIcon className="ml-auto transition-transform duration-200 group-data-open/collapsible:rotate-90" />
+                </CollapsibleTrigger>
+                <CollapsibleContent>
+                  <SidebarMenuSub>
+                    {item.items.map((child) => (
+                      <SidebarMenuSubItem key={child.title}>
+                        <SidebarMenuSubButton
+                          className="w-[calc(100%+1.5rem)]"
+                          isActive={isActiveItem(child, activePath)}
+                          render={
+                            <Link
+                              href={child.url}
+                              aria-current={
+                                isActiveItem(child, activePath)
+                                  ? "page"
+                                  : undefined
+                              }
+                            />
+                          }
+                        >
+                          <span>{child.title}</span>
+                        </SidebarMenuSubButton>
+                      </SidebarMenuSubItem>
                     ))}
-                  </DropdownMenuGroup>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </SidebarMenuItem>
+                  </SidebarMenuSub>
+                </CollapsibleContent>
+              </Collapsible>
+            )
           ) : (
-            <Collapsible
-              key={item.title}
-              defaultOpen={item.isActive}
-              className="group/collapsible"
-              render={<SidebarMenuItem />}
-            >
-              <CollapsibleTrigger
-                render={<SidebarMenuButton tooltip={item.title} />}
+            <SidebarMenuItem key={item.title}>
+              <SidebarMenuButton
+                isActive={isActiveItem(item, activePath)}
+                tooltip={item.title}
+                render={
+                  <Link
+                    href={item.url}
+                    aria-label={item.title}
+                    aria-current={
+                      isActiveItem(item, activePath) ? "page" : undefined
+                    }
+                  />
+                }
               >
                 {item.icon}
-                <span>{item.title}</span>
-                <ChevronRightIcon className="ml-auto transition-transform duration-200 group-data-open/collapsible:rotate-90" />
-              </CollapsibleTrigger>
-              <CollapsibleContent>
-                <SidebarMenuSub>
-                  {item.items?.map((subItem) => (
-                    <SidebarMenuSubItem key={subItem.title}>
-                      <SidebarMenuSubButton render={<a href={subItem.url} />}>
-                        <span>{subItem.title}</span>
-                      </SidebarMenuSubButton>
-                    </SidebarMenuSubItem>
-                  ))}
-                </SidebarMenuSub>
-              </CollapsibleContent>
-            </Collapsible>
+                <span className="group-data-[collapsible=icon]:hidden">
+                  {item.title}
+                </span>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
           ),
         )}
       </SidebarMenu>
     </SidebarGroup>
-  )
+  ));
 }

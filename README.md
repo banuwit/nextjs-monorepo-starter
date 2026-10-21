@@ -20,7 +20,7 @@ npx create-turbo@latest
 
 [Backoffice layout](<./apps/frontend/src/app/(backoffice)/layout.tsx>) renders the shared sidebar and [AppHeader](./apps/frontend/src/components/app-sidebar-header.tsx) for every backoffice route. Use [PageHeading](./apps/frontend/src/components/page-heading.tsx) inside each page for its breadcrumb and `<h1>`; pass `parents` for linked ancestors and `children` for optional text or badges below the title.
 
-To check the shell, run `pnpm --filter frontend dev` and, in another terminal, `pnpm --filter frontend test:ui`.
+To check the shell, run `pnpm --filter frontend dev` and open `/dashboard` in a browser.
 
 ### Appearance preferences
 
@@ -47,7 +47,7 @@ Preference cookies last one year from each write. Only the changed persistable p
 
 The root layout reads cookies for correct initial sidebar rendering, so routes render on demand. A boot script resolves the system theme and legacy theme before hydration. Fonts are served locally through `next/font/local`; the added Latin WOFF2 assets come from Google Fonts, with OFL licenses alongside them in [fonts](./apps/frontend/src/app/fonts/). Only Geist is preloaded; alternative fonts load when used.
 
-Run `node --test apps/frontend/tests/preferences.test.mjs` with Node 24+ for the persistence unit tests. Run `pnpm --filter frontend test:ui` with the development server on port 3000 for the complete UI smoke suite.
+After changing preferences, check the controls in a browser across navigation and reload. Follow the cases in [Panduan Preferences](./.agents/rule/preferences.md).
 
 This Turborepo includes the following packages/apps:
 

@@ -107,12 +107,11 @@ Saat menambah pilihan baru, perbarui opsi/tipe/default dan validasi di konfigura
 - Cek tema terang/gelap, font, ketiga warna, Centered/Full Width, varian sidebar, radius None/Large, dan skala Small/Large pada desktop dan mobile.
 - Pastikan Restore Defaults mengembalikan default panel tanpa mengubah tema.
 - Jika mengubah persistensi, cek kedua nilai `persistToCookie`, cookie tidak valid, serta penyimpanan browser yang diblokir. Ketiga warna tetap tidak dipersistensikan.
-- Perbarui [pengujian Preferences](../../apps/frontend/tests/preferences.test.mjs) dan [pengujian kontras](../../apps/frontend/tests/preferences-contrast.test.mjs) bila perilaku terkait berubah.
+- Saat perilaku terkait berubah, ulangi pemeriksaan Preferences dan kontras secara manual.
 
 Jalankan pemeriksaan relevan dari root repositori dengan Node.js 24 atau lebih baru:
 
 ```sh
-pnpm --filter frontend exec node --test tests/preferences.test.mjs tests/preferences-contrast.test.mjs
 pnpm --filter frontend check-types
 ```
 

@@ -22,13 +22,17 @@ export function MenuSearch() {
   const menuGroups = navigation
     .map((section) => ({
       title: section.title,
-      icon: section.icon,
-      pages: [
-        ...(section.url.startsWith("/")
-          ? [{ title: section.title, url: section.url }]
-          : []),
-        ...section.items.filter((item) => item.url.startsWith("/")),
-      ],
+      pages: section.items.flatMap((item) =>
+        item.items?.length
+          ? item.items.map((child) => ({
+              title: `${item.title} / ${child.title}`,
+              url: child.url,
+              icon: undefined,
+            }))
+          : item.url.startsWith("/")
+            ? [{ title: item.title, url: item.url, icon: item.icon }]
+            : [],
+      ),
     }))
     .filter((section) => section.pages.length > 0);
 
@@ -78,7 +82,7 @@ export function MenuSearch() {
                       router.push(page.url);
                     }}
                   >
-                    {group.icon}
+                    {page.icon}
                     <span>{page.title}</span>
                   </CommandItem>
                 ))}
