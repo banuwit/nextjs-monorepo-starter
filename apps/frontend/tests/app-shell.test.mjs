@@ -1,7 +1,20 @@
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 import { test } from "node:test";
 
 const baseUrl = "http://localhost:3000";
+
+test("collapsed desktop navigation exposes its children in a right-side menu", () => {
+  const source = readFileSync(
+    new URL("../src/components/nav-main.tsx", import.meta.url),
+    "utf8",
+  );
+  assert.match(source, /state === "collapsed" && !isMobile && item\.items\?\.length/);
+  assert.match(source, /<DropdownMenuContent side="right"/);
+  assert.match(source, /aria-label={item\.title}[\s\S]*?tooltip={item\.title}/);
+  assert.match(source, /render={<Link href={subItem\.url} \/>}/);
+  assert.match(source, /<CollapsibleContent>/);
+});
 
 for (const [path, title, currentPage] of [
   ["/dashboard", "Dashboard", "Main"],

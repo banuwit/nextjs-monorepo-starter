@@ -22,6 +22,33 @@ npx create-turbo@latest
 
 To check the shell, run `pnpm --filter frontend dev` and, in another terminal, `pnpm --filter frontend test:ui`.
 
+### Appearance preferences
+
+Edit [preferences-config.ts](./apps/frontend/src/lib/preferences-config.ts) to set the defaults and two independent flags:
+
+- `showPreferences`: shows or hides the header Preferences button. Hiding it does not disable cookie restoration.
+- `persistToCookie`: saves/restores font, page layout, sidebar style, radius and scale when `true`. When `false`, their saved cookies are ignored and changes last until a full page reload (client-side navigation retains them). Existing cookies are not deleted; enabling the flag again restores valid saved choices. Primary, Sidebar and App Body colors never read or write cookies, regardless of this flag; each reload applies their configured defaults.
+
+For centrally managed appearance, set both flags to `false`, edit `defaults`, and deploy. Users see the new defaults on reload without clearing cookies. The theme toggle remains available and **always** saves its choice independently to `app_theme`; Restore Defaults does not change the theme.
+
+The menu offers:
+
+- Fonts: Geist, Inter, Nunito, Roboto, DM Sans, Poppins and Raleway.
+- Page Layout: Centered / Full Width; Sidebar Style: Sidebar / Inset / Floating.
+- Primary Color: Blue, Indigo, Violet, Emerald, Teal, Orange, Rose and Neutral, using Tailwind 600 for filled controls in both modes. Standalone links and status text use a paired 700 shade in light mode and 300 shade in dark mode for readability. Chart palettes stay unchanged.
+- Sidebar Color: the same eight color names as Primary Color plus White and Gray, selected independently, using shade 800 in both light and dark modes. White uses dark text in light mode and a dark neutral surface in dark mode. Old `default`/`primary` cookies fall back to the configured default.
+- App Body Color: the same eight Tailwind 50 colors at 60% background opacity (equivalent to `bg-blue-50/60`). Text and child components remain fully opaque. Dark mode retains the 950 shades. Only the content area's background changes; header, cards, and chart palettes retain their colors.
+- Border Radius: None (`0`), Small (`0.375rem`), Medium (`0.625rem`), Large (`1rem`), applied through shared radius tokens. Circular avatars and explicitly fixed radii retain their shape.
+- Scale: Small (87.5%), Medium (100%), Large (112.5%) of the browser's base font size. This scales text, spacing and components using `rem`; fixed pixel sizes and responsive breakpoints are unchanged.
+
+Navbar behavior stays sticky and sidebar collapse stays icon-only. Defaults are Geist, Full Width, Sidebar, Blue primary, Neutral sidebar, Neutral app body, Medium radius and Medium scale; the initial theme is Light.
+
+Preference cookies last one year from each write. Only the changed persistable preference is written; opening the page does not persist defaults. Restore Defaults resets all eight appearance choices, saving only the five non-color defaults when persistence is enabled. Legacy color cookies are ignored. Invalid cookie values fall back independently to defaults. The old `localStorage.theme` is migrated to the theme cookie once when no theme cookie exists.
+
+The root layout reads cookies for correct initial sidebar rendering, so routes render on demand. A boot script resolves the system theme and legacy theme before hydration. Fonts are served locally through `next/font/local`; the added Latin WOFF2 assets come from Google Fonts, with OFL licenses alongside them in [fonts](./apps/frontend/src/app/fonts/). Only Geist is preloaded; alternative fonts load when used.
+
+Run `node --test apps/frontend/tests/preferences.test.mjs` with Node 24+ for the persistence unit tests. Run `pnpm --filter frontend test:ui` with the development server on port 3000 for the complete UI smoke suite.
+
 This Turborepo includes the following packages/apps:
 
 ### Apps and Packages

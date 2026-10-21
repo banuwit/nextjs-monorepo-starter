@@ -65,7 +65,7 @@ export function ProjectTable({
           <div className="flex flex-col items-start gap-1 py-2">
             <button
               onClick={() => onView(row.original)}
-              className="max-w-full truncate rounded-sm text-left font-medium underline-offset-4 hover:text-primary hover:underline focus-visible:outline-2 focus-visible:outline-ring"
+              className="max-w-full truncate rounded-sm text-left font-medium underline-offset-4 hover:text-primary-text hover:underline focus-visible:outline-2 focus-visible:outline-ring"
             >
               {row.original.name}
             </button>

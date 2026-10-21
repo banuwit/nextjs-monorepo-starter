@@ -2455,7 +2455,7 @@ function GanttView({
                 className={cn(
                   "flex min-w-0 items-center justify-center truncate px-1.5 text-center",
                   "text-muted-foreground",
-                  unit.isToday && "text-primary font-medium",
+                  unit.isToday && "text-primary-text font-medium",
                 )}
                 style={{ flex: `${unit.weight} 0 0px` }}
               >

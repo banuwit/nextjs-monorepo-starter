@@ -191,7 +191,7 @@ export function CrudResource<T extends CrudRecord>({
           </AlertDescription>
         </Alert>
       )}
-      <p role="status" className={notice ? "text-sm text-primary" : "sr-only"}>
+      <p role="status" className={notice ? "text-sm text-primary-text" : "sr-only"}>
         {notice}
       </p>
       <CrudList

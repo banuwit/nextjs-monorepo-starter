@@ -52,7 +52,7 @@ export function ProjectCards({
                 <CardTitle>
                   <button
                     onClick={() => onView(project)}
-                    className="w-full break-words rounded-sm text-left underline-offset-4 hover:text-primary hover:underline focus-visible:outline-2 focus-visible:outline-ring"
+                    className="w-full break-words rounded-sm text-left underline-offset-4 hover:text-primary-text hover:underline focus-visible:outline-2 focus-visible:outline-ring"
                   >
                     {project.name}
                   </button>

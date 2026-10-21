@@ -77,8 +77,8 @@ export function NavProjects({
           </SidebarMenuItem>
         ))}
         <SidebarMenuItem>
-          <SidebarMenuButton className="text-sidebar-foreground/70">
-            <MoreHorizontalIcon className="text-sidebar-foreground/70" />
+          <SidebarMenuButton className="text-sidebar-foreground/80">
+            <MoreHorizontalIcon className="text-sidebar-foreground/80" />
             <span>More</span>
           </SidebarMenuButton>
         </SidebarMenuItem>

@@ -3,6 +3,7 @@
 import * as React from "react"
 
 import { useAppNavigation } from "@/components/app-navigation"
+import { usePreferences } from "@/providers/preferences-provider"
 import { NavMain } from "@/components/nav-main"
 import { NavProjects } from "@/components/nav-projects"
 import { TeamSwitcher } from "@/components/team-switcher"
@@ -72,8 +73,9 @@ const data = {
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const navigation = useAppNavigation()
+  const { values } = usePreferences()
   return (
-    <Sidebar collapsible="icon" {...props}>
+    <Sidebar variant={values.sidebarStyle} collapsible="icon" {...props}>
       <SidebarHeader>
         <TeamSwitcher teams={data.teams} />
       </SidebarHeader>
