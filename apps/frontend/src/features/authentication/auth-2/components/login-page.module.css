@@ -1,0 +1,41 @@
+.grid {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background-image:
+    linear-gradient(var(--border) 1px, transparent 1px),
+    linear-gradient(90deg, var(--border) 1px, transparent 1px);
+  background-size: 3rem 3rem;
+  mask-image: radial-gradient(ellipse at 35% 50%, black, transparent 70%);
+  opacity: 0.5;
+}
+
+.grid::after {
+  content: "";
+  position: absolute;
+  top: 9rem;
+  left: 6rem;
+  width: 3rem;
+  height: 3rem;
+  background: var(--muted);
+  box-shadow:
+    9rem 6rem var(--muted),
+    18rem 24rem var(--muted),
+    3rem 30rem var(--muted);
+  animation: grid-glow 6s ease-in-out infinite alternate;
+}
+
+@keyframes grid-glow {
+  from {
+    opacity: 0.2;
+  }
+  to {
+    opacity: 0.9;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .grid::after {
+    animation: none;
+  }
+}

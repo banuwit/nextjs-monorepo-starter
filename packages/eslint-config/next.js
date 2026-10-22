@@ -11,6 +11,18 @@ import { config as baseConfig } from "./base.js";
  * */
 export const nextJsConfig = [
   ...baseConfig,
+  {
+    files: ["**/*.{ts,tsx}"],
+    languageOptions: {
+      parserOptions: {
+        babelOptions: {
+          parserOpts: { plugins: ["typescript", "jsx"] },
+        },
+      },
+    },
+    // TypeScript handles these checks; the core rules misread types and JSX.
+    rules: { "no-undef": "off", "no-unused-vars": "off" },
+  },
   globalIgnores([
     // Default ignores of eslint-config-next:
     ".next/**",

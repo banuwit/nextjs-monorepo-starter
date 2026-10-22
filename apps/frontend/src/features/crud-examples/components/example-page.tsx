@@ -59,16 +59,6 @@ export function ExamplePage({ variant }: { variant: keyof typeof patterns }) {
       reload={reload}
       columns={exampleColumns}
       label={(row) => row.key}
-      filters={[
-        {
-          label: "Tipe",
-          value: (row) => row.type,
-          options: ["string", "number", "boolean", "json"].map((value) => ({
-            value,
-            label: value,
-          })),
-        },
-      ]}
       onSave={(record, isNew, expectedUpdatedAt) =>
         commit({ type: "save", record, isNew, expectedUpdatedAt })
       }

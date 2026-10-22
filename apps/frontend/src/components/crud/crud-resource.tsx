@@ -17,7 +17,7 @@ import { CrudDialog } from "./crud-dialog";
 import { CrudInlinePanel } from "./crud-inline-panel";
 import { CrudPage } from "./crud-page";
 import { CrudSheet } from "./crud-sheet";
-import { CrudList, type CrudColumn, type CrudFilter } from "./crud-list";
+import { CrudList, type CrudColumn } from "./crud-list";
 import type { CrudFormProps, CrudRecord } from "./crud-form";
 
 type Panel<T> = { mode: "create" } | { mode: "view" | "edit"; record: T };
@@ -33,7 +33,6 @@ export function CrudResource<T extends CrudRecord>({
   error,
   reload,
   columns,
-  filters,
   label,
   form,
   onSave,
@@ -50,7 +49,6 @@ export function CrudResource<T extends CrudRecord>({
   error: string;
   reload: () => void;
   columns: CrudColumn<T>[];
-  filters?: CrudFilter<T>[];
   label: (row: T) => string;
   form: (props: CrudFormProps<T>) => ReactNode;
   onSave: (record: T, isNew: boolean, expectedUpdatedAt?: string) => boolean;
@@ -211,7 +209,6 @@ export function CrudResource<T extends CrudRecord>({
         title={title}
         rows={ready ? rows : []}
         columns={columns}
-        filters={filters}
         loading={!ready && !error}
         label={label}
         basePath={basePath}

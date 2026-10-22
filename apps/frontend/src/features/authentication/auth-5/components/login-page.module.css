@@ -1,0 +1,28 @@
+.grid {
+  position: absolute;
+  inset: -20%;
+  z-index: -1;
+  pointer-events: none;
+  background-image:
+    linear-gradient(var(--border) 1px, transparent 1px),
+    linear-gradient(90deg, var(--border) 1px, transparent 1px);
+  background-size: 3rem 3rem;
+  transform: skewY(12deg);
+  mask-image: radial-gradient(ellipse at center, black, transparent 70%);
+  opacity: 0.5;
+}
+
+.grid::after {
+  content: "";
+  position: absolute;
+  top: 12rem;
+  left: 6rem;
+  width: 3rem;
+  height: 3rem;
+  background: var(--border);
+  box-shadow:
+    12rem 3rem var(--border),
+    6rem 24rem var(--border),
+    18rem 18rem var(--border),
+    3rem 33rem var(--border);
+}

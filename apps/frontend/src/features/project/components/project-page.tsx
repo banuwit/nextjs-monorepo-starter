@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import type { SortingState } from "@tanstack/react-table";
 import {
   CalendarClockIcon,
   CheckCheckIcon,
@@ -52,7 +51,6 @@ import {
   projectPriorities,
   projectStatuses,
   selectProjects,
-  sortProjects,
   todayDate,
   type Project,
 } from "../project-model";
@@ -75,9 +73,8 @@ export function ProjectPage() {
   const [priority, setPriority] = useState("all");
   const [overdueOnly, setOverdueOnly] = useState(false);
   const [page, setPage] = useState(0);
-  const [pageSize, setPageSize] = useState(10);
+  const pageSize = 10;
   const [view, setView] = useState("table");
-  const [sorting, setSorting] = useState<SortingState>([]);
   const [today, setToday] = useState("");
   const [notice, setNotice] = useState("");
   const newButton = useRef<HTMLButtonElement>(null);
@@ -96,11 +93,8 @@ export function ProjectPage() {
   const overdueCount = today
     ? projects.filter((project) => isOverdue(project, today)).length
     : 0;
-  const filtered = sortProjects(
-    selectProjects(projects, query, status, priority).filter(
-      (project) => !overdueOnly || (today && isOverdue(project, today)),
-    ),
-    sorting,
+  const filtered = selectProjects(projects, query, status, priority).filter(
+    (project) => !overdueOnly || (today && isOverdue(project, today)),
   );
   const pageCount = Math.max(1, Math.ceil(filtered.length / pageSize));
   const currentPage = Math.min(page, pageCount - 1);
@@ -238,7 +232,10 @@ export function ProjectPage() {
           </AlertDescription>
         </Alert>
       )}
-      <p role="status" className={notice ? "text-sm text-primary-text" : "sr-only"}>
+      <p
+        role="status"
+        className={notice ? "text-sm text-primary-text" : "sr-only"}
+      >
         {notice}
       </p>
       <section
@@ -362,13 +359,6 @@ export function ProjectPage() {
         ) : (
           <ProjectTable
             projects={filtered}
-            pageIndex={currentPage}
-            pageSize={pageSize}
-            sorting={sorting}
-            onSort={(updater) => {
-              setSorting(updater);
-              setPage(0);
-            }}
             today={today}
             loading={!ready}
             onView={(project) => openPanel({ mode: "view", project })}
@@ -383,21 +373,6 @@ export function ProjectPage() {
             {filtered.length} project
           </p>
           <div className="flex flex-wrap items-center gap-3">
-            <NativeSelect
-              size="sm"
-              aria-label="Project per halaman"
-              value={pageSize}
-              onChange={(event) => {
-                setPageSize(Number(event.target.value));
-                setPage(0);
-              }}
-            >
-              {[5, 10, 20].map((count) => (
-                <NativeSelectOption key={count} value={count}>
-                  {count} / halaman
-                </NativeSelectOption>
-              ))}
-            </NativeSelect>
             <span>
               {currentPage + 1} / {pageCount}
             </span>

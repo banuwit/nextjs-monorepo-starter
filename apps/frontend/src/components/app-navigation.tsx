@@ -3,17 +3,22 @@
 import type { ReactNode } from "react";
 import {
   ActivityIcon,
+  ChartAreaIcon,
   BlocksIcon,
   CalendarDaysIcon,
+  ChartNoAxesCombinedIcon,
   FilePenLineIcon,
+  BanknoteIcon,
   FolderKanbanIcon,
   FolderOpenIcon,
   HouseIcon,
   ListTodoIcon,
+  LockKeyholeIcon,
   NotebookPenIcon,
   PresentationIcon,
   ReceiptIcon,
   ServerIcon,
+  ShoppingBagIcon,
   WorkflowIcon,
 } from "lucide-react";
 
@@ -34,6 +39,18 @@ export const mainNavigation: NavigationSection[] = [
     title: "Dashboard",
     items: [
       { title: "Main", url: "/dashboard/main", icon: <HouseIcon /> },
+      { title: "Sales", url: "/dashboard/sales", icon: <ShoppingBagIcon /> },
+      { title: "Finance", url: "/dashboard/finance", icon: <BanknoteIcon /> },
+      {
+        title: "CRM",
+        url: "/dashboard/crm",
+        icon: <ChartNoAxesCombinedIcon />,
+      },
+      {
+        title: "Analytic",
+        url: "/dashboard/analytic",
+        icon: <ChartAreaIcon />,
+      },
       {
         title: "Productivity",
         url: "/dashboard/productivity",
@@ -73,6 +90,18 @@ export const mainNavigation: NavigationSection[] = [
         items: [
           { title: "Workflow", url: "/dashboard/timeline-workflow" },
           { title: "Activity", url: "/dashboard/timeline-activity" },
+        ],
+      },
+      {
+        title: "Authentication",
+        url: "#",
+        icon: <LockKeyholeIcon />,
+        items: [
+          { title: "Login 1", url: "/login" },
+          { title: "Login 2", url: "/login-2" },
+          { title: "Login 3", url: "/login-3" },
+          { title: "Login 4", url: "/login-4" },
+          { title: "Login 5", url: "/login-5" },
         ],
       },
     ],

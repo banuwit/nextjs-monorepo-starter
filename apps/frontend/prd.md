@@ -233,7 +233,7 @@ Folder `src/components/data-grid/` wajib memberi kemampuan:
 
 - Column definitions TanStack Table, cell rendering, custom row actions.
 - Sorting (single/multi hanya bila backend didukung), global search, filters terdefinisi, pagination, page size.
-- Column visibility, row selection, bulk actions (konfigurabel per fitur).
+- Column visibility; aksi per baris dikonfigurasi per fitur. Data Grid tidak menyediakan row selection, checkbox, atau bulk actions.
 - Loading skeleton, empty state, error state, retry, responsive layout.
 - **Client-side mode** untuk data lokal/mock dan **server-side mode** untuk daftar REST bisnis.
 - Pada server-side mode, query/table state menjadi parameter fetch; pagination/search/sort/filter **dijalankan oleh API/database**; jangan hanya memfilter halaman yang sudah diambil.
@@ -367,10 +367,11 @@ app-monorepo-starter/
 │           │   └── error.tsx
 │           │
 │           ├── features/                      # UI dan logika khusus fitur, di luar entry point rute
-│           │   ├── auth/
-│           │   │   └── components/
-│           │   │       ├── login-page.tsx
-│           │   │       └── login-form.tsx
+│           │   ├── authentication/
+│           │   │   └── auth-1/
+│           │   │       └── components/
+│           │   │           ├── login-page.tsx
+│           │   │           └── login-form.tsx
 │           │   ├── dashboard/
 │           │   │   └── components/
 │           │   │       └── dashboard-page.tsx
