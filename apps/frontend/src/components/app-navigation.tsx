@@ -19,6 +19,7 @@ import {
   ReceiptIcon,
   ServerIcon,
   ShoppingBagIcon,
+  Table2Icon,
   WorkflowIcon,
 } from "lucide-react";
 
@@ -152,6 +153,15 @@ export function useAppNavigation(): NavigationSection[] {
             { title: "Modal", url: "/crud/modal" },
             { title: "Sheet", url: "/crud/sheet" },
             { title: "Panel Inline", url: "/crud/panel-inline" },
+          ],
+        },
+        {
+          title: "Table",
+          url: "#",
+          icon: <Table2Icon />,
+          items: [
+            { title: "Base", url: "/table/base" },
+            { title: "Column", url: "/table/column" },
           ],
         },
       ],

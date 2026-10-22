@@ -8,7 +8,10 @@ import {
   PinOff,
 } from "lucide-react"
 
-import { DropdownMenuItem } from "@/components/ui/dropdown-menu"
+import {
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+} from "@/components/ui/dropdown-menu"
 
 import type { DataGridFeatures } from "./data-grid-features"
 
@@ -104,6 +107,7 @@ export function DataGridColumnActions<TData extends RowData, TValue>({
           )}
         </>
       )}
+      {canPin && canMove && <DropdownMenuSeparator />}
       {canMove && (
         <>
           <DropdownMenuItem
