@@ -162,6 +162,8 @@ export function useAppNavigation(): NavigationSection[] {
           items: [
             { title: "Base", url: "/table/base" },
             { title: "Column", url: "/table/column" },
+            { title: "Drag & Drop Row", url: "/table/drag-and-drop/row" },
+            { title: "Drag & Drop Column", url: "/table/drag-and-drop/column" },
           ],
         },
       ],

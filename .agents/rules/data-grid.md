@@ -70,6 +70,20 @@ Jika pemuatan data client gagal, teruskan pesan aman untuk pengguna melalui `err
 
 Gunakan pasangan `error`/`onRetry` hanya pada cabang gagal; pada cabang berhasil, jangan kirim keduanya. Jangan tampilkan detail exception, token, atau respons mentah API sebagai pesan error.
 
+## Drag & drop baris
+
+Gunakan `DataGridClient` dengan `onRowReorder(activeId, overId)` dan `getRowId` yang stabil. Callback dimiliki fitur dan harus memperbarui array `data`; gunakan [reorderDataGridItems](../../apps/frontend/src/components/data-grid/data-grid-reordering.ts) untuk memindahkan record tanpa mengubah array asal. Sorting dinonaktifkan selama mode ini dan `defaultSorting` tidak boleh diberikan.
+
+Tambahkan [DataGridRowDragHandle](../../apps/frontend/src/components/data-grid/data-grid-row-dnd.tsx) pada cell kolom khusus dengan label aksesibel, misalnya `Reorder ${row.original.name}`. Grid menyediakan konteks sortable dan mendukung pointer serta keyboard: Space untuk mengambil/melepas, panah atas/bawah untuk memindahkan, Escape untuk membatalkan. Gunakan header label biasa dan `pagination="none"` bila seluruh data perlu diurutkan; dengan pagination/filter, target drop hanya baris yang sedang terlihat.
+
+Contoh lengkap ada di [RowUserTable](../../apps/frontend/src/features/table/drag-and-drop/row/components/row-user-table.tsx). Urutannya disimpan di state lokal, dengan tombol Reset order; persistensi backend belum disediakan. `DataGridServer` belum mendukung DnD.
+
+## Drag & drop kolom
+
+Gunakan `DataGridClient` dengan `columnDrag={{ order, onOrderChange }}`. Fitur menyimpan urutan ID seluruh leaf column (termasuk kolom tersembunyi) dan dapat mengembalikannya dengan tombol reset. Gunakan [DataGridHeaderDrag](../../apps/frontend/src/components/data-grid/data-grid-header-drag.tsx) sebagai header berikon grip. Grid menyediakan konteks drag melalui [DataGridSortableColumnHead](../../apps/frontend/src/components/data-grid/data-grid-column-dnd.tsx); header sort/dropdown tidak digabungkan dengan handle ini. Space mengambil/melepas kolom, panah kiri/kanan menggeser, dan Escape membatalkan. Header dan seluruh cell berbagi transform serta transisi 220 ms melalui CSS variables di tabel, sehingga kolom tetangga ikut bergeser saat drag. Preferensi reduced motion menonaktifkan transisi. Setelah drop, urutan kolom diperbarui; urutan record tidak berubah.
+
+DnD kolom mendukung header satu tingkat dan kolom yang tidak dipin; grouped header dan pinned column tetap statis. Contoh [ColumnUserTable](../../apps/frontend/src/features/table/drag-and-drop/column/components/column-user-table.tsx) memakai mock user yang sama dengan state urutan lokal, tanpa persistensi backend. `DataGridServer` belum mendukung DnD kolom.
+
 ## Mode server dan kontrak REST
 
 Teruskan `data` dan `meta` dari envelope daftar REST yang dikunci di PRD. `filters` berisi query aktif yang telah divalidasi di halaman/fitur. Komponen ini mengubah URL melalui Next Router; halaman bertanggung jawab membaca `searchParams`, memanggil API dengan query tersebut, dan mengirim hasil baru. Jangan memfilter hanya baris pada halaman saat ini.

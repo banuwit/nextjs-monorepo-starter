@@ -25,6 +25,7 @@ import {
 } from "@/components/ui/table"
 
 import { PAGE_SIZE } from "./constants"
+import { DataGridColumnDnd, DataGridSortableColumnHead, getColumnMotionStyle } from "./data-grid-column-dnd"
 import { DataGridEmpty } from "./data-grid-empty"
 import { DataGridError } from "./data-grid-error"
 import { features } from "./data-grid-features"
@@ -35,6 +36,8 @@ import { DataGridPaginationSimple } from "./data-grid-pagination-simple"
 import { getPinnedCellProps, useColumnPinOffsets } from "./data-grid-pinning"
 import { DataGridSearchInput } from "./data-grid-search-input"
 import { getDataGridBodyState } from "./data-grid-state"
+import { DataGridRowDnd, DataGridSortableRow } from "./data-grid-row-dnd"
+import { reorderDataGridItems } from "./data-grid-reordering"
 import { DataGridVisibilityToggle } from "./data-grid-visibility-toggle"
 import type { ToolbarConfig } from "./types"
 
@@ -70,6 +73,11 @@ interface DataGridClientBaseProps<TData extends RowData> {
   defaultColumnPinning?: ColumnPinningState
   /** Column ids in their initial order. Defaults to the column def order. */
   defaultColumnOrder?: ColumnOrderState
+  /** Drag ungrouped DataGridHeaderDrag headers. Pinned columns remain fixed. */
+  columnDrag?: {
+    order: ColumnOrderState
+    onOrderChange: (order: ColumnOrderState) => void
+  }
   /**
    * Stable row id, e.g. `(row) => String(row.id)`. Without this, TanStack
    * falls back to the row's index as its id — after a delete, sort, or
@@ -91,6 +99,15 @@ interface DataGridClientBaseProps<TData extends RowData> {
 export type DataGridClientProps<TData extends RowData> =
   DataGridClientBaseProps<TData> &
     (
+      | { onRowReorder?: never }
+      | {
+          /** Enables manual ordering; the caller updates its data by stable IDs. */
+          onRowReorder: (activeId: string, overId: string) => void
+          getRowId: (row: TData, index: number) => string
+          defaultSorting?: never
+        }
+    ) &
+    (
       | { error?: never; onRetry?: never }
       | { error: string; onRetry: () => void }
     )
@@ -110,6 +127,7 @@ export function DataGridClient<TData extends RowData>({
   enableColumnOrdering = false,
   defaultColumnPinning,
   defaultColumnOrder,
+  columnDrag,
   getRowId,
   loading = false,
   emptyTitle,
@@ -119,6 +137,7 @@ export function DataGridClient<TData extends RowData>({
   pagination = "advance",
   error,
   onRetry,
+  onRowReorder,
 }: DataGridClientProps<TData>) {
   const facets = toolbar?.facets ?? EMPTY_FACETS
   const selects = toolbar?.selects ?? EMPTY_SELECTS
@@ -171,12 +190,17 @@ export function DataGridClient<TData extends RowData>({
     data,
     columns: filterColumns,
     getRowId,
+    enableSorting: !onRowReorder,
     enableSortingRemoval: false,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
     onColumnVisibilityChange: setColumnVisibility,
     onColumnPinningChange: setColumnPinning,
-    onColumnOrderChange: setColumnOrder,
+    onColumnOrderChange: columnDrag
+      ? (updater) => columnDrag.onOrderChange(
+          typeof updater === "function" ? updater(columnDrag.order) : updater,
+        )
+      : setColumnOrder,
     onPaginationChange: setPaginationState,
     enableColumnPinning,
     meta: {
@@ -189,7 +213,7 @@ export function DataGridClient<TData extends RowData>({
       columnFilters,
       columnVisibility,
       columnPinning,
-      columnOrder,
+      columnOrder: columnDrag?.order ?? columnOrder,
       pagination: paginationState,
     },
   })
@@ -233,8 +257,11 @@ export function DataGridClient<TData extends RowData>({
     pending: loading,
     rowCount: rows.length,
   })
+  const draggableColumns = columnDrag && table.getHeaderGroups().length === 1
+    ? table.getPinnedVisibleLeafColumns("center").map((column) => column.id)
+    : []
 
-  return (
+  const content = (
     <div className="flex flex-col gap-3">
       {(toolbar || showVisibilityToggle || actions) && (
         <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
@@ -289,30 +316,38 @@ export function DataGridClient<TData extends RowData>({
           <TableHeader className="bg-muted">
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => (
-                  <TableHead
-                    key={header.id}
-                    colSpan={header.colSpan}
-                    ref={registerHeader(header.column.id)}
-                    aria-sort={
-                      header.column.getIsSorted() === "asc"
-                        ? "ascending"
-                        : header.column.getIsSorted() === "desc"
-                          ? "descending"
-                          : "none"
-                    }
-                    {...getPinnedCellProps(
-                      header.column.getIsPinned(),
-                      offsets,
-                      header.column.id,
+                {headerGroup.headers.map((header) => {
+                  const columnIndex = draggableColumns.indexOf(header.column.id)
+                  const headerProps = {
+                    colSpan: header.colSpan,
+                    "aria-sort": header.column.getIsSorted() === "asc"
+                      ? "ascending" as const
+                      : header.column.getIsSorted() === "desc"
+                        ? "descending" as const
+                        : "none" as const,
+                    ...getPinnedCellProps(
+                      header.column.getIsPinned(), offsets, header.column.id,
                       { isHeader: true },
-                    )}
-                  >
-                    {header.isPlaceholder ? null : (
-                      <table.FlexRender header={header} />
-                    )}
-                  </TableHead>
-                ))}
+                    ),
+                  }
+                  const label = header.isPlaceholder ? null : <table.FlexRender header={header} />
+
+                  return columnIndex >= 0 ? (
+                    <DataGridSortableColumnHead
+                      key={header.id}
+                      {...headerProps}
+                      columnId={header.column.id}
+                      columnIndex={columnIndex}
+                      headerRef={registerHeader(header.column.id)}
+                    >
+                      {label}
+                    </DataGridSortableColumnHead>
+                  ) : (
+                    <TableHead key={header.id} {...headerProps} ref={registerHeader(header.column.id)}>
+                      {label}
+                    </TableHead>
+                  )
+                })}
               </TableRow>
             ))}
           </TableHeader>
@@ -339,22 +374,36 @@ export function DataGridClient<TData extends RowData>({
                 </TableCell>
               </TableRow>
             ) : bodyState === "rows" ? (
-              rows.map((row) => (
-                <TableRow key={row.id} className="group/row">
-                  {row.getVisibleCells().map((cell) => (
+              rows.map((row) => {
+                const cells = row.getVisibleCells().map((cell) => {
+                  const columnIndex = draggableColumns.indexOf(cell.column.id)
+                  return (
                     <TableCell
                       key={cell.id}
                       {...getPinnedCellProps(
-                        cell.column.getIsPinned(),
-                        offsets,
-                        cell.column.id,
+                        cell.column.getIsPinned(), offsets, cell.column.id,
                       )}
+                      {...(columnIndex >= 0 ? {
+                        "data-column-id": cell.column.id,
+                        style: getColumnMotionStyle(columnIndex),
+                        className: "motion-reduce:transition-none!",
+                      } : {})}
                     >
                       <table.FlexRender cell={cell} />
                     </TableCell>
-                  ))}
-                </TableRow>
-              ))
+                  )
+                })
+
+                return onRowReorder ? (
+                  <DataGridSortableRow key={row.id} id={row.id}>
+                    {cells}
+                  </DataGridSortableRow>
+                ) : (
+                  <TableRow key={row.id} className="group/row">
+                    {cells}
+                  </TableRow>
+                )
+              })
             ) : (
               <TableRow className="hover:bg-transparent">
                 <TableCell
@@ -396,4 +445,25 @@ export function DataGridClient<TData extends RowData>({
         )}
     </div>
   )
+
+  const grid = columnDrag ? (
+    <DataGridColumnDnd
+      items={draggableColumns}
+      onReorder={(activeId, overId) => {
+        const order = table.getAllLeafColumns().map((column) => column.id)
+        table.setColumnOrder(reorderDataGridItems(order, activeId, overId, (id) => id))
+      }}
+    >
+      {content}
+    </DataGridColumnDnd>
+  ) : content
+
+  return onRowReorder ? (
+    <DataGridRowDnd
+      items={bodyState === "rows" ? rows.map((row) => row.id) : []}
+      onReorder={onRowReorder}
+    >
+      {grid}
+    </DataGridRowDnd>
+  ) : grid
 }
