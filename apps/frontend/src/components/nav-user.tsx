@@ -1,9 +1,11 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
+import { PreferencesDialog } from "@/components/preferences";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -14,10 +16,13 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
-  User,
   KeyRound,
   LogOutIcon,
+  SlidersHorizontalIcon,
+  User,
 } from "lucide-react";
+
+import { PREFERENCES_CONFIG } from "@/lib/preferences-config";
 
 export function NavUser({
   user,
@@ -27,6 +32,7 @@ export function NavUser({
     email: string;
   };
 }) {
+  const [preferencesOpen, setPreferencesOpen] = useState(false);
   const initials = user.name
     .trim()
     .split(/\s+/)
@@ -36,6 +42,7 @@ export function NavUser({
     .toUpperCase();
 
   return (
+    <>
     <DropdownMenu>
       <DropdownMenuTrigger
         render={
@@ -73,6 +80,15 @@ export function NavUser({
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
+          {PREFERENCES_CONFIG.showPreferences && (
+            <DropdownMenuItem onClick={() => setPreferencesOpen(true)}>
+              <SlidersHorizontalIcon />
+              Preferences
+            </DropdownMenuItem>
+          )}
+        </DropdownMenuGroup>
+        <DropdownMenuSeparator />
+        <DropdownMenuGroup>
           <DropdownMenuItem render={<Link href="/dashboard/profile" />}>
             <User />
             My Profile
@@ -92,5 +108,10 @@ export function NavUser({
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
+    <PreferencesDialog
+      open={preferencesOpen}
+      onOpenChange={setPreferencesOpen}
+    />
+    </>
   );
 }

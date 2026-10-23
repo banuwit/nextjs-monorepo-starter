@@ -1,6 +1,6 @@
-"use client"
+"use client";
 
-import * as React from "react"
+import * as React from "react";
 
 import {
   DropdownMenu,
@@ -8,91 +8,99 @@ import {
   DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuShortcut,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+} from "@/components/ui/dropdown-menu";
 import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
   useSidebar,
-} from "@/components/ui/sidebar"
-import { ChevronsUpDownIcon, PlusIcon } from "lucide-react"
+} from "@/components/ui/sidebar";
+import { CheckIcon, ChevronsUpDownIcon, GalleryVerticalEndIcon } from "lucide-react";
+
+const teams = ["Bandung", "Jakarta", "Surabaya"] as const;
+const TeamContext = React.createContext<{
+  activeTeam: string;
+  setActiveTeam: (team: string) => void;
+} | null>(null);
+
+export function TeamSwitcherProvider({ children }: { children: React.ReactNode }) {
+  const [activeTeam, setActiveTeam] = React.useState<string>(teams[0]);
+
+  return (
+    <TeamContext.Provider value={{ activeTeam, setActiveTeam }}>
+      {children}
+    </TeamContext.Provider>
+  );
+}
 
 export function TeamSwitcher({
-  teams,
+  placement = "sidebar",
 }: {
-  teams: {
-    name: string
-    logo: React.ReactNode
-    plan: string
-  }[]
+  placement?: "sidebar" | "header";
 }) {
-  const { isMobile } = useSidebar()
-  const [activeTeam, setActiveTeam] = React.useState(teams[0])
-  if (!activeTeam) {
-    return null
-  }
+  const { isMobile } = useSidebar();
+  const team = React.useContext(TeamContext);
+  if (!team) throw new Error("TeamSwitcherProvider is required");
+  const { activeTeam, setActiveTeam } = team;
+  const inHeader = placement === "header";
+
   return (
-    <SidebarMenu>
+    <SidebarMenu className={inHeader ? "min-w-0 max-w-48 flex-1" : undefined}>
       <SidebarMenuItem>
         <DropdownMenu>
           <DropdownMenuTrigger
             render={
               <SidebarMenuButton
                 size="lg"
-                className="data-open:bg-sidebar-accent data-open:text-sidebar-accent-foreground"
+                aria-label={`Switch team: ${activeTeam}`}
+                className={
+                  inHeader
+                    ? "h-10 text-foreground hover:bg-muted hover:text-foreground active:bg-muted active:text-foreground data-open:bg-muted data-open:text-foreground data-open:hover:bg-muted data-open:hover:text-foreground focus-visible:ring-ring"
+                    : "data-open:bg-sidebar-accent data-open:text-sidebar-accent-foreground"
+                }
               />
             }
           >
-            <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
-              {activeTeam.logo}
-            </div>
-            <div className="grid flex-1 text-left text-sm leading-tight">
-              <span className="truncate font-medium">{activeTeam.name}</span>
-              <span className="truncate text-xs">{activeTeam.plan}</span>
-            </div>
-            <ChevronsUpDownIcon className="ml-auto" />
+            <span
+              className={`flex size-8 items-center justify-center rounded-lg ${
+                inHeader
+                  ? "bg-primary text-primary-foreground"
+                  : "bg-sidebar-primary text-sidebar-primary-foreground"
+              }`}
+            >
+              <GalleryVerticalEndIcon className="size-4" />
+            </span>
+            <span className="grid min-w-0 flex-1 text-left text-sm leading-tight group-data-[collapsible=icon]:hidden">
+              <span className="truncate font-medium">WIT. Indonesia</span>
+              <span className="truncate text-xs">{activeTeam}</span>
+            </span>
+            <ChevronsUpDownIcon className="ml-auto group-data-[collapsible=icon]:hidden" />
           </DropdownMenuTrigger>
           <DropdownMenuContent
-            className="w-fit"
             align="start"
-            side={isMobile ? "bottom" : "right"}
+            side={inHeader || isMobile ? "bottom" : "right"}
             sideOffset={4}
+            className="min-w-48"
           >
             <DropdownMenuGroup>
-              <DropdownMenuLabel className="text-xs text-muted-foreground">
-                Teams
-              </DropdownMenuLabel>
-              {teams.map((team, index) => (
+              <DropdownMenuLabel>Teams</DropdownMenuLabel>
+              {teams.map((team) => (
                 <DropdownMenuItem
-                  key={team.name}
+                  key={team}
                   onClick={() => setActiveTeam(team)}
                   className="gap-2 p-2"
                 >
-                  <div className="flex size-6 items-center justify-center rounded-md border">
-                    {team.logo}
-                  </div>
-                  {team.name}
-                  <DropdownMenuShortcut>⌘{index + 1}</DropdownMenuShortcut>
+                  <span className="flex size-6 items-center justify-center rounded-md border">
+                    {team === activeTeam && <CheckIcon className="size-4" />}
+                  </span>
+                  {team}
                 </DropdownMenuItem>
               ))}
-            </DropdownMenuGroup>
-            <DropdownMenuSeparator />
-            <DropdownMenuGroup>
-              <DropdownMenuItem className="gap-2 p-2">
-                <div className="flex size-6 items-center justify-center rounded-md border bg-transparent">
-                  <PlusIcon className="size-4" />
-                </div>
-                <div className="font-medium text-muted-foreground">
-                  Add team
-                </div>
-              </DropdownMenuItem>
             </DropdownMenuGroup>
           </DropdownMenuContent>
         </DropdownMenu>
       </SidebarMenuItem>
     </SidebarMenu>
-  )
+  );
 }

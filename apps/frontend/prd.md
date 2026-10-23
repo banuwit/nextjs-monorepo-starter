@@ -15,6 +15,14 @@
 
 > **Amendemen UI, 23 Oktober 2026 (Sidebar):** Sidebar hanya dibuka/ditutup melalui ikon trigger di header; rail hover/click dan shortcut keyboard untuk toggle dihapus.
 
+> **Amendemen UI, 23 Oktober 2026 (Header style):** Preferences menyediakan gaya Header. Pada desktop, sidebar dan trigger disembunyikan; header menampilkan menubar navigasi ringkas di baris kedua menggunakan komponen shadcn Base UI Menubar. Search menu berada di header tepat di kiri menu akun. Pada mobile, menubar disembunyikan; trigger di kiri logo dan nama aplikasi membuka drawer sidebar yang sama. Permukaan menubar putih pada mode terang dan memakai warna Card pada mode gelap, terlepas dari Header Color. Border header dan menubar mengikuti warna garis Card. Preferences berada dalam menu akun.
+
+> **Amendemen UI, 23 Oktober 2026 (App Body Color):** Warna App Body mengisi seluruh latar shell dashboard pada gaya Sidebar, Inset, Floating, dan Header. Pembungkus konten halaman transparan agar warna dengan alpha tidak ditumpuk dua kali.
+
+> **Amendemen UI, 23 Oktober 2026 (Preferences modal):** Preferences dibuka sebagai modal dari menu akun dan tombol pada dashboard Finance. Halaman `/dashboard/preferences` serta direktori `features/preferences` dihapus.
+
+> **Amendemen UI, 23 Oktober 2026 (Toggle tema):** Tombol ikon terang/gelap berada di header, tepat di kiri menu akun, pada semua gaya header. Toggle tema di dalam menu akun dihapus.
+
 Roadmap tahap berikutnya: [Tahap 2 (Mobile)](../mobile/prd.md) dan [Tahap 3 (Backend)](../backend/prd.md). Kedua dokumen tersebut belum memberi izin untuk memulai implementasinya.
 
 ---
@@ -87,29 +95,29 @@ Produk ditujukan sebagai **fondasi reusable** untuk proyek baru, bukan sekadar d
 
 ## 2. Keputusan arsitektur yang DIKUNCI
 
-| Area | Keputusan |
-|---|---|
-| Repository | Buat monorepo baru `app-monorepo-starter` dari nol |
-| Package management | `pnpm` workspace + Turborepo |
-| Web | Next.js App Router + React + TypeScript |
-| Styling | Tailwind CSS + shadcn/ui |
-| Data Grid | TanStack Table, reusable global |
-| Async/server state | TanStack Query untuk interaksi client-side CRUD |
-| Database | PostgreSQL + Drizzle ORM |
-| Auth Tahap 1 | Better Auth dengan session/cookie untuk web |
-| API | REST lewat Next.js App Router Route Handlers, prefix `/api/v1` |
-| Schema/contract | **Zod sebagai source of truth**; OpenAPI **digenerate otomatis** |
-| HTTP client frontend | Terpusat di `apps/frontend/src/lib/api/` |
-| Response REST bisnis | Envelope konsisten: `data`, `meta`, `error` |
-| Pengecualian response | Better Auth `/api/auth/*` mengikuti protokolnya sendiri; HTTP 204 tanpa body |
-| CRUD UX | Empat pola komponen **global**, bukan `features/*/patterns/` |
-| Data Grid UX | Komponen **global** di `components/data-grid/` |
-| Feature folders | `components/`, `hooks/`, `schemas/`, `types/`, `utils/` hanya jika diperlukan |
+| Area                    | Keputusan                                                                              |
+| ----------------------- | -------------------------------------------------------------------------------------- |
+| Repository              | Buat monorepo baru `app-monorepo-starter` dari nol                                     |
+| Package management      | `pnpm` workspace + Turborepo                                                           |
+| Web                     | Next.js App Router + React + TypeScript                                                |
+| Styling                 | Tailwind CSS + shadcn/ui                                                               |
+| Data Grid               | TanStack Table, reusable global                                                        |
+| Async/server state      | TanStack Query untuk interaksi client-side CRUD                                        |
+| Database                | PostgreSQL + Drizzle ORM                                                               |
+| Auth Tahap 1            | Better Auth dengan session/cookie untuk web                                            |
+| API                     | REST lewat Next.js App Router Route Handlers, prefix `/api/v1`                         |
+| Schema/contract         | **Zod sebagai source of truth**; OpenAPI **digenerate otomatis**                       |
+| HTTP client frontend    | Terpusat di `apps/frontend/src/lib/api/`                                               |
+| Response REST bisnis    | Envelope konsisten: `data`, `meta`, `error`                                            |
+| Pengecualian response   | Better Auth `/api/auth/*` mengikuti protokolnya sendiri; HTTP 204 tanpa body           |
+| CRUD UX                 | Empat pola komponen **global**, bukan `features/*/patterns/`                           |
+| Data Grid UX            | Komponen **global** di `components/data-grid/`                                         |
+| Feature folders         | `components/`, `hooks/`, `schemas/`, `types/`, `utils/` hanya jika diperlukan          |
 | Shared frontend folders | `components/`, `hooks/`, `types/`, `utils/`, `lib/`, `providers/`, `config/`, `mocks/` |
-| Pemisahan layer | `packages/contracts`, `packages/core`, `packages/db`, `packages/auth` |
-| Test | Unit + integration + API contract wajib dari Tahap 1 |
-| CI | Lint, typecheck, tests, build, check generated OpenAPI, migration safety |
-| Tahap 2/3 | Roadmap saja; diputuskan dan dibangun hanya atas instruksi pengguna |
+| Pemisahan layer         | `packages/contracts`, `packages/core`, `packages/db`, `packages/auth`                  |
+| Test                    | Unit + integration + API contract wajib dari Tahap 1                                   |
+| CI                      | Lint, typecheck, tests, build, check generated OpenAPI, migration safety               |
+| Tahap 2/3               | Roadmap saja; diputuskan dan dibangun hanya atas instruksi pengguna                    |
 
 ### 2.1 Batas dependensi wajib
 
@@ -146,17 +154,17 @@ packages/auth:  integrasi Better Auth dan session; server-only dipisahkan dari c
 
 ### 3.2 User stories & acceptance umum
 
-| ID | User story | Bukti diterima |
-|---|---|---|
-| US-01 | Sebagai user, saya dapat login/logout | Cookie session valid, route terlindungi, logout invalidasi session |
-| US-02 | Sebagai admin, saya dapat mengelola users | List, detail, create, edit, tindakan delete/deactivate sesuai kebijakan |
-| US-03 | Sebagai admin, saya dapat mengelola countries/provinces/cities | Data konsisten secara relasional; CRUD melalui dialog |
-| US-04 | Sebagai admin, saya dapat mengelola menus | Sidebar mengikuti entri menu terotorisasi dari DB; form CRUD via sheet |
-| US-05 | Sebagai admin, saya dapat mengelola parameters | CRUD memakai inline side panel |
-| US-06 | Sebagai user, saya dapat search/sort/filter/paginate | Data Grid server-side bekerja konsisten dengan API |
-| US-07 | Sebagai developer, saya dapat membuat fitur baru | Hanya menambahkan konfigurasi/komponen fitur + API/domain, tanpa menyalin Data Grid/pattern |
-| US-08 | Sebagai developer, saya dapat membuat halaman frontend-only | Dummy data berasal dari `src/mocks/`, tanpa dependency DB |
-| US-09 | Sebagai pengelola produk, saya dapat menambah mobile/Go kelak | OpenAPI dan batas layer mendukung evolusi tanpa rewrite UI besar |
+| ID    | User story                                                     | Bukti diterima                                                                              |
+| ----- | -------------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
+| US-01 | Sebagai user, saya dapat login/logout                          | Cookie session valid, route terlindungi, logout invalidasi session                          |
+| US-02 | Sebagai admin, saya dapat mengelola users                      | List, detail, create, edit, tindakan delete/deactivate sesuai kebijakan                     |
+| US-03 | Sebagai admin, saya dapat mengelola countries/provinces/cities | Data konsisten secara relasional; CRUD melalui dialog                                       |
+| US-04 | Sebagai admin, saya dapat mengelola menus                      | Sidebar mengikuti entri menu terotorisasi dari DB; form CRUD via sheet                      |
+| US-05 | Sebagai admin, saya dapat mengelola parameters                 | CRUD memakai inline side panel                                                              |
+| US-06 | Sebagai user, saya dapat search/sort/filter/paginate           | Data Grid server-side bekerja konsisten dengan API                                          |
+| US-07 | Sebagai developer, saya dapat membuat fitur baru               | Hanya menambahkan konfigurasi/komponen fitur + API/domain, tanpa menyalin Data Grid/pattern |
+| US-08 | Sebagai developer, saya dapat membuat halaman frontend-only    | Dummy data berasal dari `src/mocks/`, tanpa dependency DB                                   |
+| US-09 | Sebagai pengelola produk, saya dapat menambah mobile/Go kelak  | OpenAPI dan batas layer mendukung evolusi tanpa rewrite UI besar                            |
 
 ---
 
@@ -181,28 +189,28 @@ packages/auth:  integrasi Better Auth dan session; server-only dipisahkan dari c
 
 ### 5.1 Peta halaman referensi — DIKUNCI
 
-| Menu/route | Resource | Pola default | Perilaku |
-|---|---|---|---|
-| `/dashboard` | Dashboard | Non-CRUD | Ringkasan, dapat menggunakan mock data untuk widget presentasional |
-| `/users` | Users | **Multi-page** | List → `/users/new` → `/users/[id]` → `/users/[id]/edit` |
-| `/countries` | Countries | **Dialog** | Create/edit melalui modal di halaman list |
-| `/provinces` | Provinces | **Dialog** | Create/edit melalui modal di halaman list; memilih country |
-| `/cities` | Cities | **Dialog** | Create/edit melalui modal di halaman list; memilih province |
-| `/menus` | Menus | **Sheet** | Create/edit di overlay samping; mengatur sidebar |
-| `/parameters` | Parameters | **Inline side panel** | Create/edit di panel tertanam pada halaman tanpa modal overlay |
-| `/login` | Authentication | Non-CRUD | Login Better Auth |
-| `/change-password` | Authentication | Non-CRUD | Penggantian password untuk pengguna terautentikasi |
+| Menu/route         | Resource       | Pola default          | Perilaku                                                           |
+| ------------------ | -------------- | --------------------- | ------------------------------------------------------------------ |
+| `/dashboard`       | Dashboard      | Non-CRUD              | Ringkasan, dapat menggunakan mock data untuk widget presentasional |
+| `/users`           | Users          | **Multi-page**        | List → `/users/new` → `/users/[id]` → `/users/[id]/edit`           |
+| `/countries`       | Countries      | **Dialog**            | Create/edit melalui modal di halaman list                          |
+| `/provinces`       | Provinces      | **Dialog**            | Create/edit melalui modal di halaman list; memilih country         |
+| `/cities`          | Cities         | **Dialog**            | Create/edit melalui modal di halaman list; memilih province        |
+| `/menus`           | Menus          | **Sheet**             | Create/edit di overlay samping; mengatur sidebar                   |
+| `/parameters`      | Parameters     | **Inline side panel** | Create/edit di panel tertanam pada halaman tanpa modal overlay     |
+| `/login`           | Authentication | Non-CRUD              | Login Better Auth                                                  |
+| `/change-password` | Authentication | Non-CRUD              | Penggantian password untuk pengguna terautentikasi                 |
 
 **Penting:** ada **empat jenis pola**, bukan harus persis empat URL; Tahap 1 menggunakan **enam halaman CRUD** untuk membuktikan keempat pola tersebut (3 halaman memakai dialog).
 
 ### 5.2 Kontrak perilaku pola CRUD global
 
-| Pattern | Komponen utama | State UI | Navigasi |
-|---|---|---|---|
-| Multi-page | `crud-page.tsx` | Berbasis URL/route dan form terpisah | Navigasi ke create/detail/edit URL |
-| Dialog | `crud-dialog.tsx` | `open`, `mode`, `selectedRow` | Tidak perlu pindah halaman |
-| Sheet | `crud-sheet.tsx` | `open`, `mode`, `selectedRow` | Panel overlay dari samping |
-| Inline panel | `crud-inline-panel.tsx` | `visible`, `mode`, `selectedRow` | Panel menjadi bagian layout, responsif |
+| Pattern      | Komponen utama          | State UI                             | Navigasi                               |
+| ------------ | ----------------------- | ------------------------------------ | -------------------------------------- |
+| Multi-page   | `crud-page.tsx`         | Berbasis URL/route dan form terpisah | Navigasi ke create/detail/edit URL     |
+| Dialog       | `crud-dialog.tsx`       | `open`, `mode`, `selectedRow`        | Tidak perlu pindah halaman             |
+| Sheet        | `crud-sheet.tsx`        | `open`, `mode`, `selectedRow`        | Panel overlay dari samping             |
+| Inline panel | `crud-inline-panel.tsx` | `visible`, `mode`, `selectedRow`     | Panel menjadi bagian layout, responsif |
 
 **Persyaratan reusable:**
 
@@ -248,6 +256,7 @@ Folder `src/components/data-grid/` wajib memberi kemampuan:
 ### 5.4 Kebutuhan domain per fitur
 
 **Users (multi-page):**
+
 - List dengan nama, email, status, role, aksi detail/edit/status/delete sesuai permission.
 - Create user oleh admin; **tidak** menyediakan public sign-up.
 - Detail dan edit di URL terpisah; tidak pernah menampilkan password/hash pada response.
@@ -255,24 +264,29 @@ Folder `src/components/data-grid/` wajib memberi kemampuan:
 - Model identitas menggunakan tabel pengguna Better Auth sebagai sumber utama; metadata aplikasi/role yang diperlukan ditambahkan lewat desain schema yang kompatibel dengan auth, bukan membuat dua identitas yang saling bersaing.
 
 **Countries (dialog):**
+
 - Data minimal `id`, `code` unik, `name`, timestamp; pencarian/filter.
 - Validasi uniqueness di schema+DB, API mengembalikan `409` saat bentrok.
 
 **Provinces (dialog):**
+
 - `id`, `countryId`, `code` (sesuai kebutuhan scope), `name`, timestamp.
 - Validasi `countryId` valid; opsi country dari API.
 
 **Cities (dialog):**
+
 - `id`, `provinceId`, `name`, optional code, timestamp.
 - Validasi `provinceId` valid; opsi province dari API; dependent filter bila UI menggunakannya.
 
 **Menus (sheet):**
+
 - `id`, `title`, `path`, `icon`, `parentId?`, `sortOrder`, `isActive`, aturan visibility/permission.
 - Sidebar membaca menu aktif yang **telah difilter berdasarkan hak akses**.
 - Validasi parent hierarchy: parent tidak boleh dirinya sendiri atau membuat cycle; hanya path internal yang diizinkan sesuai kebijakan.
 - Urutan menu stabil, multi-level sesuai dukungan UI; invalidasi query/navigation setelah mutation.
 
 **Parameters (inline side panel):**
+
 - `id`, `key` unik, `value`, `description?`, `type` yang didukung, status sesuai kebutuhan.
 - Jika parameter sensitif, **jangan** tampilkan nilai sensitif di UI/API; pemisahan secret/environment dari parameter biasa.
 - Validasi value berdasarkan type, edit via panel yang tidak menutupi Data Grid.
@@ -526,26 +540,26 @@ app-monorepo-starter/
 
 ### 6.1 Fungsi direktori frontend
 
-| Folder/berkas | Tanggung jawab | Tidak boleh berisi |
-|---|---|---|
-| `src/app/` | Pohon App Router; subfolder membentuk segmen rute dan route groups | Business rules dan query DB di komponen halaman |
-| `src/app/**/page.tsx` | Entry point rute yang merender halaman dari `src/features/` | Implementasi UI/logika fitur atau endpoint HTTP/API |
-| `src/app/api/**/route.ts` | File Route Handler untuk endpoint HTTP/API | Komponen halaman React |
-| `src/features/*/components/` | UI halaman, form, columns, detail/view khusus fitur | Duplikasi Data Grid/CRUD global |
-| `src/features/*/hooks/` | TanStack Query hooks khusus resource | SQL/Drizzle |
-| `src/features/*/schemas/` | Schema form/UI (dapat extend schema contracts) | Duplikat schema request API sebagai source baru |
-| `src/features/*/types/` | Type UI khusus resource | Duplikat API DTO |
-| `src/features/*/utils/` | Formatter/mapper murni khusus resource | General shared utilities |
-| `src/components/ui/` | shadcn primitives | Business logic |
-| `src/components/data-grid/` | Generic tabel/filter/sort/pagination | Hardcoded users/menus endpoints |
-| `src/components/crud/` | Generic four CRUD patterns | Request DB langsung |
-| `src/hooks/` | Hook lintas fitur | `useUsers` dan hook feature spesifik |
-| `src/types/` | Tipe UI lintas fitur | Duplikat `contracts` response DTO |
-| `src/utils/` | Pure shared formatting helpers | Auth/session/network clients |
-| `src/lib/` | HTTP clients dan integrasi library | Feature UI components |
-| `src/providers/` | Providers React | Domain persistence |
-| `src/config/` | Branding/konfigurasi UI | Secrets atau config DB client-side |
-| `src/mocks/` | Dummy data halaman **frontend-only** | Source of truth resource CRUD yang wajib DB |
+| Folder/berkas                | Tanggung jawab                                                     | Tidak boleh berisi                                  |
+| ---------------------------- | ------------------------------------------------------------------ | --------------------------------------------------- |
+| `src/app/`                   | Pohon App Router; subfolder membentuk segmen rute dan route groups | Business rules dan query DB di komponen halaman     |
+| `src/app/**/page.tsx`        | Entry point rute yang merender halaman dari `src/features/`        | Implementasi UI/logika fitur atau endpoint HTTP/API |
+| `src/app/api/**/route.ts`    | File Route Handler untuk endpoint HTTP/API                         | Komponen halaman React                              |
+| `src/features/*/components/` | UI halaman, form, columns, detail/view khusus fitur                | Duplikasi Data Grid/CRUD global                     |
+| `src/features/*/hooks/`      | TanStack Query hooks khusus resource                               | SQL/Drizzle                                         |
+| `src/features/*/schemas/`    | Schema form/UI (dapat extend schema contracts)                     | Duplikat schema request API sebagai source baru     |
+| `src/features/*/types/`      | Type UI khusus resource                                            | Duplikat API DTO                                    |
+| `src/features/*/utils/`      | Formatter/mapper murni khusus resource                             | General shared utilities                            |
+| `src/components/ui/`         | shadcn primitives                                                  | Business logic                                      |
+| `src/components/data-grid/`  | Generic tabel/filter/sort/pagination                               | Hardcoded users/menus endpoints                     |
+| `src/components/crud/`       | Generic four CRUD patterns                                         | Request DB langsung                                 |
+| `src/hooks/`                 | Hook lintas fitur                                                  | `useUsers` dan hook feature spesifik                |
+| `src/types/`                 | Tipe UI lintas fitur                                               | Duplikat `contracts` response DTO                   |
+| `src/utils/`                 | Pure shared formatting helpers                                     | Auth/session/network clients                        |
+| `src/lib/`                   | HTTP clients dan integrasi library                                 | Feature UI components                               |
+| `src/providers/`             | Providers React                                                    | Domain persistence                                  |
+| `src/config/`                | Branding/konfigurasi UI                                            | Secrets atau config DB client-side                  |
+| `src/mocks/`                 | Dummy data halaman **frontend-only**                               | Source of truth resource CRUD yang wajib DB         |
 
 ### 6.2 Fungsi package dan tingkat kemandirian
 
@@ -571,13 +585,13 @@ app-monorepo-starter/
 
 Business REST API menggunakan `/api/v1`.
 
-| Resource | List / Create | Get / Update / Delete |
-|---|---|---|
-| Users | `GET, POST /api/v1/users` | `GET, PATCH, DELETE /api/v1/users/:id` |
-| Countries | `GET, POST /api/v1/countries` | `GET, PATCH, DELETE /api/v1/countries/:id` |
-| Provinces | `GET, POST /api/v1/provinces` | `GET, PATCH, DELETE /api/v1/provinces/:id` |
-| Cities | `GET, POST /api/v1/cities` | `GET, PATCH, DELETE /api/v1/cities/:id` |
-| Menus | `GET, POST /api/v1/menus` | `GET, PATCH, DELETE /api/v1/menus/:id` |
+| Resource   | List / Create                  | Get / Update / Delete                       |
+| ---------- | ------------------------------ | ------------------------------------------- |
+| Users      | `GET, POST /api/v1/users`      | `GET, PATCH, DELETE /api/v1/users/:id`      |
+| Countries  | `GET, POST /api/v1/countries`  | `GET, PATCH, DELETE /api/v1/countries/:id`  |
+| Provinces  | `GET, POST /api/v1/provinces`  | `GET, PATCH, DELETE /api/v1/provinces/:id`  |
+| Cities     | `GET, POST /api/v1/cities`     | `GET, PATCH, DELETE /api/v1/cities/:id`     |
+| Menus      | `GET, POST /api/v1/menus`      | `GET, PATCH, DELETE /api/v1/menus/:id`      |
 | Parameters | `GET, POST /api/v1/parameters` | `GET, PATCH, DELETE /api/v1/parameters/:id` |
 
 `GET /api/v1/menus` untuk kebutuhan sidebar harus menjalankan filter permission; bila perlu kontrak khusus untuk menu navigasi efektif, tambahkan endpoint eksplisit dan dokumentasikan di OpenAPI (misalnya `/api/v1/menus/navigation`), tanpa membuat aturan security bergantung pada UI.
@@ -680,13 +694,13 @@ GET /api/v1/users?page=1&pageSize=20&search=andi&sortBy=name&sortOrder=asc
 
 Minimal support: `admin`, `editor`, `viewer` atau model permission equivalent yang terdokumentasi. Detail akses final disimpan dalam satu sumber kebijakan yang dites.
 
-| Resource/action | Admin | Editor | Viewer |
-|---|---|---|---|
-| Read sesuai scope | Ya | Ya | Ya |
-| Create/update master data | Ya | Jika diizinkan kebijakan | Tidak |
-| Delete master data | Ya | Jika diizinkan kebijakan | Tidak |
-| Manage users/roles/menus | Ya | Tidak secara default | Tidak |
-| Manage parameters | Ya | Tidak secara default | Tidak |
+| Resource/action           | Admin | Editor                   | Viewer |
+| ------------------------- | ----- | ------------------------ | ------ |
+| Read sesuai scope         | Ya    | Ya                       | Ya     |
+| Create/update master data | Ya    | Jika diizinkan kebijakan | Tidak  |
+| Delete master data        | Ya    | Jika diizinkan kebijakan | Tidak  |
+| Manage users/roles/menus  | Ya    | Tidak secara default     | Tidak  |
+| Manage parameters         | Ya    | Tidak secara default     | Tidak  |
 
 Konvensi:
 
@@ -861,22 +875,22 @@ Untuk Next.js, pastikan env yang dibutuhkan aplikasi tersedia di lokasi runtime 
 
 ### 15.2 Scripts root — kontrak developer experience
 
-| Command | Fungsi |
-|---|---|
-| `pnpm install` | Instal workspace |
-| `pnpm dev` | Menjalankan Next.js development (via Turborepo) |
-| `pnpm build` | Build seluruh target yang perlu |
-| `pnpm lint` | Lint workspace |
-| `pnpm typecheck` | TypeScript strict checks |
-| `pnpm test` | Unit tests |
-| `pnpm test:integration` | DB/API integration tests |
-| `pnpm test:contracts` | Test API schemas dan OpenAPI |
-| `pnpm db:generate` | Generate migration Drizzle |
-| `pnpm db:migrate` | Apply migration |
-| `pnpm db:seed` | Seed awal yang aman/idempotent |
-| `pnpm db:studio` | Drizzle Studio |
-| `pnpm openapi:generate` | Generate JSON dari Zod |
-| `pnpm openapi:check` | Verifikasi drift artefak |
+| Command                 | Fungsi                                          |
+| ----------------------- | ----------------------------------------------- |
+| `pnpm install`          | Instal workspace                                |
+| `pnpm dev`              | Menjalankan Next.js development (via Turborepo) |
+| `pnpm build`            | Build seluruh target yang perlu                 |
+| `pnpm lint`             | Lint workspace                                  |
+| `pnpm typecheck`        | TypeScript strict checks                        |
+| `pnpm test`             | Unit tests                                      |
+| `pnpm test:integration` | DB/API integration tests                        |
+| `pnpm test:contracts`   | Test API schemas dan OpenAPI                    |
+| `pnpm db:generate`      | Generate migration Drizzle                      |
+| `pnpm db:migrate`       | Apply migration                                 |
+| `pnpm db:seed`          | Seed awal yang aman/idempotent                  |
+| `pnpm db:studio`        | Drizzle Studio                                  |
+| `pnpm openapi:generate` | Generate JSON dari Zod                          |
+| `pnpm openapi:check`    | Verifikasi drift artefak                        |
 
 Agent harus mengimplementasikan root scripts di package.json yang meneruskan perintah ke package terkait; jangan hanya menuliskan tabel tanpa script nyata.
 
@@ -941,6 +955,7 @@ Sebuah feature **belum selesai** apabila:
 ### M0 — Monorepo bootstrap
 
 **Tugas:**
+
 - [ ] Inisialisasi pnpm workspace, Turborepo, TypeScript strict, Next.js App Router.
 - [ ] Tambahkan Tailwind, shadcn/ui, ESLint, konfigurasi build, `.gitignore`, `.env.example`, `README.md`, `AGENTS.md`.
 - [ ] Tambahkan PostgreSQL Compose, root scripts, CI skeleton.
@@ -1039,14 +1054,14 @@ Tahap 1 **dianggap selesai secara implementasi hanya bila** seluruh poin berikut
 
 ## 19. Panduan bila pengguna meminta melanjutkan development
 
-| Pesan pengguna | Tindakan agent |
-|---|---|
-| “Mulai development dari PRD” | Mulai M0, lalu milestone Tahap 1 berurutan |
-| “Lanjutkan Tahap 1” | Baca status implementasi terakhir, lanjut milestone belum selesai |
+| Pesan pengguna                 | Tindakan agent                                                                                  |
+| ------------------------------ | ----------------------------------------------------------------------------------------------- |
+| “Mulai development dari PRD”   | Mulai M0, lalu milestone Tahap 1 berurutan                                                      |
+| “Lanjutkan Tahap 1”            | Baca status implementasi terakhir, lanjut milestone belum selesai                               |
 | “Tambahkan fitur X ke Tahap 1” | Gunakan `features/X`, contracts/core/db/API, pilih pola global; perbarui PRD bila scope berubah |
-| “Lanjut Tahap 2” | Jalankan discovery dalam [PRD Tahap 2](../mobile/prd.md); **baru** tetapkan struktur Flutter |
-| “Lanjut Tahap 3” | Jalankan discovery dalam [PRD Tahap 3](../backend/prd.md); **baru** tetapkan struktur Go |
-| “Ubah keputusan yang dikunci” | Jelaskan konsekuensi dan usulkan revisi PRD/versioning |
+| “Lanjut Tahap 2”               | Jalankan discovery dalam [PRD Tahap 2](../mobile/prd.md); **baru** tetapkan struktur Flutter    |
+| “Lanjut Tahap 3”               | Jalankan discovery dalam [PRD Tahap 3](../backend/prd.md); **baru** tetapkan struktur Go        |
+| “Ubah keputusan yang dikunci”  | Jelaskan konsekuensi dan usulkan revisi PRD/versioning                                          |
 
 ### 19.1 Template laporan progres agent
 

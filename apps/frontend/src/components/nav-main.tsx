@@ -2,10 +2,8 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import type {
-  NavigationItem,
-  NavigationSection,
-} from "@/components/app-navigation";
+import type { NavigationSection } from "@/components/app-navigation";
+import { isNavigationItemActive } from "@/components/navigation-active";
 
 import {
   Collapsible,
@@ -36,21 +34,10 @@ import {
 } from "@/components/ui/sidebar";
 import { ChevronRightIcon } from "lucide-react";
 
-function isActiveItem(item: NavigationItem, pathname: string): boolean {
-  if (item.items?.length) {
-    return item.items.some((child) => isActiveItem(child, pathname));
-  }
-
-  return (
-    item.url.startsWith("/") &&
-    (pathname === item.url || pathname.startsWith(`${item.url}/`))
-  );
-}
-
 export function NavMain({ items }: { items: NavigationSection[] }) {
   const { state, isMobile } = useSidebar();
   const pathname = usePathname();
-  const activePath = pathname === "/dashboard" ? "/dashboard/main" : pathname;
+  const activePath = pathname;
 
   return items.map((section) => (
     <SidebarGroup key={section.title}>
@@ -67,7 +54,7 @@ export function NavMain({ items }: { items: NavigationSection[] }) {
                     render={
                       <SidebarMenuButton
                         aria-label={item.title}
-                        isActive={isActiveItem(item, activePath)}
+                        isActive={isNavigationItemActive(item, activePath)}
                         tooltip={item.title}
                       />
                     }
@@ -95,12 +82,18 @@ export function NavMain({ items }: { items: NavigationSection[] }) {
                                 <DropdownMenuItem
                                   key={grandchild.title}
                                   className="data-[active=true]:bg-accent data-[active=true]:text-accent-foreground"
-                                  data-active={isActiveItem(grandchild, activePath)}
+                                  data-active={isNavigationItemActive(
+                                    grandchild,
+                                    activePath,
+                                  )}
                                   render={
                                     <Link
                                       href={grandchild.url}
                                       aria-current={
-                                        isActiveItem(grandchild, activePath)
+                                        isNavigationItemActive(
+                                          grandchild,
+                                          activePath,
+                                        )
                                           ? "page"
                                           : undefined
                                       }
@@ -116,12 +109,15 @@ export function NavMain({ items }: { items: NavigationSection[] }) {
                           <DropdownMenuItem
                             key={child.title}
                             className="data-[active=true]:bg-accent data-[active=true]:text-accent-foreground"
-                            data-active={isActiveItem(child, activePath)}
+                            data-active={isNavigationItemActive(
+                              child,
+                              activePath,
+                            )}
                             render={
                               <Link
                                 href={child.url}
                                 aria-current={
-                                  isActiveItem(child, activePath)
+                                  isNavigationItemActive(child, activePath)
                                     ? "page"
                                     : undefined
                                 }
@@ -139,14 +135,14 @@ export function NavMain({ items }: { items: NavigationSection[] }) {
             ) : (
               <Collapsible
                 key={`${item.title}:${activePath}`}
-                defaultOpen={isActiveItem(item, activePath)}
+                defaultOpen={isNavigationItemActive(item, activePath)}
                 className="group/collapsible"
                 render={<SidebarMenuItem />}
               >
                 <CollapsibleTrigger
                   render={
                     <SidebarMenuButton
-                      isActive={isActiveItem(item, activePath)}
+                      isActive={isNavigationItemActive(item, activePath)}
                     />
                   }
                 >
@@ -160,7 +156,10 @@ export function NavMain({ items }: { items: NavigationSection[] }) {
                       child.items?.length ? (
                         <Collapsible
                           key={child.title}
-                          defaultOpen={isActiveItem(child, activePath)}
+                          defaultOpen={isNavigationItemActive(
+                            child,
+                            activePath,
+                          )}
                           className="group/sub-collapsible"
                           render={<SidebarMenuSubItem />}
                         >
@@ -168,7 +167,10 @@ export function NavMain({ items }: { items: NavigationSection[] }) {
                             render={
                               <SidebarMenuSubButton
                                 className="w-[calc(100%+1.5rem)] text-left"
-                                isActive={isActiveItem(child, activePath)}
+                                isActive={isNavigationItemActive(
+                                  child,
+                                  activePath,
+                                )}
                                 render={<button type="button" />}
                               />
                             }
@@ -184,12 +186,18 @@ export function NavMain({ items }: { items: NavigationSection[] }) {
                                 <SidebarMenuSubItem key={grandchild.title}>
                                   <SidebarMenuSubButton
                                     className="w-[calc(100%+0.5rem)]"
-                                    isActive={isActiveItem(grandchild, activePath)}
+                                    isActive={isNavigationItemActive(
+                                      grandchild,
+                                      activePath,
+                                    )}
                                     render={
                                       <Link
                                         href={grandchild.url}
                                         aria-current={
-                                          isActiveItem(grandchild, activePath)
+                                          isNavigationItemActive(
+                                            grandchild,
+                                            activePath,
+                                          )
                                             ? "page"
                                             : undefined
                                         }
@@ -207,12 +215,12 @@ export function NavMain({ items }: { items: NavigationSection[] }) {
                         <SidebarMenuSubItem key={child.title}>
                           <SidebarMenuSubButton
                             className="w-[calc(100%+1.5rem)]"
-                            isActive={isActiveItem(child, activePath)}
+                            isActive={isNavigationItemActive(child, activePath)}
                             render={
                               <Link
                                 href={child.url}
                                 aria-current={
-                                  isActiveItem(child, activePath)
+                                  isNavigationItemActive(child, activePath)
                                     ? "page"
                                     : undefined
                                 }
@@ -231,14 +239,16 @@ export function NavMain({ items }: { items: NavigationSection[] }) {
           ) : (
             <SidebarMenuItem key={item.title}>
               <SidebarMenuButton
-                isActive={isActiveItem(item, activePath)}
+                isActive={isNavigationItemActive(item, activePath)}
                 tooltip={item.title}
                 render={
                   <Link
                     href={item.url}
                     aria-label={item.title}
                     aria-current={
-                      isActiveItem(item, activePath) ? "page" : undefined
+                      isNavigationItemActive(item, activePath)
+                        ? "page"
+                        : undefined
                     }
                   />
                 }

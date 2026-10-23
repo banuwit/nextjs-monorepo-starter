@@ -32,3 +32,10 @@ test("header color is not persisted even when cookie persistence is enabled", ()
   assert.equal(preferenceCookie("headerColor", "rose", true), null);
   assert.equal(readPreferences("app_header=rose", true).headerColor, "white");
 });
+
+test("header layout is accepted and follows the sidebar style cookie policy", () => {
+  assert.equal(parsePreference("sidebarStyle", "header"), "header");
+  assert.equal(readPreferences("app_sidebar=header", true).sidebarStyle, "header");
+  assert.equal(readPreferences("app_sidebar=header", false).sidebarStyle, "sidebar");
+  assert.match(preferenceCookie("sidebarStyle", "header", true), /app_sidebar=header/);
+});

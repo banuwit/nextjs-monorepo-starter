@@ -13,7 +13,7 @@ export const PREFERENCE_OPTIONS = {
   themeMode: ["light", "dark", "system"],
   font: ["geist", "inter", "nunito", "roboto", "dm-sans", "poppins", "raleway"],
   contentLayout: ["centered", "full-width"],
-  sidebarStyle: ["sidebar", "inset", "floating"],
+  sidebarStyle: ["sidebar", "inset", "floating", "header"],
   primaryColor: COLOR_OPTIONS,
   sidebarColor: [...COLOR_OPTIONS, "white", "gray"],
   headerColor: [...COLOR_OPTIONS, "white", "gray"],

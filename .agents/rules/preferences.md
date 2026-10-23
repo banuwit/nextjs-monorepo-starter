@@ -4,26 +4,28 @@ Panduan ini berlaku saat membuat atau mengubah halaman frontend, dashboard shell
 
 ## Cara pemakaian
 
-1. Buka dashboard, lalu klik ikon pengaturan berlabel **Preferences** di header.
+1. Buka dashboard, lalu pilih **Preferences** dari menu akun untuk membuka modal. Tombol Preferences di dashboard Finance membuka modal yang sama.
 2. Pilih font, warna, layout, gaya sidebar, radius, atau skala. Perubahan langsung diterapkan tanpa tombol simpan.
-3. Gunakan tombol matahari/bulan yang terpisah di header untuk mengganti mode terang/gelap.
+3. Gunakan tombol ikon tema di header, tepat di kiri menu akun, untuk mengganti mode terang/gelap.
 4. Klik **Restore Defaults** untuk mengembalikan seluruh pilihan dalam panel ke nilai bawaan. Mode terang/gelap tetap mengikuti pilihan sebelumnya.
 
-| Pengaturan     | Pilihan                                                    | Bawaan     | Efek                                                                                                           |
-| -------------- | ---------------------------------------------------------- | ---------- | -------------------------------------------------------------------------------------------------------------- |
-| Fonts          | Geist, Inter, Nunito, Roboto, DM Sans, Poppins, Raleway    | Geist      | Mengubah font sans aplikasi.                                                                                   |
-| Primary Color  | Blue, Indigo, Violet, Emerald, Teal, Orange, Rose, Neutral | Blue       | Mengubah warna utama, teks pendamping, dan focus ring.                                                         |
-| Sidebar Color  | Semua warna utama, White, Gray                             | Neutral    | Mengubah latar sidebar dan warna teks yang terkait. White mengikuti mode terang/gelap.                         |
-| Header Color   | Semua warna utama, White, Gray                             | White      | Mengubah latar header dan kontras teks/kontrolnya. White mengikuti mode terang/gelap.                          |
-| App Body Color | Semua warna utama                                          | Neutral    | Mengubah latar area konten yang memakai `AppBody`.                                                             |
-| Page Layout    | Centered, Full Width                                       | Full Width | Centered membatasi lebar `AppBody` sampai `75rem`; Full Width memakai ruang tersedia.                          |
-| Sidebar Style  | Sidebar, Inset, Floating                                   | Sidebar    | Mengubah varian sidebar. Buka/tutup sidebar hanya melalui ikon trigger di header.                              |
-| Border Radius  | None, Small, Medium, Large                                 | Medium     | Mengubah token radius dasar menjadi `0`, `0.375rem`, `0.625rem`, atau `1rem`.                                  |
-| Scale          | Small, Medium, Large                                       | Medium     | Mengubah ukuran font root menjadi `87.5%`, `100%`, atau `112.5%`, sehingga ukuran berbasis `rem` ikut berubah. |
+| Pengaturan     | Pilihan                                                    | Bawaan     | Efek                                                                                                                               |
+| -------------- | ---------------------------------------------------------- | ---------- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| Fonts          | Geist, Inter, Nunito, Roboto, DM Sans, Poppins, Raleway    | Geist      | Mengubah font sans aplikasi.                                                                                                       |
+| Primary Color  | Blue, Indigo, Violet, Emerald, Teal, Orange, Rose, Neutral | Blue       | Mengubah warna utama, teks pendamping, dan focus ring.                                                                             |
+| Sidebar Color  | Semua warna utama, White, Gray                             | Neutral    | Mengubah latar sidebar dan warna teks yang terkait. White mengikuti mode terang/gelap.                                             |
+| Header Color   | Semua warna utama, White, Gray                             | White      | Mengubah latar header dan kontras teks/kontrolnya. White mengikuti mode terang/gelap.                                              |
+| App Body Color | Semua warna utama                                          | Neutral    | Mengubah seluruh latar shell dashboard pada semua gaya navigasi.                                                                   |
+| Page Layout    | Centered, Full Width                                       | Full Width | Centered membatasi lebar `AppBody` sampai `75rem`; Full Width memakai ruang tersedia.                                              |
+| Sidebar Style  | Sidebar, Inset, Floating, Header                           | Sidebar    | Mengubah varian navigasi. Header memakai menubar di bawah header pada desktop; drawer sidebar dan trigger tetap dipakai di mobile. |
+| Border Radius  | None, Small, Medium, Large                                 | Medium     | Mengubah token radius dasar menjadi `0`, `0.375rem`, `0.625rem`, atau `1rem`.                                                      |
+| Scale          | Small, Medium, Large                                       | Medium     | Mengubah ukuran font root menjadi `87.5%`, `100%`, atau `112.5%`, sehingga ukuran berbasis `rem` ikut berubah.                     |
 
-Warna utama, sidebar, header, dan app body dapat dipilih secara independen. Warna chart tidak ikut diubah. Latar app body pada mode terang memakai shade 50 dengan alpha 60%; mode gelap memakai shade 950. Transparansi hanya berlaku pada latar, bukan isi konten. Pada gaya Floating, latar di belakang sidebar dan header memakai warna visual app body yang sama; pembungkus sticky header menutup konten yang bergulir di celah atas. Permukaan header tetap memakai Header Color, dengan radius dan bayangan seperti sidebar.
+Warna utama, sidebar, header, dan app body dapat dipilih secara independen. Warna chart tidak ikut diubah. Latar shell dashboard pada mode terang memakai shade 50 dengan alpha 60%; mode gelap memakai shade 950. Transparansi hanya berlaku pada latar, bukan isi konten. `AppBody` transparan agar warna pada shell tidak tertumpuk. Pada gaya Floating, latar di belakang sidebar dan header memakai warna visual app body yang sama; pembungkus sticky header menutup konten yang bergulir di celah atas. Permukaan header tetap memakai Header Color, dengan radius dan bayangan seperti sidebar.
 
-Mode tema bawaan adalah `light`. Model data mendukung `system` dan mengikuti perubahan tema sistem operasi, tetapi kontrol header saat ini hanya menawarkan perpindahan terang/gelap.
+Pada gaya Header, sidebar dan trigger tidak ditampilkan di desktop. Menubar navigasi yang ringkas berada pada baris kedua di bawah header: putih dengan teks gelap pada mode terang, memakai warna Card dan teks terang pada mode gelap, terlepas dari Header Color. Border header sidebar, header gaya Header, dan menubar mengikuti warna garis Card. Search menu berada di header di kiri tombol ikon tema dan menu akun. Di mobile, baris menubar disembunyikan; trigger di kiri logo dan nama aplikasi membuka drawer sidebar yang sama, dan Search menu tersedia sebagai ikon di header. Menu akun menyediakan aksi untuk membuka modal Preferences; tombol ikon tema berada tepat di kirinya.
+
+Mode tema bawaan adalah `light`. Model data mendukung `system` dan mengikuti perubahan tema sistem operasi, tetapi tombol ikon tema saat ini hanya menawarkan perpindahan terang/gelap.
 
 ## Penyimpanan dan konfigurasi
 
@@ -32,7 +34,7 @@ Sumber acuan adalah [preferences-config.ts](../../apps/frontend/src/lib/preferen
 - `PREFERENCE_OPTIONS`: pilihan yang valid untuk setiap pengaturan.
 - `DEFAULT_THEME_MODE`: tema awal.
 - `PREFERENCES_CONFIG.defaults`: nilai bawaan panel, tanpa `themeMode`.
-- `PREFERENCES_CONFIG.showPreferences`: saat ini `true`. Jika `false`, tombol/panel Preferences disembunyikan; provider, tampilan bawaan, dan tombol tema tetap bekerja.
+- `PREFERENCES_CONFIG.showPreferences`: saat ini `true`. Jika `false`, item/panel Preferences disembunyikan; provider, tampilan bawaan, dan toggle tema tetap bekerja.
 - `PREFERENCES_CONFIG.persistToCookie`: saat ini `false`. Mengatur penyimpanan pilihan nonwarna selain tema seperti tabel berikut.
 
 | Pengaturan                                                 | Penyimpanan                                                                                                                     | Perilaku saat reload                                                                             |
@@ -92,15 +94,17 @@ Saat menambah pilihan baru, perbarui opsi/tipe/default dan validasi di konfigura
 
 ## Peta implementasi
 
-| File                                                                                                                       | Tanggung jawab                                                                                                                      |
-| -------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
-| [preferences-config.ts](../../apps/frontend/src/lib/preferences-config.ts)                                                 | Opsi, default, palet, validasi, pembacaan/pembuatan cookie, dan boot script.                                                        |
-| [preferences-provider.tsx](../../apps/frontend/src/providers/preferences-provider.tsx)                                     | State React, hook, perubahan atribut HTML/CSS variable, sinkronisasi tema, cookie, dan reset.                                       |
-| [preferences.tsx](../../apps/frontend/src/components/preferences.tsx)                                                      | Panel Preferences di header.                                                                                                        |
-| [app-sidebar-header.tsx](../../apps/frontend/src/components/app-sidebar-header.tsx)                                        | Penempatan panel dan tombol tema terpisah.                                                                                          |
-| [layout.tsx](../../apps/frontend/src/app/layout.tsx)                                                                       | Membaca cookie di server, memuat font, menyiapkan atribut/style awal, menjalankan boot script sebelum paint, dan memasang provider. |
-| [app-sidebar.tsx](../../apps/frontend/src/components/app-sidebar.tsx)                                                      | Memakai nilai `sidebarStyle` untuk varian sidebar.                                                                                  |
-| [app-body.tsx](../../apps/frontend/src/components/app-body.tsx) dan [globals.css](../../apps/frontend/src/app/globals.css) | Pembungkus konten dan penerapan token font, layout, warna, radius, serta skala.                                                     |
+| File                                                                                                                                                        | Tanggung jawab                                                                                                                      |
+| ----------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| [preferences-config.ts](../../apps/frontend/src/lib/preferences-config.ts)                                                                                  | Opsi, default, palet, validasi, pembacaan/pembuatan cookie, dan boot script.                                                        |
+| [preferences-provider.tsx](../../apps/frontend/src/providers/preferences-provider.tsx)                                                                      | State React, hook, perubahan atribut HTML/CSS variable, sinkronisasi tema, cookie, dan reset.                                       |
+| [preferences.tsx](../../apps/frontend/src/components/preferences.tsx)                                                                                       | Kontrol Preferences bersama dan modal untuk menu akun serta dashboard Finance.                                                      |
+| [nav-user.tsx](../../apps/frontend/src/components/nav-user.tsx)                                                                                             | Menu akun dengan aksi modal Preferences.                                                                                            |
+| [app-sidebar-header.tsx](../../apps/frontend/src/components/app-sidebar-header.tsx)                                                                         | Header untuk gaya sidebar serta kontrol bersama Search, tombol ikon tema, dan menu akun.                                            |
+| [app-header.tsx](../../apps/frontend/src/components/app-header.tsx) dan [app-header-menubar.tsx](../../apps/frontend/src/components/app-header-menubar.tsx) | Header untuk gaya Header dan menubar navigasi desktop.                                                                              |
+| [layout.tsx](../../apps/frontend/src/app/layout.tsx)                                                                                                        | Membaca cookie di server, memuat font, menyiapkan atribut/style awal, menjalankan boot script sebelum paint, dan memasang provider. |
+| [app-sidebar.tsx](../../apps/frontend/src/components/app-sidebar.tsx)                                                                                       | Memakai nilai `sidebarStyle` untuk varian sidebar.                                                                                  |
+| [app-body.tsx](../../apps/frontend/src/components/app-body.tsx) dan [globals.css](../../apps/frontend/src/app/globals.css)                                  | Pembungkus konten dan penerapan token font, layout, warna, radius, serta skala.                                                     |
 
 ## Verifikasi saat mengubah implementasi
 

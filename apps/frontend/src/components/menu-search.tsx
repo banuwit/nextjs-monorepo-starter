@@ -8,6 +8,7 @@ import {
   type NavigationItem,
   useAppNavigation,
 } from "@/components/app-navigation";
+import { filterMenuTree } from "@/components/menu-search-tree";
 import { Button } from "@/components/ui/button";
 import {
   Command,
@@ -20,39 +21,50 @@ import {
 } from "@/components/ui/command";
 import { Kbd } from "@/components/ui/kbd";
 
-type MenuPage = {
-  title: string;
-  url: string;
-  icon: NavigationItem["icon"];
-};
-
-function getMenuPages(
-  items: NavigationItem[],
-  parents: string[] = [],
-): MenuPage[] {
-  return items.flatMap((item) =>
-    item.items?.length
-      ? getMenuPages(item.items, [...parents, item.title])
-      : item.url.startsWith("/")
-        ? [
-            {
-              title: [...parents, item.title].join(" / "),
-              url: item.url,
-              icon: item.icon,
-            },
-          ]
-        : [],
+function MenuTree({
+  items,
+  onSelect,
+}: {
+  items: NavigationItem[];
+  onSelect: (url: string) => void;
+}) {
+  return items.map((item) =>
+    item.items?.length ? (
+      <div key={item.title}>
+        <div className="flex items-center gap-2 px-2 py-1.5 text-sm font-medium text-foreground [&_svg]:size-4">
+          {item.icon}
+          <span>{item.title}</span>
+        </div>
+        <div className="ml-3 border-l border-border pl-2">
+          <MenuTree items={item.items} onSelect={onSelect} />
+        </div>
+      </div>
+    ) : (
+      <CommandItem
+        key={item.url}
+        value={item.url}
+        onSelect={() => onSelect(item.url)}
+      >
+        {item.icon}
+        <span>{item.title}</span>
+      </CommandItem>
+    ),
   );
 }
 
-export function MenuSearch() {
+export function MenuSearch({ iconOnly = false }: { iconOnly?: boolean }) {
   const navigation = useAppNavigation();
+  const [search, setSearch] = useState("");
   const menuGroups = navigation
     .map((section) => ({
       title: section.title,
-      pages: getMenuPages(section.items),
+      items: filterMenuTree(
+        section.items,
+        search,
+        section.title.toLowerCase().includes(search.trim().toLowerCase()),
+      ),
     }))
-    .filter((section) => section.pages.length > 0);
+    .filter((section) => section.items.length > 0);
 
   const [open, setOpen] = useState(false);
   const router = useRouter();
@@ -74,36 +86,39 @@ export function MenuSearch() {
       <Button
         type="button"
         variant="link"
+        size={iconOnly ? "icon-xs" : "default"}
         aria-label="Search menu"
         className="px-0! font-normal text-muted-foreground hover:no-underline"
         onClick={() => setOpen(true)}
       >
         <SearchIcon data-icon="inline-start" />
-        Search menu...
-        <Kbd className="border px-1.5 text-[10px]">
-          <span className="text-xs">⌘</span>J
-        </Kbd>
+        {!iconOnly && (
+          <>
+            Search menu...
+            <Kbd className="border px-1.5 text-[10px]">
+              <span className="text-xs">⌘</span>J
+            </Kbd>
+          </>
+        )}
       </Button>
       <CommandDialog open={open} onOpenChange={setOpen}>
-        <Command>
-          <CommandInput placeholder="Search pages..." />
+        <Command shouldFilter={false}>
+          <CommandInput
+            placeholder="Search pages..."
+            value={search}
+            onValueChange={setSearch}
+          />
           <CommandList>
             <CommandEmpty>No menus found.</CommandEmpty>
             {menuGroups.map((group) => (
               <CommandGroup key={group.title} heading={group.title}>
-                {group.pages.map((page) => (
-                  <CommandItem
-                    key={page.url}
-                    value={`${group.title} ${page.title}`}
-                    onSelect={() => {
-                      setOpen(false);
-                      router.push(page.url);
-                    }}
-                  >
-                    {page.icon}
-                    <span>{page.title}</span>
-                  </CommandItem>
-                ))}
+                <MenuTree
+                  items={group.items}
+                  onSelect={(url) => {
+                    setOpen(false);
+                    router.push(url);
+                  }}
+                />
               </CommandGroup>
             ))}
           </CommandList>
