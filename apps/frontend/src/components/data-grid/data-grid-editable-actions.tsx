@@ -3,7 +3,7 @@
 import { Check, Copy, Pencil, Trash2, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
-type RowEditActionsProps = {
+type DataGridEditableActionsProps = {
   label: string;
   editing: boolean;
   disabled?: boolean;
@@ -15,7 +15,7 @@ type RowEditActionsProps = {
   onCancel: () => void;
 };
 
-export function DataGridRowEditActions({
+export function DataGridEditableActions({
   label,
   editing,
   disabled,
@@ -25,7 +25,7 @@ export function DataGridRowEditActions({
   onDelete,
   onSave,
   onCancel,
-}: RowEditActionsProps) {
+}: DataGridEditableActionsProps) {
   return (
     <div className="flex items-center gap-1">
       {editing ? (

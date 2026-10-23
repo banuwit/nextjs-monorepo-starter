@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { cn } from "@/lib/utils"
 
-import { DataGridColumnActions } from "./data-grid-header-dropdown-actions"
+import { DataGridHeaderDropdownActions } from "./data-grid-header-dropdown-actions"
 import type { DataGridFeatures } from "./data-grid-features"
 import { DataGridVisibilityHeader } from "./data-grid-visibility-header"
 import { getSorted } from "./types"
@@ -142,7 +142,7 @@ export function DataGridHeaderDropdown<TData extends RowData, TValue>({
             {hasColumnActions && (
               <>
                 {canSort && <DropdownMenuSeparator />}
-                <DataGridColumnActions
+                <DataGridHeaderDropdownActions
                   column={column}
                   pinned={pinned}
                   enablePinning={enablePinning}

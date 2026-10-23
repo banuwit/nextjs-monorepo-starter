@@ -14,7 +14,7 @@ import {
 import { DataGridClient } from "@/components/data-grid/data-grid-client";
 import type { DataGridFeatures } from "@/components/data-grid/data-grid-features";
 import { DataGridHeader } from "@/components/data-grid/data-grid-header";
-import { DataGridRowEditActions } from "@/components/data-grid/data-grid-editable-actions";
+import { DataGridEditableActions } from "@/components/data-grid/data-grid-editable-actions";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
@@ -183,7 +183,7 @@ function UserRowCell({
 function RowActions({ user }: { user: UserDraft }) {
   const { state, errors, dispatch, requestDelete } = useRowEditor();
   return (
-    <DataGridRowEditActions
+    <DataGridEditableActions
       label={user.id}
       editing={state.editing?.draft.id === user.id}
       disabled={Boolean(state.editing)}

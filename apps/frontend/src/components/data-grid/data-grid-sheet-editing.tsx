@@ -65,14 +65,14 @@ type CellEditingContext = {
 };
 const CellEditingContext = createContext<CellEditingContext | null>(null);
 
-export function useDataGridCellEditing() {
+export function useDataGridSheetEditing() {
   const context = useContext(CellEditingContext);
-  if (!context) throw new Error("Cell editing requires DataGridCellEditing.");
+  if (!context) throw new Error("Cell editing requires DataGridSheetEditing.");
   return context;
 }
 
 /** Coordinates cell interaction. Validation and undo history belong to the feature. */
-export function DataGridCellEditing({
+export function DataGridSheetEditing({
   rowCount,
   columnCount,
   getValue,
@@ -585,7 +585,7 @@ export function DataGridCellEditor({
   dirty?: boolean;
   children?: ReactNode;
 }) {
-  const context = useDataGridCellEditing();
+  const context = useDataGridSheetEditing();
   const { editing, selection, finish, nextCell, errorId } = context;
   const active = editing?.row === cell.row && editing.column === cell.column;
   const bounds = selection ? getCellRange(selection) : null;

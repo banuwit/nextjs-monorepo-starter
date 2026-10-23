@@ -70,7 +70,7 @@ function moveColumn<TData extends RowData, TValue>(
   table.setColumnOrder(order)
 }
 
-interface DataGridColumnActionsProps<TData extends RowData, TValue> {
+interface DataGridHeaderDropdownActionsProps<TData extends RowData, TValue> {
   column: Column<DataGridFeatures, TData, TValue>
   /** Current pin position — pass it in so the menu re-renders on change. */
   pinned: false | "start" | "end"
@@ -83,12 +83,12 @@ interface DataGridColumnActionsProps<TData extends RowData, TValue> {
  * "right" (what the user sees in an LTR layout); TanStack v9 calls the
  * regions `start` and `end`.
  */
-export function DataGridColumnActions<TData extends RowData, TValue>({
+export function DataGridHeaderDropdownActions<TData extends RowData, TValue>({
   column,
   pinned,
   enablePinning,
   enableOrdering,
-}: DataGridColumnActionsProps<TData, TValue>) {
+}: DataGridHeaderDropdownActionsProps<TData, TValue>) {
   const table = column.table
   const canPin = enablePinning && column.getCanPin()
   const region = pinned || "center"

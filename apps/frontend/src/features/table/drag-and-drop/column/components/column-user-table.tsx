@@ -6,7 +6,7 @@ import { useState } from "react";
 
 import { DataGridClient } from "@/components/data-grid/data-grid-client";
 import type { DataGridFeatures } from "@/components/data-grid/data-grid-features";
-import { DataGridHeaderDrag } from "@/components/data-grid/data-grid-header-dnd";
+import { DataGridHeaderDnd } from "@/components/data-grid/data-grid-header-dnd";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -23,12 +23,12 @@ const dateFormatter = new Intl.DateTimeFormat("en-GB", {
 const columns: ColumnDef<DataGridFeatures, User>[] = [
   {
     id: "no",
-    header: () => <DataGridHeaderDrag title="No" />,
+    header: () => <DataGridHeaderDnd title="No" />,
     cell: ({ row }) => <span className="tabular-nums">{row.index + 1}</span>,
   },
   {
     accessorKey: "id",
-    header: () => <DataGridHeaderDrag title="User ID" />,
+    header: () => <DataGridHeaderDnd title="User ID" />,
     cell: ({ row }) => (
       <span className="text-muted-foreground tabular-nums">
         {row.original.id}
@@ -37,7 +37,7 @@ const columns: ColumnDef<DataGridFeatures, User>[] = [
   },
   {
     accessorKey: "name",
-    header: () => <DataGridHeaderDrag title="Name" />,
+    header: () => <DataGridHeaderDnd title="Name" />,
     cell: ({ row }) => (
       <div className="flex items-center gap-3">
         <Avatar>
@@ -52,17 +52,17 @@ const columns: ColumnDef<DataGridFeatures, User>[] = [
       </div>
     ),
   },
-  { accessorKey: "email", header: () => <DataGridHeaderDrag title="Email" /> },
+  { accessorKey: "email", header: () => <DataGridHeaderDnd title="Email" /> },
   {
     accessorKey: "gender",
-    header: () => <DataGridHeaderDrag title="Gender" />,
+    header: () => <DataGridHeaderDnd title="Gender" />,
     cell: ({ row }) => (
       <span className="capitalize">{row.original.gender}</span>
     ),
   },
   {
     accessorKey: "role",
-    header: () => <DataGridHeaderDrag title="Role" />,
+    header: () => <DataGridHeaderDnd title="Role" />,
     cell: ({ row }) => (
       <Badge variant="outline" className="capitalize">
         {row.original.role}
@@ -71,7 +71,7 @@ const columns: ColumnDef<DataGridFeatures, User>[] = [
   },
   {
     accessorKey: "joinDate",
-    header: () => <DataGridHeaderDrag title="Join Date" />,
+    header: () => <DataGridHeaderDnd title="Join Date" />,
     cell: ({ row }) => (
       <time dateTime={row.original.joinDate}>
         {dateFormatter.format(new Date(row.original.joinDate))}
@@ -80,7 +80,7 @@ const columns: ColumnDef<DataGridFeatures, User>[] = [
   },
   {
     accessorKey: "status",
-    header: () => <DataGridHeaderDrag title="Status" />,
+    header: () => <DataGridHeaderDnd title="Status" />,
     cell: ({ row }) => (
       <Badge
         variant={

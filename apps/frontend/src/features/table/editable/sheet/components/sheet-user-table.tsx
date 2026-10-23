@@ -34,9 +34,9 @@ import { DataGridVisibilityToggle } from "@/components/data-grid/data-grid-visib
 import { getUserCellColumnOrder } from "../user-sheet-columns";
 import { DataGridHeaderDropdown } from "@/components/data-grid/data-grid-header-dropdown";
 import {
-  DataGridCellEditing,
+  DataGridSheetEditing,
   DataGridCellEditor,
-  useDataGridCellEditing,
+  useDataGridSheetEditing,
 } from "@/components/data-grid/data-grid-sheet-editing";
 import {
   getCellRange,
@@ -279,7 +279,7 @@ function UserGrid({
   toolbar: (table: ReactTable<DataGridFeatures, User>) => ReactNode;
 }) {
   const { selection, editing, getCellProps, fillDown, undo, redo } =
-    useDataGridCellEditing();
+    useDataGridSheetEditing();
   const { visible, visibleIds, columnState, settings, allRows, sorting } =
     useView();
   const bounds = selection ? getCellRange(selection) : null;
@@ -411,7 +411,7 @@ function UserRowMenu({
   remove: (user: User) => void;
   activate: (user: User) => void;
 }) {
-  const { setMessage } = useDataGridCellEditing();
+  const { setMessage } = useDataGridSheetEditing();
   if (!user) return null;
   return (
     <ContextMenuGroup>
@@ -552,7 +552,7 @@ export function CellUserTable({ users }: { users: User[] }) {
           }
         }}
       >
-        <DataGridCellEditing
+        <DataGridSheetEditing
           viewKey={
             rows.map((row) => row.id).join(",") +
             ":" +
@@ -680,7 +680,7 @@ export function CellUserTable({ users }: { users: User[] }) {
             canUndo={state.past.length > 0}
             canRedo={state.future.length > 0}
           />
-        </DataGridCellEditing>
+        </DataGridSheetEditing>
       </div>
       {editor && (
         <CellUserForm

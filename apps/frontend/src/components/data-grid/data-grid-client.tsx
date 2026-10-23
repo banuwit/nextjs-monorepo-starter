@@ -113,7 +113,7 @@ interface DataGridClientBaseProps<TData extends RowData> {
   defaultColumnPinning?: ColumnPinningState
   /** Column ids in their initial order. Defaults to the column def order. */
   defaultColumnOrder?: ColumnOrderState
-  /** Drag ungrouped DataGridHeaderDrag headers. Pinned columns remain fixed. */
+  /** Drag ungrouped DataGridHeaderDnd headers. Pinned columns remain fixed. */
   columnDrag?: {
     order: ColumnOrderState
     onOrderChange: (order: ColumnOrderState) => void

@@ -6,7 +6,7 @@ import { useContext } from "react";
 import { Button } from "@/components/ui/button";
 import { ColumnDragHandleContext } from "./data-grid-column-dnd";
 
-export function DataGridHeaderDrag({ title }: { title: string }) {
+export function DataGridHeaderDnd({ title }: { title: string }) {
   const context = useContext(ColumnDragHandleContext);
   if (!context) return <span>{title}</span>;
   const { attributes, listeners, setHandleNode } = context;
