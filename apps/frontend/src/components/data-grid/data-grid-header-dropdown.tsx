@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { cn } from "@/lib/utils"
 
-import { DataGridColumnActions } from "./data-grid-column-actions"
+import { DataGridColumnActions } from "./data-grid-header-dropdown-actions"
 import type { DataGridFeatures } from "./data-grid-features"
 import { DataGridVisibilityHeader } from "./data-grid-visibility-header"
 import { getSorted } from "./types"

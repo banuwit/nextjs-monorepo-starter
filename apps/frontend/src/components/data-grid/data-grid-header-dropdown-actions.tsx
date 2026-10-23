@@ -38,6 +38,20 @@ function moveColumn<TData extends RowData, TValue>(
     return
   }
 
+  // Pinned regions follow the pinning arrays, not columnOrder.
+  if (region !== "center") {
+    table.setColumnPinning((current) => {
+      const ids = [...current[region]]
+      const from = ids.indexOf(column.id)
+      const to = ids.indexOf(neighbour.id)
+      if (from < 0 || to < 0) return current
+      ids[from] = neighbour.id
+      ids[to] = column.id
+      return { ...current, [region]: ids }
+    })
+    return
+  }
+
   const current = table.store.state.columnOrder
   const order = current.length
     ? [...current]

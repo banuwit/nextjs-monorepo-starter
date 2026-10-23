@@ -9,9 +9,12 @@ import type {
   ColumnVisibilityState,
   PaginationState,
   RowData,
+  ReactTable,
+  OnChangeFn,
   SortingState,
 } from "@tanstack/react-table"
 import * as React from "react"
+import { cn } from "@/lib/utils"
 
 import { FacetedFilter } from "@/components/filters/faceted-filter"
 import { SelectBox } from "@/components/filters/select-box"
@@ -41,11 +44,33 @@ import { reorderDataGridItems } from "./data-grid-reordering"
 import { DataGridVisibilityToggle } from "./data-grid-visibility-toggle"
 import type { ToolbarConfig } from "./types"
 
+export interface DataGridColumnState {
+  visibility: ColumnVisibilityState
+  order: ColumnOrderState
+  pinning: ColumnPinningState
+  onVisibilityChange: OnChangeFn<ColumnVisibilityState>
+  onOrderChange: OnChangeFn<ColumnOrderState>
+  onPinningChange: OnChangeFn<ColumnPinningState>
+}
+
 interface DataGridClientBaseProps<TData extends RowData> {
   columns: ColumnDef<DataGridFeatures, TData>[]
   data: TData[]
+  /** Optional accessibility attributes for interactive grids. */
+  tableProps?: React.ComponentProps<"table">
+  getHeaderProps?: (columnId: string) => React.ComponentProps<"th">
+  /** Cell interaction and appearance; shared rendering/pinning stays in the grid. */
+  getCellProps?: (context: {
+    row: TData
+    rowIndex: number
+    columnId: string
+  }) => React.ComponentProps<"td">
   /** Omit for a plain grid with sorting only — no search or filter. */
   toolbar?: ToolbarConfig
+  /** Feature-owned column state keeps spreadsheet coordinates aligned with the view. */
+  columnState?: DataGridColumnState
+  /** Replace the default toolbar while using the same table instance. */
+  renderToolbar?: (table: ReactTable<DataGridFeatures, TData>) => React.ReactNode
   defaultSorting?: SortingState
   /** Extra buttons rendered to the right of the visibility toggle. */
   actions?: React.ReactNode
@@ -118,7 +143,12 @@ const EMPTY_SELECTS: NonNullable<ToolbarConfig["selects"]> = []
 export function DataGridClient<TData extends RowData>({
   columns,
   data,
+  tableProps,
+  getHeaderProps,
+  getCellProps,
   toolbar,
+  columnState,
+  renderToolbar,
   defaultSorting = [],
   actions,
   showVisibilityToggle = true,
@@ -194,13 +224,13 @@ export function DataGridClient<TData extends RowData>({
     enableSortingRemoval: false,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
-    onColumnVisibilityChange: setColumnVisibility,
-    onColumnPinningChange: setColumnPinning,
+    onColumnVisibilityChange: columnState?.onVisibilityChange ?? setColumnVisibility,
+    onColumnPinningChange: columnState?.onPinningChange ?? setColumnPinning,
     onColumnOrderChange: columnDrag
       ? (updater) => columnDrag.onOrderChange(
           typeof updater === "function" ? updater(columnDrag.order) : updater,
         )
-      : setColumnOrder,
+      : columnState?.onOrderChange ?? setColumnOrder,
     onPaginationChange: setPaginationState,
     enableColumnPinning,
     meta: {
@@ -211,9 +241,9 @@ export function DataGridClient<TData extends RowData>({
     state: {
       sorting,
       columnFilters,
-      columnVisibility,
-      columnPinning,
-      columnOrder: columnDrag?.order ?? columnOrder,
+      columnVisibility: columnState?.visibility ?? columnVisibility,
+      columnPinning: columnState?.pinning ?? columnPinning,
+      columnOrder: columnDrag?.order ?? columnState?.order ?? columnOrder,
       pagination: paginationState,
     },
   })
@@ -263,7 +293,7 @@ export function DataGridClient<TData extends RowData>({
 
   const content = (
     <div className="flex flex-col gap-3">
-      {(toolbar || showVisibilityToggle || actions) && (
+      {renderToolbar ? renderToolbar(table) : (toolbar || showVisibilityToggle || actions) && (
         <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex flex-1 flex-wrap items-center gap-2">
             {searchConfigs.map((search) => (
@@ -303,7 +333,7 @@ export function DataGridClient<TData extends RowData>({
             {showVisibilityToggle && (
               <DataGridVisibilityToggle
                 table={table}
-                columnVisibility={columnVisibility}
+                columnVisibility={columnState?.visibility ?? columnVisibility}
               />
             )}
             {actions}
@@ -312,7 +342,7 @@ export function DataGridClient<TData extends RowData>({
       )}
 
       <div className="overflow-hidden rounded-md border">
-        <Table>
+        <Table {...tableProps}>
           <TableHeader className="bg-muted">
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
@@ -331,6 +361,7 @@ export function DataGridClient<TData extends RowData>({
                     ),
                   }
                   const label = header.isPlaceholder ? null : <table.FlexRender header={header} />
+                  const customHeaderProps = getHeaderProps?.(header.column.id)
 
                   return columnIndex >= 0 ? (
                     <DataGridSortableColumnHead
@@ -343,7 +374,7 @@ export function DataGridClient<TData extends RowData>({
                       {label}
                     </DataGridSortableColumnHead>
                   ) : (
-                    <TableHead key={header.id} {...headerProps} ref={registerHeader(header.column.id)}>
+                    <TableHead key={header.id} {...headerProps} {...customHeaderProps} className={cn(headerProps.className, customHeaderProps?.className)} style={{...headerProps.style, ...customHeaderProps?.style}} ref={registerHeader(header.column.id)}>
                       {label}
                     </TableHead>
                   )
@@ -377,17 +408,21 @@ export function DataGridClient<TData extends RowData>({
               rows.map((row) => {
                 const cells = row.getVisibleCells().map((cell) => {
                   const columnIndex = draggableColumns.indexOf(cell.column.id)
+                  const pinnedProps = getPinnedCellProps(
+                    cell.column.getIsPinned(), offsets, cell.column.id,
+                  )
+                  const customProps = getCellProps?.({
+                    row: row.original, rowIndex: row.index, columnId: cell.column.id,
+                  })
                   return (
                     <TableCell
                       key={cell.id}
-                      {...getPinnedCellProps(
-                        cell.column.getIsPinned(), offsets, cell.column.id,
-                      )}
+                      {...customProps}
                       {...(columnIndex >= 0 ? {
                         "data-column-id": cell.column.id,
-                        style: getColumnMotionStyle(columnIndex),
-                        className: "motion-reduce:transition-none!",
                       } : {})}
+                      className={cn(pinnedProps.className, columnIndex >= 0 && "motion-reduce:transition-none!", customProps?.className, cell.column.getIsPinned() && "sticky", cell.column.getIsPinned() && customProps?.["aria-selected"] === true && "bg-[color-mix(in_srgb,var(--primary)_10%,var(--background))]")}
+                      style={{ ...customProps?.style, ...pinnedProps.style, ...(columnIndex >= 0 ? getColumnMotionStyle(columnIndex) : {}) }}
                     >
                       <table.FlexRender cell={cell} />
                     </TableCell>
