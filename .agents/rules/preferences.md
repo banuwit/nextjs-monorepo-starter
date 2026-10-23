@@ -14,13 +14,14 @@ Panduan ini berlaku saat membuat atau mengubah halaman frontend, dashboard shell
 | Fonts          | Geist, Inter, Nunito, Roboto, DM Sans, Poppins, Raleway    | Geist      | Mengubah font sans aplikasi.                                                                                   |
 | Primary Color  | Blue, Indigo, Violet, Emerald, Teal, Orange, Rose, Neutral | Blue       | Mengubah warna utama, teks pendamping, dan focus ring.                                                         |
 | Sidebar Color  | Semua warna utama, White, Gray                             | Neutral    | Mengubah latar sidebar dan warna teks yang terkait. White mengikuti mode terang/gelap.                         |
+| Header Color   | Semua warna utama, White, Gray                             | White      | Mengubah latar header dan kontras teks/kontrolnya. White mengikuti mode terang/gelap.                          |
 | App Body Color | Semua warna utama                                          | Neutral    | Mengubah latar area konten yang memakai `AppBody`.                                                             |
 | Page Layout    | Centered, Full Width                                       | Full Width | Centered membatasi lebar `AppBody` sampai `75rem`; Full Width memakai ruang tersedia.                          |
-| Sidebar Style  | Sidebar, Inset, Floating                                   | Sidebar    | Mengubah varian sidebar. Pengaturan buka/tutup sidebar merupakan kontrol terpisah.                             |
+| Sidebar Style  | Sidebar, Inset, Floating                                   | Sidebar    | Mengubah varian sidebar. Buka/tutup sidebar hanya melalui ikon trigger di header.                              |
 | Border Radius  | None, Small, Medium, Large                                 | Medium     | Mengubah token radius dasar menjadi `0`, `0.375rem`, `0.625rem`, atau `1rem`.                                  |
 | Scale          | Small, Medium, Large                                       | Medium     | Mengubah ukuran font root menjadi `87.5%`, `100%`, atau `112.5%`, sehingga ukuran berbasis `rem` ikut berubah. |
 
-Warna utama, sidebar, dan app body dapat dipilih secara independen. Warna chart tidak ikut diubah. Latar app body pada mode terang memakai shade 50 dengan alpha 60%; mode gelap memakai shade 950. Transparansi hanya berlaku pada latar, bukan isi konten.
+Warna utama, sidebar, header, dan app body dapat dipilih secara independen. Warna chart tidak ikut diubah. Latar app body pada mode terang memakai shade 50 dengan alpha 60%; mode gelap memakai shade 950. Transparansi hanya berlaku pada latar, bukan isi konten. Pada gaya Floating, latar di belakang sidebar dan header memakai warna visual app body yang sama; pembungkus sticky header menutup konten yang bergulir di celah atas. Permukaan header tetap memakai Header Color, dengan radius dan bayangan seperti sidebar.
 
 Mode tema bawaan adalah `light`. Model data mendukung `system` dan mengikuti perubahan tema sistem operasi, tetapi kontrol header saat ini hanya menawarkan perpindahan terang/gelap.
 
@@ -34,11 +35,11 @@ Sumber acuan adalah [preferences-config.ts](../../apps/frontend/src/lib/preferen
 - `PREFERENCES_CONFIG.showPreferences`: saat ini `true`. Jika `false`, tombol/panel Preferences disembunyikan; provider, tampilan bawaan, dan tombol tema tetap bekerja.
 - `PREFERENCES_CONFIG.persistToCookie`: saat ini `false`. Mengatur penyimpanan pilihan nonwarna selain tema seperti tabel berikut.
 
-| Pengaturan                                   | Penyimpanan                                                                                                                     | Perilaku saat reload                                                                             |
-| -------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
-| Tema                                         | Selalu mencoba menyimpan cookie `app_theme`, terlepas dari `persistToCookie`.                                                   | Memakai cookie yang valid atau tema bawaan.                                                      |
-| Font, layout, gaya sidebar, radius, scale    | Hanya disimpan/dibaca jika `persistToCookie: true`, melalui `app_font`, `app_layout`, `app_sidebar`, `app_radius`, `app_scale`. | Saat flag `false`, kembali ke nilai bawaan. Saat `true`, memakai cookie valid atau nilai bawaan. |
-| Primary Color, Sidebar Color, App Body Color | Tidak pernah disimpan/dibaca dari cookie, termasuk saat flag `true`.                                                            | Selalu kembali ke nilai bawaan.                                                                  |
+| Pengaturan                                                 | Penyimpanan                                                                                                                     | Perilaku saat reload                                                                             |
+| ---------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
+| Tema                                                       | Selalu mencoba menyimpan cookie `app_theme`, terlepas dari `persistToCookie`.                                                   | Memakai cookie yang valid atau tema bawaan.                                                      |
+| Font, layout, gaya sidebar, radius, scale                  | Hanya disimpan/dibaca jika `persistToCookie: true`, melalui `app_font`, `app_layout`, `app_sidebar`, `app_radius`, `app_scale`. | Saat flag `false`, kembali ke nilai bawaan. Saat `true`, memakai cookie valid atau nilai bawaan. |
+| Primary Color, Sidebar Color, Header Color, App Body Color | Tidak pernah disimpan/dibaca dari cookie, termasuk saat flag `true`.                                                            | Selalu kembali ke nilai bawaan.                                                                  |
 
 Perubahan tetap tersedia selama provider root masih terpasang, termasuk navigasi client biasa. Penyimpanan memakai browser pengguna, tanpa API, database, atau sinkronisasi akun. Cookie berlaku satu tahun, dengan `Path=/`, `SameSite=Lax`, dan `Secure` pada HTTPS. Jika penyimpanan browser diblokir, pilihan saat ini tetap diterapkan, tetapi tidak dapat diandalkan setelah reload.
 
@@ -104,9 +105,9 @@ Saat menambah pilihan baru, perbarui opsi/tipe/default dan validasi di konfigura
 ## Verifikasi saat mengubah implementasi
 
 - Cek perubahan langsung, navigasi antarhalaman, dan reload sesuai aturan penyimpanan.
-- Cek tema terang/gelap, font, ketiga warna, Centered/Full Width, varian sidebar, radius None/Large, dan skala Small/Large pada desktop dan mobile.
+- Cek tema terang/gelap, font, keempat warna, Centered/Full Width, varian sidebar, radius None/Large, dan skala Small/Large pada desktop dan mobile. Saat Floating, cek latar belakang sidebar/header mengikuti App Body Color dan sudut header mengikuti radius sidebar.
 - Pastikan Restore Defaults mengembalikan default panel tanpa mengubah tema.
-- Jika mengubah persistensi, cek kedua nilai `persistToCookie`, cookie tidak valid, serta penyimpanan browser yang diblokir. Ketiga warna tetap tidak dipersistensikan.
+- Jika mengubah persistensi, cek kedua nilai `persistToCookie`, cookie tidak valid, serta penyimpanan browser yang diblokir. Keempat warna tetap tidak dipersistensikan.
 - Saat perilaku terkait berubah, ulangi pemeriksaan Preferences dan kontras secara manual.
 
 Jalankan pemeriksaan relevan dari root repositori dengan Node.js 24 atau lebih baru:

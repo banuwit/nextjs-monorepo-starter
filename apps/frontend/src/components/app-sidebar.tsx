@@ -13,7 +13,6 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-  SidebarRail,
 } from "@/components/ui/sidebar";
 import { GalleryVerticalEndIcon } from "lucide-react";
 
@@ -43,7 +42,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       <SidebarContent className="group-data-[collapsible=icon]:overflow-y-auto">
         <NavMain items={navigation} />
       </SidebarContent>
-      <SidebarRail />
     </Sidebar>
   );
 }

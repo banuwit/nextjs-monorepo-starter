@@ -30,6 +30,7 @@ import {
 import { PAGE_SIZE } from "./constants"
 import { DataGridColumnDnd, DataGridSortableColumnHead, getColumnMotionStyle } from "./data-grid-column-dnd"
 import { DataGridEmpty } from "./data-grid-empty"
+import { groupDataGridRows } from "./data-grid-grouping"
 import { DataGridError } from "./data-grid-error"
 import { features } from "./data-grid-features"
 import type { DataGridFeatures } from "./data-grid-features"
@@ -42,6 +43,8 @@ import { getDataGridBodyState } from "./data-grid-state"
 import { DataGridRowDnd, DataGridSortableRow } from "./data-grid-row-dnd"
 import { reorderDataGridItems } from "./data-grid-reordering"
 import { DataGridVisibilityToggle } from "./data-grid-visibility-toggle"
+import { DataGridVirtualRows, type DataGridVirtualScroll } from "./data-grid-virtual-rows"
+import { DataGridScrollArea } from "./data-grid-scroll-area"
 import type { ToolbarConfig } from "./types"
 
 export interface DataGridColumnState {
@@ -56,9 +59,21 @@ export interface DataGridColumnState {
 interface DataGridClientBaseProps<TData extends RowData> {
   columns: ColumnDef<DataGridFeatures, TData>[]
   data: TData[]
+  /** Detail content beneath a parent row; return null when collapsed. */
+  renderRowDetails?: (row: TData) => React.ReactNode
+  /** Group the current row view inside one table. Use pagination="none" for complete groups. */
+  rowGrouping?: {
+    getKey: (row: TData) => string
+    renderHeader: (context: { key: string; rows: TData[] }) => React.ReactNode
+    isCollapsed?: (key: string) => boolean
+  }
+  defaultPageSize?: number
+  pageSizeOptions?: number[]
   /** Optional accessibility attributes for interactive grids. */
   tableProps?: React.ComponentProps<"table">
   getHeaderProps?: (columnId: string) => React.ComponentProps<"th">
+  /** Row semantics and keyboard interaction for feature-owned tree views. */
+  getRowProps?: (row: TData) => React.ComponentProps<"tr">
   /** Cell interaction and appearance; shared rendering/pinning stays in the grid. */
   getCellProps?: (context: {
     row: TData
@@ -119,6 +134,8 @@ interface DataGridClientBaseProps<TData extends RowData> {
   emptyFilteredDescription?: string
   /** Pagination style, or `none` to render every row. Default: `advance`. */
   pagination?: "advance" | "simple" | "none"
+  /** Flat, unpaginated rows only; not combined with row grouping, details or drag-and-drop. */
+  virtualScroll?: DataGridVirtualScroll
 }
 
 export type DataGridClientProps<TData extends RowData> =
@@ -143,8 +160,13 @@ const EMPTY_SELECTS: NonNullable<ToolbarConfig["selects"]> = []
 export function DataGridClient<TData extends RowData>({
   columns,
   data,
+  renderRowDetails,
+  rowGrouping,
+  defaultPageSize = PAGE_SIZE,
+  pageSizeOptions,
   tableProps,
   getHeaderProps,
+  getRowProps,
   getCellProps,
   toolbar,
   columnState,
@@ -165,6 +187,7 @@ export function DataGridClient<TData extends RowData>({
   emptyFilteredTitle,
   emptyFilteredDescription,
   pagination = "advance",
+  virtualScroll,
   error,
   onRetry,
   onRowReorder,
@@ -173,6 +196,8 @@ export function DataGridClient<TData extends RowData>({
   const selects = toolbar?.selects ?? EMPTY_SELECTS
   const searchConfigs = toolbar?.searches ?? []
   const paginate = pagination !== "none"
+  const scrollRef = React.useRef<HTMLDivElement>(null)
+  const useVirtualRows = !!virtualScroll && !paginate && !rowGrouping && !renderRowDetails && !onRowReorder && !columnDrag
 
   // Facets/selects carry arrays; TanStack's automatic string filter does not
   // interpret those as a set of allowed values.
@@ -211,7 +236,7 @@ export function DataGridClient<TData extends RowData>({
   const [paginationState, setPaginationState] = React.useState<PaginationState>(
     {
       pageIndex: 0,
-      pageSize: PAGE_SIZE,
+      pageSize: defaultPageSize,
     },
   )
 
@@ -291,6 +316,56 @@ export function DataGridClient<TData extends RowData>({
     ? table.getPinnedVisibleLeafColumns("center").map((column) => column.id)
     : []
 
+  const renderRow = (row: (typeof rows)[number], virtualProps?: React.ComponentProps<"tr">) => {
+    const cells = row.getVisibleCells().map((cell) => {
+      const columnIndex = draggableColumns.indexOf(cell.column.id)
+      const pinnedProps = getPinnedCellProps(
+        cell.column.getIsPinned(), offsets, cell.column.id,
+      )
+      const customProps = getCellProps?.({
+        row: row.original, rowIndex: row.index, columnId: cell.column.id,
+      })
+      return (
+        <TableCell
+          key={cell.id}
+          {...customProps}
+          {...(columnIndex >= 0 ? {
+            "data-column-id": cell.column.id,
+          } : {})}
+          className={cn(pinnedProps.className, columnIndex >= 0 && "motion-reduce:transition-none!", customProps?.className, cell.column.getIsPinned() && "sticky", cell.column.getIsPinned() && customProps?.["aria-selected"] === true && "bg-[color-mix(in_srgb,var(--primary)_10%,var(--background))]")}
+          style={{ ...customProps?.style, ...pinnedProps.style, ...(columnIndex >= 0 ? getColumnMotionStyle(columnIndex) : {}) }}
+        >
+          <table.FlexRender cell={cell} />
+        </TableCell>
+      )
+    })
+
+    const rowProps = getRowProps?.(row.original)
+    const parentRow = onRowReorder ? (
+      <DataGridSortableRow key={row.id} id={row.id}>
+        {cells}
+      </DataGridSortableRow>
+    ) : (
+      <TableRow key={row.id} {...rowProps} {...virtualProps} className={cn("group/row", rowProps?.className)}>
+        {cells}
+      </TableRow>
+    )
+    const details = renderRowDetails?.(row.original)
+
+    return (
+      <React.Fragment key={row.id}>
+        {parentRow}
+        {details != null && details !== false && (
+          <TableRow className="hover:bg-transparent">
+            <TableCell colSpan={table.getVisibleLeafColumns().length} className="whitespace-normal bg-muted/30 p-0">
+              {details}
+            </TableCell>
+          </TableRow>
+        )}
+      </React.Fragment>
+    )
+  }
+
   const content = (
     <div className="flex flex-col gap-3">
       {renderToolbar ? renderToolbar(table) : (toolbar || showVisibilityToggle || actions) && (
@@ -342,8 +417,13 @@ export function DataGridClient<TData extends RowData>({
       )}
 
       <div className="overflow-hidden rounded-md border">
-        <Table {...tableProps}>
-          <TableHeader className="bg-muted">
+        <Table {...tableProps} aria-rowcount={useVirtualRows ? virtualScroll!.totalCount + 1 : tableProps?.["aria-rowcount"]}
+          renderContainer={useVirtualRows ? (children) => (
+            <DataGridScrollArea scrollRef={scrollRef} label={virtualScroll!.label} height={virtualScroll!.height ?? "min(35rem, 65vh)"}>
+              {children}
+            </DataGridScrollArea>
+          ) : undefined}>
+          <TableHeader className={cn("bg-muted", useVirtualRows && "sticky top-0 z-20")}>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => {
@@ -405,40 +485,16 @@ export function DataGridClient<TData extends RowData>({
                 </TableCell>
               </TableRow>
             ) : bodyState === "rows" ? (
-              rows.map((row) => {
-                const cells = row.getVisibleCells().map((cell) => {
-                  const columnIndex = draggableColumns.indexOf(cell.column.id)
-                  const pinnedProps = getPinnedCellProps(
-                    cell.column.getIsPinned(), offsets, cell.column.id,
-                  )
-                  const customProps = getCellProps?.({
-                    row: row.original, rowIndex: row.index, columnId: cell.column.id,
-                  })
-                  return (
-                    <TableCell
-                      key={cell.id}
-                      {...customProps}
-                      {...(columnIndex >= 0 ? {
-                        "data-column-id": cell.column.id,
-                      } : {})}
-                      className={cn(pinnedProps.className, columnIndex >= 0 && "motion-reduce:transition-none!", customProps?.className, cell.column.getIsPinned() && "sticky", cell.column.getIsPinned() && customProps?.["aria-selected"] === true && "bg-[color-mix(in_srgb,var(--primary)_10%,var(--background))]")}
-                      style={{ ...customProps?.style, ...pinnedProps.style, ...(columnIndex >= 0 ? getColumnMotionStyle(columnIndex) : {}) }}
-                    >
-                      <table.FlexRender cell={cell} />
+              useVirtualRows ? <DataGridVirtualRows rows={rows} colSpan={table.getVisibleLeafColumns().length} scrollRef={scrollRef} options={virtualScroll!} renderRow={renderRow} /> : rowGrouping ? groupDataGridRows(rows, (row) => rowGrouping.getKey(row.original)).map((group) => (
+                <React.Fragment key={group.key}>
+                  <TableRow data-row-group={group.key} className="hover:bg-transparent">
+                    <TableCell colSpan={table.getVisibleLeafColumns().length} className="p-0">
+                      {rowGrouping.renderHeader({ key: group.key, rows: group.rows.map((row) => row.original) })}
                     </TableCell>
-                  )
-                })
-
-                return onRowReorder ? (
-                  <DataGridSortableRow key={row.id} id={row.id}>
-                    {cells}
-                  </DataGridSortableRow>
-                ) : (
-                  <TableRow key={row.id} className="group/row">
-                    {cells}
                   </TableRow>
-                )
-              })
+                  {!rowGrouping.isCollapsed?.(group.key) && group.rows.map((row) => renderRow(row))}
+                </React.Fragment>
+              )) : rows.map((row) => renderRow(row))
             ) : (
               <TableRow className="hover:bg-transparent">
                 <TableCell
@@ -467,6 +523,7 @@ export function DataGridClient<TData extends RowData>({
           <DataGridPaginationAdvance
             table={table}
             pagination={paginationState}
+            pageSizeOptions={pageSizeOptions}
           />
         )}
       {bodyState !== "error" &&

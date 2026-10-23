@@ -1,6 +1,6 @@
 import type { User } from "@/mocks/user.mock";
 
-export type UserFilterField = keyof User | "no";
+export type UserFilterField = Exclude<keyof User, "managerId"> | "no";
 export type UserCellSorting = { field: UserFilterField; desc: boolean } | null;
 
 /** Sort the same rows used by clipboard coordinates, without mutating history. */

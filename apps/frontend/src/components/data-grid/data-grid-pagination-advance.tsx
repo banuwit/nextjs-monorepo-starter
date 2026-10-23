@@ -42,12 +42,14 @@ interface DataGridPaginationAdvanceProps<TData extends RowData> {
   table?: ReactTable<DataGridFeatures, TData>
   pagination?: PaginationState
   server?: ServerPagination
+  pageSizeOptions?: number[]
 }
 
 export function DataGridPaginationAdvance<TData extends RowData>({
   table,
   pagination,
   server,
+  pageSizeOptions = PAGE_SIZE_OPTIONS,
 }: DataGridPaginationAdvanceProps<TData>) {
   const isServer = !!server
 
@@ -113,7 +115,7 @@ export function DataGridPaginationAdvance<TData extends RowData>({
             <SelectValue placeholder={pageSize} />
           </SelectTrigger>
           <SelectContent side="top">
-            {PAGE_SIZE_OPTIONS.map((size) => (
+            {pageSizeOptions.map((size) => (
               <SelectItem key={size} value={`${size}`}>
                 {size}
               </SelectItem>

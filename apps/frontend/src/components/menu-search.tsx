@@ -4,7 +4,10 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { SearchIcon } from "lucide-react";
 
-import { useAppNavigation } from "@/components/app-navigation";
+import {
+  type NavigationItem,
+  useAppNavigation,
+} from "@/components/app-navigation";
 import { Button } from "@/components/ui/button";
 import {
   Command,
@@ -17,22 +20,37 @@ import {
 } from "@/components/ui/command";
 import { Kbd } from "@/components/ui/kbd";
 
+type MenuPage = {
+  title: string;
+  url: string;
+  icon: NavigationItem["icon"];
+};
+
+function getMenuPages(
+  items: NavigationItem[],
+  parents: string[] = [],
+): MenuPage[] {
+  return items.flatMap((item) =>
+    item.items?.length
+      ? getMenuPages(item.items, [...parents, item.title])
+      : item.url.startsWith("/")
+        ? [
+            {
+              title: [...parents, item.title].join(" / "),
+              url: item.url,
+              icon: item.icon,
+            },
+          ]
+        : [],
+  );
+}
+
 export function MenuSearch() {
   const navigation = useAppNavigation();
   const menuGroups = navigation
     .map((section) => ({
       title: section.title,
-      pages: section.items.flatMap((item) =>
-        item.items?.length
-          ? item.items.map((child) => ({
-              title: `${item.title} / ${child.title}`,
-              url: child.url,
-              icon: undefined,
-            }))
-          : item.url.startsWith("/")
-            ? [{ title: item.title, url: item.url, icon: item.icon }]
-            : [],
-      ),
+      pages: getMenuPages(section.items),
     }))
     .filter((section) => section.pages.length > 0);
 

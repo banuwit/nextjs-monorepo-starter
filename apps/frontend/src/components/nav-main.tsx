@@ -18,6 +18,9 @@ import {
   DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
@@ -81,25 +84,54 @@ export function NavMain({ items }: { items: NavigationSection[] }) {
                   >
                     <DropdownMenuGroup>
                       <DropdownMenuLabel>{item.title}</DropdownMenuLabel>
-                      {item.items.map((child) => (
-                        <DropdownMenuItem
-                          key={child.title}
-                          className="data-[active=true]:bg-accent data-[active=true]:text-accent-foreground"
-                          data-active={isActiveItem(child, activePath)}
-                          render={
-                            <Link
-                              href={child.url}
-                              aria-current={
-                                isActiveItem(child, activePath)
-                                  ? "page"
-                                  : undefined
-                              }
-                            />
-                          }
-                        >
-                          {child.title}
-                        </DropdownMenuItem>
-                      ))}
+                      {item.items.map((child) =>
+                        child.items?.length ? (
+                          <DropdownMenuSub key={child.title}>
+                            <DropdownMenuSubTrigger>
+                              {child.title}
+                            </DropdownMenuSubTrigger>
+                            <DropdownMenuSubContent>
+                              {child.items.map((grandchild) => (
+                                <DropdownMenuItem
+                                  key={grandchild.title}
+                                  className="data-[active=true]:bg-accent data-[active=true]:text-accent-foreground"
+                                  data-active={isActiveItem(grandchild, activePath)}
+                                  render={
+                                    <Link
+                                      href={grandchild.url}
+                                      aria-current={
+                                        isActiveItem(grandchild, activePath)
+                                          ? "page"
+                                          : undefined
+                                      }
+                                    />
+                                  }
+                                >
+                                  {grandchild.title}
+                                </DropdownMenuItem>
+                              ))}
+                            </DropdownMenuSubContent>
+                          </DropdownMenuSub>
+                        ) : (
+                          <DropdownMenuItem
+                            key={child.title}
+                            className="data-[active=true]:bg-accent data-[active=true]:text-accent-foreground"
+                            data-active={isActiveItem(child, activePath)}
+                            render={
+                              <Link
+                                href={child.url}
+                                aria-current={
+                                  isActiveItem(child, activePath)
+                                    ? "page"
+                                    : undefined
+                                }
+                              />
+                            }
+                          >
+                            {child.title}
+                          </DropdownMenuItem>
+                        ),
+                      )}
                     </DropdownMenuGroup>
                   </DropdownMenuContent>
                 </DropdownMenu>
@@ -124,26 +156,74 @@ export function NavMain({ items }: { items: NavigationSection[] }) {
                 </CollapsibleTrigger>
                 <CollapsibleContent>
                   <SidebarMenuSub>
-                    {item.items.map((child) => (
-                      <SidebarMenuSubItem key={child.title}>
-                        <SidebarMenuSubButton
-                          className="w-[calc(100%+1.5rem)]"
-                          isActive={isActiveItem(child, activePath)}
-                          render={
-                            <Link
-                              href={child.url}
-                              aria-current={
-                                isActiveItem(child, activePath)
-                                  ? "page"
-                                  : undefined
-                              }
-                            />
-                          }
+                    {item.items.map((child) =>
+                      child.items?.length ? (
+                        <Collapsible
+                          key={child.title}
+                          defaultOpen={isActiveItem(child, activePath)}
+                          className="group/sub-collapsible"
+                          render={<SidebarMenuSubItem />}
                         >
-                          <span>{child.title}</span>
-                        </SidebarMenuSubButton>
-                      </SidebarMenuSubItem>
-                    ))}
+                          <CollapsibleTrigger
+                            render={
+                              <SidebarMenuSubButton
+                                className="w-[calc(100%+1.5rem)] text-left"
+                                isActive={isActiveItem(child, activePath)}
+                                render={<button type="button" />}
+                              />
+                            }
+                          >
+                            <span className="min-w-0 flex-1 truncate">
+                              {child.title}
+                            </span>
+                            <ChevronRightIcon className="ml-auto transition-transform duration-200 group-data-open/sub-collapsible:rotate-90" />
+                          </CollapsibleTrigger>
+                          <CollapsibleContent>
+                            <SidebarMenuSub className="relative left-[0.875rem] mx-0 mt-1 w-full translate-x-0 border-l pl-2.5 pr-0 py-0">
+                              {child.items.map((grandchild) => (
+                                <SidebarMenuSubItem key={grandchild.title}>
+                                  <SidebarMenuSubButton
+                                    className="w-[calc(100%+0.5rem)]"
+                                    isActive={isActiveItem(grandchild, activePath)}
+                                    render={
+                                      <Link
+                                        href={grandchild.url}
+                                        aria-current={
+                                          isActiveItem(grandchild, activePath)
+                                            ? "page"
+                                            : undefined
+                                        }
+                                      />
+                                    }
+                                  >
+                                    <span>{grandchild.title}</span>
+                                  </SidebarMenuSubButton>
+                                </SidebarMenuSubItem>
+                              ))}
+                            </SidebarMenuSub>
+                          </CollapsibleContent>
+                        </Collapsible>
+                      ) : (
+                        <SidebarMenuSubItem key={child.title}>
+                          <SidebarMenuSubButton
+                            className="w-[calc(100%+1.5rem)]"
+                            isActive={isActiveItem(child, activePath)}
+                            render={
+                              <Link
+                                href={child.url}
+                                aria-current={
+                                  isActiveItem(child, activePath)
+                                    ? "page"
+                                    : undefined
+                                }
+                              />
+                            }
+                          >
+                            <span>{child.title}</span>
+                          </SidebarMenuSubButton>
+                        </SidebarMenuSubItem>
+                      ),
+                    )}
                   </SidebarMenuSub>
                 </CollapsibleContent>
               </Collapsible>

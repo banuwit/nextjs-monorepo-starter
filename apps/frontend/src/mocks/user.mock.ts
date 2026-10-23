@@ -26,6 +26,8 @@ export type User = {
   role: (typeof roles)[number];
   joinDate: string;
   status: (typeof statuses)[number];
+  /** Direct supervisor; absent for the root of the demo organization. */
+  managerId?: string;
 };
 
 const names = [
@@ -77,6 +79,15 @@ export const users: User[] = names.map((name, index) => ({
     .toISOString()
     .slice(0, 10),
   status: statuses[Math.floor(index / 3) % statuses.length] ?? "active",
+  // Root → managers (002–006) → team members (007–026) → reports (027–036).
+  managerId:
+    index === 0
+      ? undefined
+      : index <= 5
+        ? "USR-001"
+        : index < 26
+          ? `USR-${String(2 + ((index - 6) % 5)).padStart(3, "0")}`
+          : `USR-${String(7 + ((index - 26) % 5)).padStart(3, "0")}`,
 }));
 
 export type UserListResult = {
@@ -84,6 +95,25 @@ export type UserListResult = {
   meta: DataGridPageMeta;
   filters: DataGridFilters;
 };
+
+/** Larger deterministic fixture for scrolling demos; the original directory remains the seed. */
+export function createMockUsers(count: number): User[] {
+  return Array.from({ length: count }, (_, index) => {
+    const seed = users[index % users.length]!;
+    const batch = Math.floor(index / users.length);
+    if (batch === 0) return { ...seed };
+    const number = index + 1;
+    return {
+      ...seed,
+      id: `USR-${String(number).padStart(3, "0")}`,
+      name: `${seed.name} ${batch + 1}`,
+      email: seed.email.replace("@", `.${number}@`),
+      managerId: seed.managerId
+        ? `USR-${String(Number(seed.managerId.slice(4)) + batch * users.length).padStart(3, "0")}`
+        : undefined,
+    };
+  });
+}
 
 // Demo source: replace this query with the users API when backend integration is added.
 export function getMockUsers(

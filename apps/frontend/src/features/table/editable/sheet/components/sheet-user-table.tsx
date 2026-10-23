@@ -291,7 +291,7 @@ function UserGrid({
     <>
       <div
         className={cn(
-          "min-w-0 [&_[data-slot=table-container]]:max-h-[65vh] [&_thead]:sticky [&_thead]:top-0 [&_thead]:z-30 [&_th]:h-10 [&_th]:border-r [&_th:last-child]:border-r-0",
+          "min-w-0 [&_th]:h-10 [&_th]:border-r [&_th:last-child]:border-r-0",
           settings.compact &&
             "[&_[data-cell-content]]:min-h-9 [&_[data-cell-content]]:py-1 [&_[data-cell-editor]]:h-9!",
           settings.stripes && "[&_tbody_tr:nth-child(even)]:bg-muted/30",

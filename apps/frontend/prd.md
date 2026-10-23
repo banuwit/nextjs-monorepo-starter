@@ -11,6 +11,10 @@
 
 > **Amendemen UI, 21 Oktober 2026 (contoh CRUD):** Setelah empat contoh pola tersedia di `/crud/new-page`, `/crud/modal`, `/crud/sheet`, dan `/crud/panel-inline`, pengguna meminta halaman dan entri navigasi User (`/users`), Country (`/countries`), Menu (`/menus`), serta Parameter (`/parameters`) dihapus. Rujukan halaman tersebut pada baseline di bawah adalah riwayat rancangan, bukan scope frontend saat ini. Contoh CRUD memakai salinan data mock Parameter yang terpisah. Keputusan ini tidak menghapus model mock maupun menetapkan perubahan API/database Tahap 1.
 
+> **Amendemen UI, 23 Oktober 2026 (Preferences):** Tambahkan Header Color dengan pilihan palet dan kebijakan persistensi yang sama seperti Sidebar Color, default White. Pada gaya Floating, sidebar dan header sama-sama mengambang dengan radius yang sama; latar di belakang keduanya memakai warna App Body Color. Rujukan Preferences pada baseline di bawah dibaca bersama amendemen ini.
+
+> **Amendemen UI, 23 Oktober 2026 (Sidebar):** Sidebar hanya dibuka/ditutup melalui ikon trigger di header; rail hover/click dan shortcut keyboard untuk toggle dihapus.
+
 Roadmap tahap berikutnya: [Tahap 2 (Mobile)](../mobile/prd.md) dan [Tahap 3 (Backend)](../backend/prd.md). Kedua dokumen tersebut belum memberi izin untuk memulai implementasinya.
 
 ---

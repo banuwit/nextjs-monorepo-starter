@@ -96,6 +96,7 @@ export function PreferencesProvider({
     } else if (
       key === "primaryColor" ||
       key === "sidebarColor" ||
+      key === "headerColor" ||
       key === "appBodyColor"
     ) {
       for (const [property, color] of Object.entries(

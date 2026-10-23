@@ -92,6 +92,7 @@ export default async function RootLayout({
       data-sidebar-style={values.sidebarStyle}
       data-primary-color={values.primaryColor}
       data-sidebar-color={values.sidebarColor}
+      data-header-color={values.headerColor}
       data-app-body-color={values.appBodyColor}
       data-border-radius={values.borderRadius}
       data-scale={values.scale}
@@ -99,6 +100,7 @@ export default async function RootLayout({
         {
           ...preferenceColorStyle("primaryColor", values.primaryColor),
           ...preferenceColorStyle("sidebarColor", values.sidebarColor),
+          ...preferenceColorStyle("headerColor", values.headerColor),
           ...preferenceColorStyle("appBodyColor", values.appBodyColor),
         } as React.CSSProperties
       }

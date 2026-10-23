@@ -16,6 +16,7 @@ export const PREFERENCE_OPTIONS = {
   sidebarStyle: ["sidebar", "inset", "floating"],
   primaryColor: COLOR_OPTIONS,
   sidebarColor: [...COLOR_OPTIONS, "white", "gray"],
+  headerColor: [...COLOR_OPTIONS, "white", "gray"],
   appBodyColor: COLOR_OPTIONS,
   borderRadius: ["none", "small", "medium", "large"],
   scale: ["small", "medium", "large"],
@@ -154,13 +155,14 @@ export function appBodyLightColor(color: Preferences["appBodyColor"]) {
 }
 
 export function preferenceColorStyle(
-  key: "primaryColor" | "sidebarColor" | "appBodyColor",
+  key: "primaryColor" | "sidebarColor" | "headerColor" | "appBodyColor",
   color: Preferences["sidebarColor"],
 ): Record<string, string> {
-  if (key === "sidebarColor") {
+  if (key === "sidebarColor" || key === "headerColor") {
+    const prefix = key === "sidebarColor" ? "sidebar" : "header";
     return {
-      "--app-sidebar-light": SIDEBAR_COLORS[color].light,
-      "--app-sidebar-dark":
+      [`--app-${prefix}-light`]: SIDEBAR_COLORS[color].light,
+      [`--app-${prefix}-dark`]:
         color === "white"
           ? SIDEBAR_COLORS[color].dark
           : SIDEBAR_COLORS[color].light,
@@ -198,6 +200,7 @@ export const PREFERENCES_CONFIG: {
     sidebarStyle: "sidebar",
     primaryColor: "blue",
     sidebarColor: "neutral",
+    headerColor: "white",
     appBodyColor: "neutral",
     borderRadius: "medium",
     scale: "medium",
@@ -211,6 +214,7 @@ const COOKIE_NAMES = {
   sidebarStyle: "app_sidebar",
   primaryColor: null,
   sidebarColor: null,
+  headerColor: null,
   appBodyColor: null,
   borderRadius: "app_radius",
   scale: "app_scale",

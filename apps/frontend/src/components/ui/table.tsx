@@ -3,17 +3,21 @@
 import * as React from "react"
 import { cn } from "cn"
 
-function Table({ className, ...props }: React.ComponentProps<"table">) {
+function Table({ className, containerProps, renderContainer, ...props }: React.ComponentProps<"table"> & {
+  containerProps?: React.ComponentProps<"div">
+  renderContainer?: (table: React.ReactNode) => React.ReactNode
+}) {
+  const table = (
+    <table data-slot="table" className={cn("w-full caption-bottom text-sm", className)} {...props} />
+  )
+  if (renderContainer) return renderContainer(table)
   return (
     <div
       data-slot="table-container"
-      className="relative w-full overflow-x-auto"
+      {...containerProps}
+      className={cn("relative w-full overflow-x-auto", containerProps?.className)}
     >
-      <table
-        data-slot="table"
-        className={cn("w-full caption-bottom text-sm", className)}
-        {...props}
-      />
+      {table}
     </div>
   )
 }

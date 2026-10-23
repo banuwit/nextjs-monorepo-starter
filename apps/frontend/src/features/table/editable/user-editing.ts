@@ -114,6 +114,7 @@ export function createUserCellDraft(rows: User[], source?: User): UserDraft {
     role: source?.role ?? "viewer",
     joinDate: source?.joinDate ?? new Date().toISOString().slice(0, 10),
     status: source?.status ?? "pending",
+    managerId: source?.managerId,
   };
 }
 
@@ -133,6 +134,7 @@ export const userEditSchema = z.object({
   role: z.enum(["admin", "editor", "viewer"]),
   joinDate: z.iso.date("Enter a valid date."),
   status: z.enum(["active", "inactive", "pending"]),
+  managerId: z.string().min(1).optional(),
 });
 
 export const userEditsSchema = z

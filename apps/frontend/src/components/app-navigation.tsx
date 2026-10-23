@@ -8,6 +8,7 @@ import {
   CalendarDaysIcon,
   ChartNoAxesCombinedIcon,
   FilePenLineIcon,
+  GitBranchIcon,
   BanknoteIcon,
   FolderKanbanIcon,
   FolderOpenIcon,
@@ -15,6 +16,7 @@ import {
   ListTodoIcon,
   LockKeyholeIcon,
   NotebookPenIcon,
+  NetworkIcon,
   PresentationIcon,
   ReceiptIcon,
   ServerIcon,
@@ -37,31 +39,33 @@ export type NavigationSection = {
 
 export const mainNavigation: NavigationSection[] = [
   {
-    title: "Dashboard",
-    items: [
-      { title: "Main", url: "/dashboard/main", icon: <HouseIcon /> },
-      { title: "Sales", url: "/dashboard/sales", icon: <ShoppingBagIcon /> },
-      { title: "Finance", url: "/dashboard/finance", icon: <BanknoteIcon /> },
-      {
-        title: "CRM",
-        url: "/dashboard/crm",
-        icon: <ChartNoAxesCombinedIcon />,
-      },
-      {
-        title: "Analytic",
-        url: "/dashboard/analytic",
-        icon: <ChartAreaIcon />,
-      },
-      {
-        title: "Productivity",
-        url: "/dashboard/productivity",
-        icon: <ActivityIcon />,
-      },
-    ],
-  },
-  {
     title: "Page",
     items: [
+      {
+        title: "Dashboard",
+        url: "#",
+        icon: <HouseIcon />,
+        items: [
+          { title: "Main", url: "/dashboard/main", icon: <HouseIcon /> },
+          { title: "Sales", url: "/dashboard/sales", icon: <ShoppingBagIcon /> },
+          { title: "Finance", url: "/dashboard/finance", icon: <BanknoteIcon /> },
+          {
+            title: "CRM",
+            url: "/dashboard/crm",
+            icon: <ChartNoAxesCombinedIcon />,
+          },
+          {
+            title: "Analytic",
+            url: "/dashboard/analytic",
+            icon: <ChartAreaIcon />,
+          },
+          {
+            title: "Productivity",
+            url: "/dashboard/productivity",
+            icon: <ActivityIcon />,
+          },
+        ],
+      },
       {
         title: "Project",
         url: "/dashboard/project",
@@ -126,13 +130,14 @@ export const mainNavigation: NavigationSection[] = [
         icon: <PresentationIcon />,
       },
       {
-        title: "Flow",
-        url: "#",
-        icon: <WorkflowIcon />,
-        items: [
-          { title: "Structure", url: "/dashboard/flow-structure" },
-          { title: "Process", url: "/dashboard/flow-process" },
-        ],
+        title: "Structure",
+        url: "/dashboard/flow-structure",
+        icon: <NetworkIcon />,
+      },
+      {
+        title: "Process",
+        url: "/dashboard/flow-process",
+        icon: <GitBranchIcon />,
       },
     ],
   },
@@ -162,11 +167,33 @@ export function useAppNavigation(): NavigationSection[] {
           items: [
             { title: "Base", url: "/table/base" },
             { title: "Column", url: "/table/column" },
-            { title: "Drag & Drop Row", url: "/table/drag-and-drop/row" },
-            { title: "Drag & Drop Column", url: "/table/drag-and-drop/column" },
-            { title: "Editable Inline", url: "/table/editable/inline" },
-            { title: "Editable Row", url: "/table/editable/row" },
-            { title: "Editable Cell", url: "/table/editable/cell" },
+            { title: "Scroll", url: "/table/scroll" },
+            {
+              title: "Group",
+              url: "#",
+              items: [
+                { title: "Group Expansion", url: "/table/group/expansion" },
+                { title: "Group Section", url: "/table/group/section" },
+                { title: "Group Tree", url: "/table/group/tree" },
+              ],
+            },
+            {
+              title: "Drag & Drop",
+              url: "#",
+              items: [
+                { title: "Drag & Drop Row", url: "/table/drag-and-drop/row" },
+                { title: "Drag & Drop Column", url: "/table/drag-and-drop/column" },
+              ],
+            },
+            {
+              title: "Editable",
+              url: "#",
+              items: [
+                { title: "Editable Inline", url: "/table/editable/inline" },
+                { title: "Editable Row", url: "/table/editable/row" },
+                { title: "Editable Sheet", url: "/table/editable/sheet" },
+              ],
+            },
           ],
         },
       ],

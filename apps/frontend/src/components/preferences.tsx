@@ -66,6 +66,7 @@ const groups = [
 const colorGroups = [
   { key: "primaryColor", label: "Primary Color" },
   { key: "sidebarColor", label: "Sidebar Color" },
+  { key: "headerColor", label: "Header Color" },
   { key: "appBodyColor", label: "App Body Color" },
 ] as const;
 
