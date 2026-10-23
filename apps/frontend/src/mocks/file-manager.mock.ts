@@ -1,7 +1,7 @@
 import type {
   FileManagerFile,
   FileManagerFolder,
-} from "../features/file-manager/file-manager-model";
+} from "../features/file-manager/types/file-manager";
 
 export const folders: FileManagerFolder[] = [
   {

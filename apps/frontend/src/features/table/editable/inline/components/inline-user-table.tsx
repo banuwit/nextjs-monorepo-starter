@@ -26,10 +26,9 @@ import {
   getChangedUserCount,
   getUserEditErrors,
   updateUserDraft,
-  userEditsSchema,
-  type EditableUserField,
-  type UserDraft,
-} from "../../user-editing";
+} from "../../utils/user-editing";
+import { userEditsSchema } from "../../schemas/user-editing.schema";
+import type { EditableUserField, UserDraft } from "../../types/user-editing";
 
 const options = (values: string[]) =>
   values.map((value) => ({

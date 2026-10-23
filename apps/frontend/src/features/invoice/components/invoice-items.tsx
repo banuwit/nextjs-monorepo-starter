@@ -24,11 +24,8 @@ import {
   EmptyTitle,
 } from "@/components/ui/empty";
 import { cn } from "@/lib/utils";
-import {
-  formatInvoiceCurrency,
-  getLineAmount,
-  type InvoiceLineItem,
-} from "../invoice-model";
+import { formatInvoiceCurrency, getLineAmount } from "../utils/invoice";
+import type { InvoiceLineItem } from "../types/invoice";
 
 export function InvoiceItems({
   items,

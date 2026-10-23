@@ -31,7 +31,7 @@ import {
   infrastructureGroups,
   infrastructureSummary,
 } from "@/mocks/infrastructure.mock";
-import type { InfrastructureFilters } from "../infrastructure-model";
+import type { InfrastructureFilters } from "../types/infrastructure";
 import { previewCloudAction } from "./infrastructure-actions";
 
 const rows = infrastructureGroups.flatMap((group) => group.rows);

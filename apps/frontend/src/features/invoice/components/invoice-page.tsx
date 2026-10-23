@@ -16,13 +16,9 @@ import {
 } from "@/components/ui/dialog";
 import { Skeleton } from "@/components/ui/skeleton";
 import { createDemoInvoice, invoiceClients } from "@/mocks/invoice.mock";
-import {
-  calculateInvoice,
-  formatInvoiceCurrency,
-  invoiceSchema,
-  readyInvoiceSchema,
-  type Invoice,
-} from "../invoice-model";
+import { calculateInvoice, formatInvoiceCurrency } from "../utils/invoice";
+import { invoiceSchema, readyInvoiceSchema } from "../schemas/invoice.schema";
+import type { Invoice } from "../types/invoice";
 import { InvoiceForm } from "./invoice-form";
 import { InvoicePreview } from "./invoice-preview";
 

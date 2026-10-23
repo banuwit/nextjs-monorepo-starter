@@ -13,7 +13,7 @@ import {
   PopoverTitle,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { normalizeEditorLink } from "../editor-model";
+import { normalizeEditorLink } from "../utils/editor-link";
 
 export function EditorLink({ editor }: { editor: Editor }) {
   const id = useId();

@@ -17,11 +17,8 @@ import {
 } from "@/components/ui/popover";
 import { Progress } from "@/components/ui/progress";
 import { cn } from "@/lib/utils";
-import {
-  calendars,
-  calendarOwners,
-  type CalendarEvent,
-} from "../calendar-model";
+import { calendars, calendarOwners } from "../utils/calendar";
+import type { CalendarEvent } from "../types/calendar";
 
 export function CalendarEventCard({ info }: { info: EventDisplayInfo }) {
   const details = info.event.extendedProps as CalendarEvent["extendedProps"];

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-import { CrmDashboardPage } from "@/features/dashboard/crm/crm-dashboard-page";
+import { CrmDashboardPage } from "@/features/dashboard/crm/components/crm-dashboard-page";
 
 export const metadata: Metadata = {
   title: "CRM | Dashboard",

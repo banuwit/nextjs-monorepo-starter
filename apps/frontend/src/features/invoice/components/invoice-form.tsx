@@ -16,11 +16,8 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  invoiceTaxOptions,
-  type Invoice,
-  type InvoiceClient,
-} from "../invoice-model";
+import { invoiceTaxOptions } from "../utils/invoice";
+import type { Invoice, InvoiceClient } from "../types/invoice";
 import { ClientSelector } from "./client-selector";
 import { InvoiceDetails } from "./invoice-details";
 import { InvoiceItems } from "./invoice-items";

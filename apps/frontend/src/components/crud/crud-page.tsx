@@ -6,13 +6,11 @@ import { cn } from "@/lib/utils";
 
 export function CrudPage({
   title,
-  parent,
   actions,
   children,
   sidePanel,
 }: {
   title: string;
-  parent?: { label: string; href: string };
   actions?: ReactNode;
   children: ReactNode;
   sidePanel?: ReactNode;
@@ -30,10 +28,6 @@ export function CrudPage({
           <PageHeading
             title={title}
             currentPage={title}
-            parents={[
-              { label: "Dashboard", href: "/dashboard" },
-              ...(parent ? [parent] : []),
-            ]}
           >
             {actions}
           </PageHeading>

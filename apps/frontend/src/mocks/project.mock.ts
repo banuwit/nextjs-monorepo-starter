@@ -1,4 +1,4 @@
-import type { Project } from "@/features/project/project-model";
+import type { Project } from "@/features/project/types/project";
 
 export const initialProjects: Project[] = [
   {

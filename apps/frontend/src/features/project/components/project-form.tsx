@@ -20,9 +20,8 @@ import {
   projectPriorities,
   projectStatuses,
   todayDate,
-  type Project,
-  type ProjectErrors,
-} from "../project-model";
+} from "../utils/project";
+import type { Project, ProjectErrors } from "../types/project";
 
 export function ProjectForm({
   project,

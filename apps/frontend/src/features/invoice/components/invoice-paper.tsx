@@ -3,8 +3,8 @@ import {
   formatInvoiceCurrency,
   getLineAmount,
   invoiceTaxOptions,
-  type Invoice,
-} from "../invoice-model";
+} from "../utils/invoice";
+import type { Invoice } from "../types/invoice";
 
 export function InvoicePaper({ invoice }: { invoice: Invoice }) {
   const taxOption = invoiceTaxOptions.find(

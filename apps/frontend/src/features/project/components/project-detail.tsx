@@ -6,8 +6,8 @@ import {
   formatProjectDate,
   isOverdue,
   projectPriorities,
-  type Project,
-} from "../project-model";
+} from "../utils/project";
+import type { Project } from "../types/project";
 import { ProjectProgress, ProjectStatus } from "./project-meta";
 
 export function ProjectDetail({

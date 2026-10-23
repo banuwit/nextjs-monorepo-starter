@@ -1,4 +1,4 @@
-import type { Note, Person } from "../features/notes/notes-model.ts";
+import type { Note, Person } from "../features/notes/types/notes";
 
 export const notePeople: Person[] = [
   { id: "daniel", label: "Daniel Okafor" },

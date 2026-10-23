@@ -18,7 +18,8 @@ import Suggestion, {
   type SuggestionProps,
 } from "@tiptap/suggestion";
 import { PluginKey } from "@tiptap/pm/state";
-import { filterPeople, getOutline, type Person } from "../notes-model";
+import { filterPeople, getOutline } from "../utils/notes";
+import type { Person } from "../types/notes";
 import { notePeople } from "@/mocks/notes.mock";
 
 export function scrollToHeading(editor: Editor, index: number) {

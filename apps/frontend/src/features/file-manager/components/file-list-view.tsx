@@ -13,7 +13,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { cn } from "@/lib/utils";
-import type { FileManagerFile } from "../file-manager-model";
+import type { FileManagerFile } from "../types/file-manager";
 import { FileActions } from "./file-actions";
 import { fileIcons } from "./file-icons";
 

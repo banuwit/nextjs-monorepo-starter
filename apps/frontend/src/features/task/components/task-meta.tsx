@@ -26,7 +26,7 @@ import type {
   TaskOwnerProfile,
   TaskPriority,
   TaskTeam,
-} from "./types";
+} from "../types/task";
 
 export const taskInsightIcons: Record<TaskInsightLabel, LucideIcon> = {
   Attachments: Paperclip,

@@ -71,7 +71,6 @@ export function ExampleRecordPage({
   return (
     <CrudPage
       title={title}
-      parent={{ label: "New Page", href: basePath }}
       actions={
         <Button variant="outline" onClick={cancel}>
           <ArrowLeftIcon data-icon="inline-start" />

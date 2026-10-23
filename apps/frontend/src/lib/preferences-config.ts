@@ -150,8 +150,7 @@ export const SURFACE_COLORS = {
 >;
 
 export function appBodyLightColor(color: Preferences["appBodyColor"]) {
-  // Equivalent to bg-<color>-50/60: alpha applies only to the background.
-  return `color-mix(in oklch, ${SURFACE_COLORS[color].light} 60%, transparent)`;
+  return SURFACE_COLORS[color].light;
 }
 
 export function preferenceColorStyle(

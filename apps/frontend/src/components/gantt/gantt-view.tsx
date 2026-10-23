@@ -95,23 +95,22 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { IconPlaceholder } from "@/components/gantt/icon-placeholder";
-
-/** Current time, refreshed on an interval and on tab focus. */
-function useNow(intervalMs = 30_000): Date {
-  const [now, setNow] = useState(() => new Date());
-  useEffect(() => {
-    const tick = () => setNow(new Date());
-    const id = setInterval(tick, intervalMs);
-    document.addEventListener("visibilitychange", tick);
-    window.addEventListener("focus", tick);
-    return () => {
-      clearInterval(id);
-      document.removeEventListener("visibilitychange", tick);
-      window.removeEventListener("focus", tick);
-    };
-  }, [intervalMs]);
-  return now;
-}
+import { useCommittedRef } from "./use-committed-ref";
+import {
+  calculateDependencyEdges,
+  laneTopRem,
+  type DependencyEdge,
+} from "./gantt-dependency-layout";
+import {
+  GanttNowLine,
+  GanttNowDot,
+  GanttOffscreenChips,
+} from "./gantt-overlays";
+import {
+  getPaneViewport,
+  getScrollStart,
+  setScrollStart,
+} from "./gantt-scroll";
 
 /**
  * Today's zoned day key, re-rendering only at the midnight rollover (and on
@@ -216,14 +215,6 @@ const GHOST_HEIGHT_REM = 1.25;
  * that rides a lane (bar, baseline ghost, drag ghost, hint ring, slot draft)
  * reads it, so their vertical positions can never drift apart.
  */
-function laneTopRem(
-  laneOffsetRem: number,
-  lane: number,
-  laneHeightRem: number,
-  laneGapRem: number,
-): number {
-  return laneOffsetRem + lane * (laneHeightRem + laneGapRem);
-}
 
 /** Height of a stack of `count` lanes, inter-lane gaps included. */
 function laneBlockRem(
@@ -360,39 +351,10 @@ interface TimelineReorderState {
 const EMPTY_ID_SET: ReadonlySet<string> = new Set();
 
 /** One finish-to-start arrow, both anchors in track rem coordinates. */
-interface DependencyEdge {
-  key: string;
-  /** Predecessor and dependent event ids, so a gesture can re-anchor its own
-   * endpoints live. */
-  fromId: string;
-  toId: string;
-  fromX: number;
-  fromY: number;
-  toX: number;
-  toY: number;
-}
 
 interface GanttViewProps extends useRender.ComponentProps<"div"> {
   /** Day-scale unit interval in minutes; defaults to the interval view config. */
   interval?: number;
-}
-
-/** The pane's scrollable viewport (custom ScrollArea or native host). */
-function getPaneViewport(pane: HTMLElement | null): HTMLElement | null {
-  return (
-    pane?.querySelector<HTMLElement>("[data-slot=scroll-area-viewport]") ?? null
-  );
-}
-
-/** Distance scrolled from the inline-start edge (RTL reports negative). */
-function getScrollStart(viewport: HTMLElement): number {
-  return Math.abs(viewport.scrollLeft);
-}
-
-/** Write a distance-from-inline-start back as a signed scrollLeft. */
-function setScrollStart(viewport: HTMLElement, value: number) {
-  viewport.scrollLeft =
-    getComputedStyle(viewport).direction === "rtl" ? -value : value;
 }
 
 function GanttView({
@@ -681,11 +643,13 @@ function GanttView({
   /** Cumulative start/width fractions per unit, for backdrop stripes/lines. */
   const unitFractions = useMemo(() => {
     let acc = 0;
-    return units.map((unit) => {
+    const fractions = [];
+    for (const unit of units) {
       const start = acc / totalWeight;
       acc += unit.weight;
-      return { unit, start, width: unit.weight / totalWeight };
-    });
+      fractions.push({ unit, start, width: unit.weight / totalWeight });
+    }
+    return fractions;
   }, [units, totalWeight]);
   /** Snap a track fraction to its unit (hint preview target). */
   const resolveHintStop = useMemo(() => {
@@ -807,16 +771,15 @@ function GanttView({
       );
     }
     return map;
-  }, [rows, allEvents, descendantIds, viewConfig.getSummaryProgress]);
+  }, [rows, allEvents, descendantIds, viewConfig]);
 
-  // Lane memory across layout passes, keyed by getLaneKey (event identity,
-  // NOT the time-stamped occurrence key). It stores the TIMES alongside the
-  // lane so the packer can tell the schedule the user just edited apart from
-  // the ones that sat still: untouched schedules keep their lane, the edited
-  // one re-seeks. Written during the memo below on purpose: the pass is
-  // idempotent - feeding its own output back in produces the same assignment -
-  // so a StrictMode double render is a no-op.
-  const laneMemory = useRef(new Map<string, GanttLaneMemo>());
+  // Keep the previous layout in React state: abandoned renders cannot publish
+  // lane assignments to the committed view.
+  const [packedLayout, setPackedLayout] = useState({
+    inputs: [] as unknown[],
+    lanes: new Map<string, GanttLaneMemo>(),
+    bars: new Map<string, TimelineRowBars>(),
+  });
   const scheduleMode = viewConfig.scheduleMode;
 
   // Per-row packed bars, hoisted so the tree and timeline rows share heights
@@ -848,11 +811,31 @@ function GanttView({
     },
   );
 
-  const baseRowBars = useMemo(() => {
+  const layoutInputs = [
+    rows,
+    occurrences,
+    allEvents,
+    rangeStartMs,
+    rangeEndMs,
+    settings.i18n,
+    viewConfig.summaryBars,
+    viewConfig.baselineBars,
+    descendantIds,
+    subtreeProgress,
+    laneHeightRem,
+    rowPaddingRem,
+    laneGapRem,
+    minRowRem,
+    scheduleMode,
+  ];
+  let layout = packedLayout;
+  if (
+    !layoutInputs.every((input, i) => Object.is(input, packedLayout.inputs[i]))
+  ) {
     const map = new Map<string, TimelineRowBars>();
     // read the lanes the previous pass settled on, write the ones this pass
     // settles on; rebuilding (not mutating) prunes schedules that are gone
-    const previousLanes = laneMemory.current;
+    const previousLanes = packedLayout.lanes;
     const nextLanes = new Map<string, GanttLaneMemo>();
     const totalMin = (rangeEndMs - rangeStartMs) / 60000;
     // one pass: occurrences grouped by resource, plus per-resource envelopes
@@ -1108,25 +1091,10 @@ function GanttView({
         summary,
       });
     }
-    laneMemory.current = nextLanes;
-    return map;
-  }, [
-    rows,
-    occurrences,
-    allEvents,
-    rangeStartMs,
-    rangeEndMs,
-    settings.i18n,
-    viewConfig.summaryBars,
-    viewConfig.baselineBars,
-    descendantIds,
-    subtreeProgress,
-    laneHeightRem,
-    rowPaddingRem,
-    laneGapRem,
-    minRowRem,
-    scheduleMode,
-  ]);
+    layout = { inputs: layoutInputs, lanes: nextLanes, bars: map };
+    setPackedLayout(layout);
+  }
+  const baseRowBars = layout.bars;
 
   // ----- split panes: width state, splitter drag/keyboard, scroll sync -----
   const treeConfig = { ...DEFAULT_TREE_PANEL, ...viewConfig.treePanel };
@@ -1204,77 +1172,30 @@ function GanttView({
     return ids ?? EMPTY_ID_SET;
   }, [allEvents, viewConfig.dependencyLines]);
 
-  const dependencyEdges = useMemo(() => {
-    const none = { edges: [] as DependencyEdge[], totalRem: 0 };
-    if (!viewConfig.dependencyLines) return none;
-    const totalMin = (rangeEndMs - rangeStartMs) / 60000;
-    if (totalMin <= 0) return none;
-    type Pending = {
-      id: string;
-      dependencies: string[];
-      startX: number;
-      y: number;
-    };
-    const anchors = new Map<string, { endX: number; y: number }>();
-    const pending: Pending[] = [];
-    let topRem = 0;
-    for (const row of rows) {
-      const bars = rowBars.get(row.resource.id);
-      if (bars) {
-        for (const segment of bars.segments) {
-          const occ = segment.occurrence;
-          // a recurring instance has no single edge to anchor a plan on
-          if (occ.isRecurring) continue;
-          const lane = segment.column ?? 0;
-          const y =
-            topRem +
-            laneTopRem(bars.laneOffsetRem, lane, laneHeightRem, laneGapRem) +
-            laneHeightRem / 2;
-          const startX = ((segment.startMin ?? 0) / totalMin) * trackRemWidth;
-          const endX = ((segment.endMin ?? 0) / totalMin) * trackRemWidth;
-          anchors.set(occ.eventId, { endX, y });
-          if (occ.event.dependencies?.length) {
-            pending.push({
-              id: occ.eventId,
-              dependencies: occ.event.dependencies,
-              startX,
-              y,
-            });
-          }
-        }
-      }
-      topRem += bars?.heightRem ?? minRowRem;
-    }
-    if (pending.length === 0) return none;
-    const edges: DependencyEdge[] = [];
-    for (const item of pending) {
-      for (const depId of item.dependencies) {
-        if (depId === item.id) continue;
-        const from = anchors.get(depId);
-        if (!from) continue;
-        edges.push({
-          key: `${depId}->${item.id}`,
-          fromId: depId,
-          toId: item.id,
-          fromX: from.endX,
-          fromY: from.y,
-          toX: item.startX,
-          toY: item.y,
-        });
-      }
-    }
-    return { edges, totalRem: topRem };
-  }, [
-    rows,
-    rowBars,
-    rangeStartMs,
-    rangeEndMs,
-    trackRemWidth,
-    laneHeightRem,
-    laneGapRem,
-    minRowRem,
-    viewConfig.dependencyLines,
-  ]);
+  const rangeDurationMs = rangeEndMs - rangeStartMs;
+  const dependencyEdges = useMemo(
+    () =>
+      calculateDependencyEdges(
+        rows,
+        rowBars,
+        rangeDurationMs,
+        trackRemWidth,
+        laneHeightRem,
+        laneGapRem,
+        minRowRem,
+        viewConfig.dependencyLines,
+      ),
+    [
+      rows,
+      rowBars,
+      rangeDurationMs,
+      trackRemWidth,
+      laneHeightRem,
+      laneGapRem,
+      minRowRem,
+      viewConfig.dependencyLines,
+    ],
+  );
 
   const showCreateTask =
     viewConfig.displayCreateTaskHint &&
@@ -1300,7 +1221,6 @@ function GanttView({
   const clampedTreeWidth = clampContainer(configuredTreeWidth, containerWidth);
   /** Live width while the splitter is dragging; render reads it so a
       mid-drag re-render can't snap the pane back to stale state. */
-  const liveTreeWidthRef = useRef<number | null>(null);
 
   // In-flight gestures must never outlive the view (leaked window listeners,
   // body overlays and the drag cursor), and must never keep running against
@@ -1319,20 +1239,21 @@ function GanttView({
   const selectedSet = useMemo(() => new Set(selectedRows), [selectedRows]);
   // Latest-value refs so the row handlers keep ONE identity across renders -
   // the row components are memoized and must not re-render per state change
-  const viewConfigRef = useRef(viewConfig);
-  viewConfigRef.current = viewConfig;
-  const selectedRowsRef = useRef(selectedRows);
-  selectedRowsRef.current = selectedRows;
-  const toggleRowSelected = useCallback((id: string, checked: boolean) => {
-    const current = selectedRowsRef.current;
-    const next = checked
-      ? [...current.filter((rowId) => rowId !== id), id]
-      : current.filter((rowId) => rowId !== id);
-    if (viewConfigRef.current.selectedRows === undefined) {
-      setInternalSelected(next);
-    }
-    viewConfigRef.current.onSelectedRowsChange?.(next);
-  }, []);
+  const viewConfigRef = useCommittedRef(viewConfig);
+  const selectedRowsRef = useCommittedRef(selectedRows);
+  const toggleRowSelected = useCallback(
+    (id: string, checked: boolean) => {
+      const current = selectedRowsRef.current;
+      const next = checked
+        ? [...current.filter((rowId) => rowId !== id), id]
+        : current.filter((rowId) => rowId !== id);
+      if (viewConfigRef.current.selectedRows === undefined) {
+        setInternalSelected(next);
+      }
+      viewConfigRef.current.onSelectedRowsChange?.(next);
+    },
+    [selectedRowsRef, viewConfigRef],
+  );
 
   const bodyRef = useRef<HTMLDivElement | null>(null);
   const treePaneRef = useRef<HTMLDivElement | null>(null);
@@ -1363,8 +1284,11 @@ function GanttView({
     // in RTL the tree pane sits on the right: pointer deltas invert
     const dir = getComputedStyle(splitter).direction === "rtl" ? -1 : 1;
     splitter.setAttribute("data-resizing", "");
-    document.body.style.cursor = "col-resize";
-    document.body.style.userSelect = "none";
+    const bodyStyle = document.body.style;
+    const previousCursor = bodyStyle.cursor;
+    const previousUserSelect = bodyStyle.userSelect;
+    bodyStyle.setProperty("cursor", "col-resize");
+    bodyStyle.setProperty("user-select", "none");
     // Live width goes straight to the DOM: a React state write here would
     // re-render every row and bar per pointermove. State commits on release.
     // The container clamp applies live too - the timeline must not collapse
@@ -1376,7 +1300,6 @@ function GanttView({
         clampTree(startWidth + (ev.clientX - startX) * dir),
         bodyRef.current?.clientWidth ?? 0,
       );
-      liveTreeWidthRef.current = liveWidth;
       if (treePaneRef.current) {
         treePaneRef.current.style.width = `${liveWidth}px`;
       }
@@ -1387,9 +1310,8 @@ function GanttView({
       window.removeEventListener("pointerup", finish);
       window.removeEventListener("pointercancel", finish);
       splitter.removeAttribute("data-resizing");
-      document.body.style.cursor = "";
-      document.body.style.userSelect = "";
-      liveTreeWidthRef.current = null;
+      bodyStyle.setProperty("cursor", previousCursor);
+      bodyStyle.setProperty("user-select", previousUserSelect);
       if (liveWidth !== startWidth) {
         setTreeWidth(liveWidth);
         viewConfigRef.current.treePanel?.onWidthChange?.(liveWidth);
@@ -1986,10 +1908,8 @@ function GanttView({
   // destructive styling when invalid, Esc cancel, commit via callback) -----
   const [reorder, setReorder] = useState<TimelineReorderState | null>(null);
   const reorderEnabled = !!settings.onResourceReorder;
-  const settingsRef = useRef(settings);
-  settingsRef.current = settings;
-  const rowsRef = useRef(rows);
-  rowsRef.current = rows;
+  const settingsRef = useCommittedRef(settings);
+  const rowsRef = useCommittedRef(rows);
 
   const beginRowReorder = useCallback(
     (e: React.PointerEvent, dragRow: TimelineRow) => {
@@ -2173,22 +2093,24 @@ function GanttView({
       window.addEventListener("pointercancel", onCancelEvent);
       window.addEventListener("keydown", onKey);
     },
-    [],
+    [rowsRef, settingsRef],
   );
 
-  const collapsedIdsRef = useRef(collapsedIds);
-  collapsedIdsRef.current = collapsedIds;
+  const collapsedIdsRef = useCommittedRef(collapsedIds);
   // Stable identity (reads through refs) so memoized rows survive re-renders
-  const onToggleRow = useCallback((row: TimelineRow) => {
-    const current = collapsedIdsRef.current;
-    const next = current.includes(row.resource.id)
-      ? current.filter((id) => id !== row.resource.id)
-      : [...current, row.resource.id];
-    if (viewConfigRef.current.collapsedGroups === undefined) {
-      setInternalCollapsed(next);
-    }
-    viewConfigRef.current.onCollapsedGroupsChange?.(next);
-  }, []);
+  const onToggleRow = useCallback(
+    (row: TimelineRow) => {
+      const current = collapsedIdsRef.current;
+      const next = current.includes(row.resource.id)
+        ? current.filter((id) => id !== row.resource.id)
+        : [...current, row.resource.id];
+      if (viewConfigRef.current.collapsedGroups === undefined) {
+        setInternalCollapsed(next);
+      }
+      viewConfigRef.current.onCollapsedGroupsChange?.(next);
+    },
+    [collapsedIdsRef, viewConfigRef],
+  );
 
   const loading = useGanttSelector<unknown, boolean>((state) => state.loading);
   const customScrollbars = viewConfig.scrollbars !== "native";
@@ -2642,7 +2564,7 @@ function GanttView({
           ref={treePaneRef}
           data-slot="gantt-tree-pane"
           className="relative h-full shrink-0"
-          style={{ width: liveTreeWidthRef.current ?? clampedTreeWidth }}
+          style={{ width: clampedTreeWidth }}
         >
           {customScrollbars ? (
             // keyed by scale: Base UI measures overflow once per mount, and a
@@ -2923,58 +2845,6 @@ function GanttView({
     render,
     props: mergeProps<"div">(defaultProps, props),
   });
-}
-
-/**
- * The red now-line, self-ticking: only this component re-renders on the 30s
- * clock, never the grid around it. z-10 keeps it above row content but UNDER
- * the sticky header (z-30) - vertical scrolling slides it beneath, never over.
- */
-function GanttNowLine({
-  rangeStartMs,
-  rangeEndMs,
-}: {
-  rangeStartMs: number;
-  rangeEndMs: number;
-}) {
-  const now = useNow();
-  const ms = now.getTime();
-  if (ms < rangeStartMs || ms >= rangeEndMs) return null;
-  const fraction = (ms - rangeStartMs) / (rangeEndMs - rangeStartMs);
-  return (
-    <div
-      data-slot="gantt-now-indicator"
-      // comet tail: solid at the cap, dissolving toward the bottom -
-      // present without ruling a hard line through every row
-      className="from-destructive/80 via-destructive/45 to-destructive/15 absolute inset-y-0 z-10 w-px bg-linear-to-b"
-      style={{ insetInlineStart: `${fraction * 100}%` }}
-    />
-  );
-}
-
-/**
- * The now-line's dot cap, pinned INSIDE the sticky header at the header/body
- * boundary: it stays put while the line scrolls beneath the header.
- */
-function GanttNowDot({
-  rangeStartMs,
-  rangeEndMs,
-}: {
-  rangeStartMs: number;
-  rangeEndMs: number;
-}) {
-  const now = useNow();
-  const ms = now.getTime();
-  if (ms < rangeStartMs || ms >= rangeEndMs) return null;
-  const fraction = (ms - rangeStartMs) / (rangeEndMs - rangeStartMs);
-  return (
-    <span
-      aria-hidden
-      data-slot="gantt-now-dot"
-      className="bg-destructive absolute -bottom-0.75 z-10 size-1.5 -translate-x-1/2 rounded-full"
-      style={{ insetInlineStart: `${fraction * 100}%` }}
-    />
-  );
 }
 
 /**
@@ -4297,235 +4167,6 @@ const GanttTimelineRow = memo(function GanttTimelineRow({
     </div>
   );
 });
-
-interface OffscreenChip {
-  id: string;
-  side: "start" | "end";
-  top: number;
-  color?: string;
-  label: string;
-  /** First bar start, shown in the chip tooltip. */
-  startMs: number | null;
-  /** scrollLeft that brings the bar back into view. */
-  target: number;
-}
-
-function sameChips(a: OffscreenChip[], b: OffscreenChip[]): boolean {
-  return (
-    a.length === b.length &&
-    a.every(
-      (chip, i) =>
-        chip.id === b[i]?.id &&
-        chip.side === b[i]?.side &&
-        chip.top === b[i]?.top &&
-        chip.target === b[i]?.target,
-    )
-  );
-}
-
-/**
- * Edge chips for rows whose bars sit entirely outside the visible timeline;
- * clicking scrolls the bar back into view. Reads geometry straight from the
- * DOM (row data attributes), so scrolling never re-renders the grid.
- */
-function GanttOffscreenChips({
-  paneRef,
-  occurrences,
-  locale,
-  refreshKey,
-}: {
-  paneRef: RefObject<HTMLDivElement | null>;
-  occurrences: GanttOccurrence[];
-  locale?: Locale;
-  refreshKey: string;
-}) {
-  const settings = useGanttSettings();
-  const [chips, setChips] = useState<OffscreenChip[]>([]);
-
-  useEffect(() => {
-    const pane = paneRef.current;
-    const viewport = getPaneViewport(pane);
-    if (!pane || !viewport) return;
-    let raf = 0;
-    const measure = () => {
-      raf = 0;
-      const paneRect = pane.getBoundingClientRect();
-      const header = viewport.querySelector<HTMLElement>(
-        "[data-slot=gantt-timeline-header]",
-      );
-      const headerBottom = header
-        ? header.getBoundingClientRect().bottom - paneRect.top
-        : 0;
-      const trackW = viewport.scrollWidth;
-      const visibleStart = getScrollStart(viewport);
-      const visibleEnd = visibleStart + viewport.clientWidth;
-      // The floating zoom control shares the right edge. The chips stay in
-      // their column - a shifted chip reads as misaligned, and its position
-      // IS its meaning - so it is the ZOOM CONTROL that glides inward while
-      // any end chip occupies its band (published as --gantt-zoom-shift,
-      // written imperatively like the rest of this measure pass). The band
-      // test uses the control's VERTICAL extent only, which a horizontal
-      // dodge never changes, so the loop cannot oscillate.
-      const zoomEl = pane.querySelector<HTMLElement>("[data-slot=gantt-zoom]");
-      const zoom = zoomEl
-        ? {
-            top: zoomEl.getBoundingClientRect().top - paneRect.top - 8,
-            bottom: zoomEl.getBoundingClientRect().bottom - paneRect.top + 8,
-          }
-        : null;
-      let chipInZoomBand = false;
-      const next: OffscreenChip[] = [];
-      for (const rowEl of viewport.querySelectorAll<HTMLElement>(
-        "[data-gantt-row]",
-      )) {
-        const from = parseFloat(rowEl.dataset.ganttBarMin ?? "");
-        const to = parseFloat(rowEl.dataset.ganttBarMax ?? "");
-        if (Number.isNaN(from) || Number.isNaN(to)) continue;
-        const rect = rowEl.getBoundingClientRect();
-        const top = rect.top - paneRect.top + rect.height / 2;
-        if (top < headerBottom + 10 || top > paneRect.height - 16) continue;
-        const startPx = from * trackW;
-        const endPx = to * trackW;
-        const startMs = parseFloat(rowEl.dataset.ganttBarStartMs ?? "");
-        const base = {
-          id: rowEl.dataset.ganttRowId ?? "",
-          top: Math.round(top),
-          color: rowEl.dataset.ganttBarColor,
-          label: rowEl.dataset.ganttBarLabel ?? "",
-          startMs: Number.isNaN(startMs) ? null : startMs,
-        };
-        if (endPx <= visibleStart + 2) {
-          next.push({
-            ...base,
-            side: "start",
-            target: startPx - 24,
-          });
-        } else if (startPx >= visibleEnd - 2) {
-          if (zoom && top >= zoom.top && top <= zoom.bottom) {
-            chipInZoomBand = true;
-          }
-          next.push({
-            ...base,
-            side: "end",
-            target: endPx - viewport.clientWidth + 24,
-          });
-        }
-      }
-      // 28px clears the 20px chip column plus breathing room on both sides
-      zoomEl?.style.setProperty(
-        "--gantt-zoom-shift",
-        chipInZoomBand ? "28px" : "0px",
-      );
-      setChips((prev) => (sameChips(prev, next) ? prev : next));
-    };
-    const schedule = () => {
-      if (!raf) raf = requestAnimationFrame(measure);
-    };
-    viewport.addEventListener("scroll", schedule);
-    const observer = new ResizeObserver(schedule);
-    observer.observe(viewport);
-    schedule();
-    return () => {
-      viewport.removeEventListener("scroll", schedule);
-      observer.disconnect();
-      if (raf) cancelAnimationFrame(raf);
-      // the zoom control returns to its corner once no chip can collide
-      pane
-        .querySelector<HTMLElement>("[data-slot=gantt-zoom]")
-        ?.style.removeProperty("--gantt-zoom-shift");
-    };
-  }, [paneRef, occurrences, refreshKey]);
-
-  if (chips.length === 0) return null;
-
-  const scrollTo = (chip: OffscreenChip) => {
-    const viewport = getPaneViewport(paneRef.current);
-    if (!viewport) return;
-    const target = Math.max(0, chip.target);
-    viewport.scrollTo({
-      // chip targets are distances from the inline start; RTL signs them
-      left: getComputedStyle(viewport).direction === "rtl" ? -target : target,
-      behavior: "smooth",
-    });
-    // hand keyboard focus to the bar the chip promised (the chip unmounts)
-    const bar = viewport.querySelector<HTMLElement>(
-      `[data-gantt-row-id="${CSS.escape(chip.id)}"] [data-slot=gantt-bar]`,
-    );
-    bar?.focus({ preventScroll: true });
-  };
-
-  return (
-    <div
-      data-slot="gantt-offscreen-chips"
-      className="pointer-events-none absolute inset-0 z-30 overflow-hidden"
-    >
-      <TooltipProvider delay={600} closeDelay={0} timeout={300}>
-        {chips.map((chip) => (
-          <Tooltip key={`${chip.id}-${chip.side}`}>
-            <TooltipTrigger
-              render={
-                <button
-                  type="button"
-                  data-slot="gantt-offscreen-chip"
-                  data-side={chip.side}
-                  aria-label={settings.i18n.labels.jumpToBar(chip.label)}
-                  className="bg-background text-muted-foreground hover:text-foreground pointer-events-auto absolute flex size-5 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full border shadow-xs"
-                  style={{
-                    top: chip.top,
-                    ...(chip.side === "start"
-                      ? { insetInlineStart: "0.5rem" }
-                      : { insetInlineEnd: "0.875rem" }),
-                  }}
-                  onClick={() => scrollTo(chip)}
-                />
-              }
-            >
-              {chip.side === "start" ? (
-                <IconPlaceholder
-                  lucide="ChevronLeftIcon"
-                  tabler="IconChevronLeft"
-                  hugeicons="ArrowLeft01Icon"
-                  phosphor="CaretLeftIcon"
-                  remixicon="RiArrowLeftSLine"
-                  className="size-3"
-                  aria-hidden="true"
-                />
-              ) : (
-                <IconPlaceholder
-                  lucide="ChevronRightIcon"
-                  tabler="IconChevronRight"
-                  hugeicons="ArrowRight01Icon"
-                  phosphor="CaretRightIcon"
-                  remixicon="RiArrowRightSLine"
-                  className="size-3"
-                  aria-hidden="true"
-                />
-              )}
-              <span
-                aria-hidden
-                className="ring-background absolute -end-px -top-px size-1.5 rounded-full ring-1"
-                style={{ background: chip.color ?? "var(--color-primary)" }}
-              />
-            </TooltipTrigger>
-            <TooltipContent side={chip.side === "start" ? "right" : "left"}>
-              <div className="font-medium">{chip.label}</div>
-              {chip.startMs !== null && (
-                <div className="opacity-80">
-                  {/* zoned: the chip must name the same day the grid shows */}
-                  {format(
-                    toZoned(new Date(chip.startMs), settings.timeZone),
-                    "MMM d, yyyy",
-                    { locale },
-                  )}
-                </div>
-              )}
-            </TooltipContent>
-          </Tooltip>
-        ))}
-      </TooltipProvider>
-    </div>
-  );
-}
 
 export { GanttView };
 export type { GanttViewProps };

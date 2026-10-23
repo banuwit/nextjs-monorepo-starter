@@ -36,13 +36,15 @@ import { cn } from "@/lib/utils";
 import type { User } from "@/mocks/user.mock";
 import {
   getUserEditErrors,
-  type EditableUserField,
-  type UserDraft,
   getRowEditRows,
   rowEditReducer,
-  type RowEditAction,
-  type RowEditState,
-} from "../../user-editing";
+} from "../../utils/user-editing";
+import type {
+  EditableUserField,
+  UserDraft,
+  RowEditAction,
+  RowEditState,
+} from "../../types/user-editing";
 
 const fields: {
   field: EditableUserField;

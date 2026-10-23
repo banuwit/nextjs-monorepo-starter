@@ -3,7 +3,8 @@
 import { DataGridSearchInput } from "@/components/data-grid/data-grid-search-input";
 import { Button } from "@/components/ui/button";
 import { FacetedFilter } from "@/components/filters/faceted-filter";
-import { emptyTreeFilters, type TreeFilters } from "../user-tree";
+import { emptyTreeFilters } from "../utils/user-tree";
+import type { TreeFilters } from "../types/user-tree";
 
 export const treeColumns = [
   { id: "name", label: "Name", width: 360 },

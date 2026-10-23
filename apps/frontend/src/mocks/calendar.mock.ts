@@ -2,7 +2,7 @@ import { addDays, format, startOfWeek } from "date-fns";
 import type {
   CalendarEvent,
   CalendarId,
-} from "@/features/calendar/calendar-model";
+} from "@/features/calendar/types/calendar";
 
 // Keep the sample schedule in the opening week, including month/year boundaries.
 export function createDemoEvents(today: Date): CalendarEvent[] {

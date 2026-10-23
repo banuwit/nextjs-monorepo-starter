@@ -24,7 +24,7 @@ import {
   userColumnLabels,
 } from "./expansion-table-controls";
 import { UserReportCards } from "./user-report-cards";
-import { getDirectReports } from "../user-reporting";
+import { getDirectReports } from "../utils/user-reporting";
 
 const dateFormatter = new Intl.DateTimeFormat("en-GB", {
   day: "2-digit",

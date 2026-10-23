@@ -1,5 +1,3 @@
-import { Fragment } from "react";
-
 import {
   BadgeCheckIcon,
   CalendarDaysIcon,
@@ -18,13 +16,6 @@ import {
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
 import { Button, buttonVariants } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -227,17 +218,6 @@ function Documents() {
 export function ProfilePage() {
   return (
     <div className="flex flex-col gap-4 py-4">
-      <Breadcrumb className="px-4">
-        <BreadcrumbList>
-          {["Dashboard", "People", "Employee directory", profile.name].map((label) => (
-            <Fragment key={label}>
-              <BreadcrumbItem>{label}</BreadcrumbItem>
-              <BreadcrumbSeparator />
-            </Fragment>
-          ))}
-          <BreadcrumbItem><BreadcrumbPage>Profile details</BreadcrumbPage></BreadcrumbItem>
-        </BreadcrumbList>
-      </Breadcrumb>
       <ProfileHeader />
       <Tabs className="min-h-0 flex-1 gap-0" defaultValue="overview">
         <div className="touch-pan-x overflow-x-auto overscroll-x-contain border-y">

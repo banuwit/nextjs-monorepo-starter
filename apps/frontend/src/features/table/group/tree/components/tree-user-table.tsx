@@ -24,9 +24,8 @@ import {
   filterUserTree,
   flattenUserTree,
   getExpandedTreeIds,
-  type TreeFilters,
-  type UserTreeNode,
-} from "../user-tree";
+} from "../utils/user-tree";
+import type { TreeFilters, UserTreeNode } from "../types/user-tree";
 import { treeColumns, TreeTableControls } from "./tree-table-controls";
 
 const dateFormatter = new Intl.DateTimeFormat("en-GB", {

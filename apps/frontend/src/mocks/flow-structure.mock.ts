@@ -1,4 +1,4 @@
-import type { FlowStep } from "../features/flow-structure/flow-model";
+import type { FlowStep } from "../features/flow-structure/types/flow";
 
 export const flowSteps: FlowStep[] = [
   {

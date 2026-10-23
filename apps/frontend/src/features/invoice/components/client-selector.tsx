@@ -22,7 +22,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { clientSchema, type InvoiceClient } from "../invoice-model";
+import { clientSchema } from "../schemas/invoice.schema";
+import type { InvoiceClient } from "../types/invoice";
 
 export function ClientSelector({
   value,

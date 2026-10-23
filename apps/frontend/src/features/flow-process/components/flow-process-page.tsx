@@ -69,9 +69,8 @@ import {
   graphReducer,
   removeStep,
   serializeGraph,
-  type Graph,
-  type StepNode,
-} from "../flow-model";
+} from "../utils/flow";
+import type { Graph, StepNode } from "../types/flow";
 import { FlowActions, FlowStep } from "./flow-step";
 import { StepInspector } from "./step-inspector";
 import "@xyflow/react/dist/style.css";

@@ -14,7 +14,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import type { Invoice } from "../invoice-model";
+import type { Invoice } from "../types/invoice";
 
 export function InvoiceDetails({
   invoice,

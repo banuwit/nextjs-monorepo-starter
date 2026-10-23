@@ -61,13 +61,8 @@ import {
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { toast } from "@/components/ui/toast";
 import { flowSteps } from "@/mocks/flow-structure.mock";
-import {
-  insertStep,
-  removeStep,
-  simulateRun,
-  type FlowStep,
-  type RunResult,
-} from "../flow-model";
+import { insertStep, removeStep, simulateRun } from "../utils/flow";
+import type { FlowStep, RunResult } from "../types/flow";
 import {
   FlowNode,
   FlowEdge,

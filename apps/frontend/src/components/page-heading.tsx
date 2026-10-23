@@ -1,18 +1,10 @@
-import { Fragment, type ReactNode } from "react";
+import type { ReactNode } from "react";
 
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
+import { NavigationBreadcrumb } from "@/components/navigation-breadcrumb";
 
 type PageHeadingProps = {
   title: string;
   currentPage: string;
-  parents?: { label: string; href: string }[];
   titleClassName?: string;
   children?: ReactNode;
 };
@@ -20,27 +12,12 @@ type PageHeadingProps = {
 export function PageHeading({
   title,
   currentPage,
-  parents,
   titleClassName,
   children,
 }: PageHeadingProps) {
   return (
     <div className="flex flex-col">
-      <Breadcrumb>
-        <BreadcrumbList className="text-xs">
-          {parents?.map(({ label, href }) => (
-            <Fragment key={href}>
-              <BreadcrumbItem className="hidden md:block">
-                <BreadcrumbLink href={href}>{label}</BreadcrumbLink>
-              </BreadcrumbItem>
-              <BreadcrumbSeparator className="hidden md:block" />
-            </Fragment>
-          ))}
-          <BreadcrumbItem>
-            <BreadcrumbPage>{currentPage}</BreadcrumbPage>
-          </BreadcrumbItem>
-        </BreadcrumbList>
-      </Breadcrumb>
+      <NavigationBreadcrumb currentPage={currentPage} />
       <div
         data-slot="page-heading-content"
         className="flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:justify-between"

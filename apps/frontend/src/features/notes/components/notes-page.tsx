@@ -43,7 +43,8 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 import { exampleNote, notePeople } from "@/mocks/notes.mock";
-import { noteSchema, type Note } from "../notes-model";
+import { noteSchema } from "../schemas/notes.schema";
+import type { Note } from "../types/notes";
 import { blockCommands, noteExtensions, NoteOutline } from "./notes-extensions";
 import { NoteFormatting } from "./note-formatting";
 import "./notes.css";

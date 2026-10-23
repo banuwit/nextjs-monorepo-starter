@@ -2,7 +2,6 @@
 
 import { AppHeaderMenubar } from "@/components/app-header-menubar";
 import { AppHeaderActions } from "@/components/app-sidebar-header";
-import { MenuSearch } from "@/components/menu-search";
 import { TeamSwitcher } from "@/components/team-switcher";
 import { Separator } from "@/components/ui/separator";
 import { SidebarTrigger } from "@/components/ui/sidebar";
@@ -20,7 +19,7 @@ export function AppHeader() {
       className="sticky top-0 z-20 shrink-0"
     >
       <div data-slot="app-header">
-        <header className="flex h-12 items-center gap-2 px-2 border-b">
+        <header className="flex h-12 items-center gap-2 border-b px-2">
           <div className="flex min-w-0 items-center gap-1 sm:gap-2">
             <SidebarTrigger className="-ml-1 md:hidden" />
             <Separator
@@ -30,8 +29,7 @@ export function AppHeader() {
             <TeamSwitcher placement="header" />
           </div>
           <div className="ml-auto flex items-center gap-1 sm:gap-2">
-            <MenuSearch iconOnly={isMobile} />
-            <AppHeaderActions />
+            <AppHeaderActions showSearch searchIconOnly={isMobile} />
           </div>
         </header>
         <AppHeaderMenubar />

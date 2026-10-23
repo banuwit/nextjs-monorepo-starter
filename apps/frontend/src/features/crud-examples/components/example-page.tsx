@@ -49,7 +49,6 @@ export function ExamplePage({ variant }: { variant: keyof typeof patterns }) {
     <CrudResource
       title="Parameter contoh"
       heading={label}
-      parent={{ label: "CRUD", href: "/crud" }}
       description={`Pola ${label}. Semua submenu CRUD memakai data contoh yang sama dan tersimpan di browser ini.`}
       pattern={pattern}
       basePath={pattern === "page" ? "/crud/new-page" : undefined}

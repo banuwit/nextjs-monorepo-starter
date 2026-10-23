@@ -43,6 +43,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { IconPlaceholder } from "@/components/gantt/icon-placeholder";
+import { useNow } from "./gantt-clock";
 
 /**
  * Effective Tailwind palette presets for bar colors; every entry works on
@@ -68,9 +69,7 @@ interface GanttBarContextValue<TData = unknown> {
   isSelected: boolean;
 }
 
-const GanttBarContext =
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  createContext<GanttBarContextValue<any> | null>(null);
+const GanttBarContext = createContext<GanttBarContextValue<any> | null>(null);
 
 /** The bar's subject; usable inside renderEvent content and bar children. */
 function useGanttBarContext<TData = unknown>(): GanttBarContextValue<TData> {
@@ -207,33 +206,17 @@ function GanttBar<TData = unknown>({
     occurrence.allDay,
     settings.locale,
   );
-  // Memoized: a second full formatEventTime per render would double the
-  // bar's formatting cost, and it cannot wait for the tooltip because the
-  // label also feeds aria-label. Keyed on the instants, not the baseline
-  // object - resolveEventBaseline allocates a fresh one every render.
-  const baselineStartMs = baseline?.start.getTime();
-  const baselineEndMs = baseline?.end.getTime();
-  const plannedLabel = useMemo(
-    () =>
-      baselineStartMs === undefined || baselineEndMs === undefined
-        ? undefined
-        : settings.i18n.labels.planned(
-            settings.i18n.functions.formatEventTime(
-              toZoned(new Date(baselineStartMs), settings.timeZone),
-              toZoned(new Date(baselineEndMs), settings.timeZone),
-              occurrence.allDay,
-              settings.locale,
-            ),
-          ),
-    [
-      baselineStartMs,
-      baselineEndMs,
-      occurrence.allDay,
-      settings.i18n,
-      settings.timeZone,
-      settings.locale,
-    ],
-  );
+  // Shared by the tooltip and aria-label; format only once per render.
+  const plannedLabel = baseline
+    ? settings.i18n.labels.planned(
+        settings.i18n.functions.formatEventTime(
+          toZoned(baseline.start, settings.timeZone),
+          toZoned(baseline.end, settings.timeZone),
+          occurrence.allDay,
+          settings.locale,
+        ),
+      )
+    : undefined;
   // name the row too: the split-pane layout carries no grid semantics.
   // The prop path is O(1); the lookup fallback is memoized so external
   // GanttBar usage never flattens the tree per render.
@@ -286,6 +269,7 @@ function GanttBar<TData = unknown>({
     </>
   );
 
+  const now = useNow();
   const defaultProps = {
     type: "button" as const,
     "data-slot": "gantt-bar",
@@ -295,7 +279,7 @@ function GanttBar<TData = unknown>({
     "data-selected": isSelected || undefined,
     "data-dragging": isDragging || undefined,
     "data-drag-kind": dragKind ?? undefined,
-    "data-past": occurrence.end.getTime() < Date.now() || undefined,
+    "data-past": occurrence.end.getTime() < now.getTime() || undefined,
     "data-label-outside": labelOutside || undefined,
     "data-progress": progress ?? undefined,
     "data-completed": progress === 100 || undefined,

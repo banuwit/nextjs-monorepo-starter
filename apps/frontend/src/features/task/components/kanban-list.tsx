@@ -35,8 +35,8 @@ import {
   TaskPriorityBadge,
   TaskTeamBadge,
 } from "./task-meta";
-import type { BoardState, Column, ColumnId, Task } from "./types";
-import { findColumnId } from "./utils";
+import type { BoardState, Column, ColumnId, Task } from "../types/task";
+import { findColumnId } from "../utils/task-board";
 
 interface KanbanListProps {
   board: BoardState;

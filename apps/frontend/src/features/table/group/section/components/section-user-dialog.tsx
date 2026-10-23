@@ -8,7 +8,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import type { User } from "@/mocks/user.mock";
-import { sectionColumns } from "../user-sections";
+import { sectionColumns } from "../utils/user-sections";
 
 export function SectionUserDialog({
   user,

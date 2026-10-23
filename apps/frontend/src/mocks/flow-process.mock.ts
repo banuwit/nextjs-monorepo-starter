@@ -1,4 +1,4 @@
-import type { Graph } from "../features/flow-process/flow-model";
+import type { Graph } from "../features/flow-process/types/flow";
 
 export const stepOwners = ["Ines Marchetti", "Tomas Lindqvist", "Hanna Berg"];
 

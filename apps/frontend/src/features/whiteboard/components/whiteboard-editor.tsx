@@ -82,13 +82,9 @@ import {
   createBoardTemplate,
   whiteboardTitle,
 } from "@/mocks/whiteboard.mock";
-import {
-  getFrames,
-  parseBoard,
-  prependVersion,
-  savedBoardSchema,
-  type BoardVersion,
-} from "../whiteboard-model";
+import { getFrames, parseBoard, prependVersion } from "../utils/whiteboard";
+import { savedBoardSchema } from "../schemas/whiteboard.schema";
+import type { BoardVersion } from "../types/whiteboard";
 import "@excalidraw/excalidraw/index.css";
 
 const storageKey = "whiteboard:v1";

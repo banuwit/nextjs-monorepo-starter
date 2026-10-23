@@ -1,5 +1,5 @@
 "use client";
-import type { FileFilters } from "../file-manager-model";
+import type { FileFilters } from "../types/file-manager";
 import { ArrowUpDown, Search, SlidersHorizontal } from "lucide-react";
 
 import { Button } from "@/components/ui/button";

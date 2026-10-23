@@ -1,1 +1,1 @@
-export { TaskPage as default } from "@/features/task/task-page";
+export { TaskPage as default } from "@/features/task/components/task-page";

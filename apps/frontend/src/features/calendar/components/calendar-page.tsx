@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState, useSyncExternalStore } from "react";
 import { useCalendarController } from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/react/daygrid";
 import timeGridPlugin from "@fullcalendar/react/timegrid";
@@ -29,11 +29,13 @@ import {
   calendarOwners,
   countEventsInRange,
   filterEvents,
-  type CalendarEvent,
-  type CalendarId,
-  type CalendarOwner,
-  type EventForm,
-} from "../calendar-model";
+} from "../utils/calendar";
+import type {
+  CalendarEvent,
+  CalendarId,
+  CalendarOwner,
+  EventForm,
+} from "../types/calendar";
 import { CalendarEventCard } from "./calendar-event-card";
 import { EventCalendarViews } from "./event-calendar-views";
 import { EventFormDialog } from "./event-form-dialog";
@@ -330,12 +332,15 @@ function Calendar() {
   );
 }
 
+const subscribe = () => () => {};
+
 export function CalendarPage() {
-  const [ready, setReady] = useState(false);
-  // Initialize in the browser so demo dates and "today" use the user's timezone.
-  useEffect(() => {
-    setReady(true);
-  }, []);
+  // Browser-only initialization; the server and hydration render the fallback.
+  const ready = useSyncExternalStore(
+    subscribe,
+    () => true,
+    () => false,
+  );
   return (
     <AppBody>
       {ready ? (

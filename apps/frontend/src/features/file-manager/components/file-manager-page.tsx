@@ -38,11 +38,13 @@ import {
   getFileKind,
   toggleFileStar,
   updateFolderSummary,
-  type FileFilters,
-  type FileManagerFile,
-  type FileManagerFolder,
-  type FileManagerView,
-} from "../file-manager-model";
+} from "../utils/file-manager";
+import type {
+  FileFilters,
+  FileManagerFile,
+  FileManagerFolder,
+  FileManagerView,
+} from "../types/file-manager";
 import { FileGridView } from "./file-grid-view";
 import { FileListView } from "./file-list-view";
 import { FileManagerToolbar } from "./file-manager-toolbar";

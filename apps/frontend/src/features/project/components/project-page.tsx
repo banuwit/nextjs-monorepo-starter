@@ -52,9 +52,9 @@ import {
   projectStatuses,
   selectProjects,
   todayDate,
-  type Project,
-} from "../project-model";
-import { useProjects } from "../use-projects";
+} from "../utils/project";
+import type { Project } from "../types/project";
+import { useProjects } from "../hooks/use-projects";
 import { ProjectDetail } from "./project-detail";
 import { ProjectForm } from "./project-form";
 import { ProjectTable } from "./project-table";
@@ -166,11 +166,7 @@ export function ProjectPage() {
 
   return (
     <AppBody>
-      <PageHeading
-        title="Project"
-        currentPage="Project"
-        parents={[{ label: "Dashboard", href: "/dashboard" }]}
-      >
+      <PageHeading title="Project" currentPage="Project">
         <Button
           ref={newButton}
           disabled={!ready}

@@ -20,7 +20,7 @@ import {
   DataGridClient,
   type DataGridColumnState,
 } from "@/components/data-grid/data-grid-client";
-import { getUserCellColumnOrder } from "../user-sheet-columns";
+import { getUserCellColumnOrder } from "../utils/user-sheet-columns";
 import { DataGridHeaderDropdown } from "@/components/data-grid/data-grid-header-dropdown";
 import {
   DataGridSheetEditing,
@@ -48,15 +48,14 @@ import {
   applyUserCellChanges,
   createUserCellDraft,
   userCellHistoryReducer,
-  type EditableUserField,
-} from "../../user-editing";
-import {
-  filterUserCells,
-  sortUserCells,
-  type UserCellSorting,
-  type UserFilter,
-  type UserFilterField,
-} from "../user-sheet-filters";
+} from "../../utils/user-editing";
+import type { EditableUserField } from "../../types/user-editing";
+import { filterUserCells, sortUserCells } from "../utils/user-sheet-filters";
+import type {
+  UserCellSorting,
+  UserFilter,
+  UserFilterField,
+} from "../types/user-sheet-filters";
 import { CellColumnFilter } from "./sheet-table-filters";
 import {
   CellUserDelete,

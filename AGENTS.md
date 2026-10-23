@@ -2,7 +2,7 @@
 
 ## Kondisi saat ini dan sumber acuan
 
-- Kode aplikasi masih berupa starter Turborepo: `apps/frontend` adalah aplikasi contoh Next.js, `packages/ui` berisi komponen UI yang dapat dipakai ulang, sedangkan `packages/eslint-config` dan `packages/typescript-config` berisi konfigurasi bersama.
+- `apps/frontend` adalah aplikasi Next.js; `packages/eslint-config` dan `packages/typescript-config` berisi konfigurasi bersama. Paket contoh `packages/ui` telah dihapus karena tidak digunakan.
 - [PRD Tahap 1](apps/frontend/prd.md) adalah spesifikasi yang disetujui untuk `app-monorepo-starter` yang akan dibangun. Dokumen tersebut menjelaskan arsitektur target dan milestone, bukan fitur yang sudah tersedia di repositori ini. Baca seluruh isinya sebelum mengerjakan produk dan ikuti keputusan yang ditandai **DIKUNCI** serta urutan milestone Tahap 1. [PRD Tahap 2](apps/mobile/prd.md) dan [PRD Tahap 3](apps/backend/prd.md) masih berupa roadmap; jangan mulai implementasinya kecuali diminta pengguna.
 - Starter saat ini berbeda dari PRD dalam nama aplikasi, paket, skrip, dan fungsionalitas. Periksa file yang benar-benar ada sebelum melaporkan progres; jangan menyatakan milestone selesai hanya berdasarkan PRD.
 - Sesuai amendemen UI terbaru, navigasi Documentation berisi empat contoh pola CRUD di `/crud/*`. Halaman frontend User, Country, Menu, Parameter, Province, dan City telah dihapus; rujuk amendemen pada PRD sebelum memakai peta halaman baseline.
@@ -11,8 +11,9 @@
 
 - Gunakan `pnpm` (paket root menetapkan `pnpm@11.25.0` dan Node.js 24 atau lebih baru). Workspace didefinisikan dalam `pnpm-workspace.yaml`.
 - Skrip root yang tersedia saat ini adalah `pnpm dev`, `pnpm build`, `pnpm lint`, `pnpm check-types`, dan `pnpm format` (yang menulis ulang file). Aplikasi frontend berjalan pada port 3000. Pengujian, skrip database, dan `pnpm typecheck` masih merupakan target PRD dan belum dikonfigurasi.
-- Di frontend, gunakan `src/app/` untuk entry point rute, layout, dan Route Handler; simpan UI/logika halaman khusus fitur di `src/features/<fitur>/`. Komponen shadcn dan komponen lintas fitur tetap di `src/components/`; gunakan `packages/ui` hanya untuk komponen yang benar-benar dibagikan antar-aplikasi. Jaga impor antar-paket dan konfigurasi TypeScript/ESLint sesuai workspace saat ini.
-- Sebelum membuat atau mengubah halaman/komponen frontend, dashboard shell, tema, atau Preferences, baca dan ikuti [Panduan Preferences](.agents/rule/preferences.md). Gunakan provider, pembungkus konten, dan token tampilan yang sudah tersedia agar halaman mengikuti pengaturan global; ikuti aturan reset, persistensi, dan verifikasi dalam panduan tersebut.
+- Di frontend, gunakan `src/app/` untuk entry point rute, layout, dan Route Handler; simpan UI/logika halaman khusus fitur di `src/features/<fitur>/`. Komponen shadcn dan komponen lintas fitur tetap di `src/components/`; buat paket UI bersama hanya saat ada komponen yang benar-benar dibagikan antar-aplikasi. Jaga impor antar-paket dan konfigurasi TypeScript/ESLint sesuai workspace saat ini.
+- Ikuti [Panduan Struktur Folder](.agents/rules/structure-folder.md): setiap fitur dan subfitur frontend memiliki `components/`, `hooks/`, `schemas/`, `types/`, dan `utils/`, termasuk folder kosong lokal tanpa `.gitkeep`.
+- Sebelum membuat atau mengubah halaman/komponen frontend, dashboard shell, tema, atau Preferences, baca dan ikuti [Panduan Preferences](.agents/rules/preferences.md). Gunakan provider, pembungkus konten, dan token tampilan yang sudah tersedia agar halaman mengikuti pengaturan global; ikuti aturan reset, persistensi, dan verifikasi dalam panduan tersebut.
 - Untuk pekerjaan API, Postman CLI tersedia di `/Users/banurusman/.local/bin/postman` (tidak ada di `PATH`).
 - Jalankan pemeriksaan yang relevan dengan file yang diubah, lalu laporkan perintah dan hasil sebenarnya. Pertahankan blok Turborepo yang dikelola di bawah ini; sebelum mengubah konfigurasi atau perintah Turborepo, ikuti petunjuk dokumentasi terpasangnya.
 
@@ -38,4 +39,5 @@ Blok ini ditulis dan ditambahkan kembali oleh `turbo` sebelum perintah dalam cak
 8. Tulis pengujian untuk perilaku baru.
 9. Jalankan pemeriksaan yang relevan sebelum menyelesaikan setiap tugas.
 10. Laporkan file yang diubah, pengujian, dan masalah yang belum terselesaikan.
+
 <!-- END:turborepo-agent-rules -->

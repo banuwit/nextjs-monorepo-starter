@@ -43,12 +43,8 @@ import {
   documentCollaborators,
   launchBrief,
 } from "@/mocks/rich-text-editor.mock";
-import {
-  DRAFT_KEY,
-  editorExtensions,
-  getDocumentStats,
-  readDraft,
-} from "../editor-model";
+import { DRAFT_KEY, getDocumentStats, readDraft } from "../utils/editor";
+import { editorExtensions } from "../schemas/editor.schema";
 import { EditorToolbar } from "./editor-toolbar";
 import { EditorLinkBubble } from "./editor-link";
 

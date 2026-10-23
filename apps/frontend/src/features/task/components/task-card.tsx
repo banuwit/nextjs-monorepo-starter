@@ -11,7 +11,7 @@ import {
   TaskPriorityBadge,
   TaskTeamBadge,
 } from "./task-meta";
-import type { ColumnId, Task } from "./types";
+import type { ColumnId, Task } from "../types/task";
 
 export function TaskCard({
   task,

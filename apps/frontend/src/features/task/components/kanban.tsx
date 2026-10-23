@@ -50,11 +50,14 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Toaster } from "@/components/ui/toast";
 
 import { TaskFormDialog } from "./task-form-dialog";
-import { selectTasks, mergeVisibleBoard } from "../task-board.js";
+import {
+  selectTasks,
+  mergeVisibleBoard,
+} from "../utils/task-board-operations.js";
 
 import { columnIds, columns } from "@/mocks/task.mock";
 import { KanbanColumn } from "./kanban-column";
-import { KanbanGantt } from "./kanban-gantt";
+import dynamic from "next/dynamic";
 import { KanbanList } from "./kanban-list";
 import { KanbanTable } from "./kanban-table";
 import { TaskCard } from "./task-card";
@@ -63,8 +66,20 @@ import type {
   ColumnId,
   Task,
   TaskPriority as Priority,
-} from "./types";
-import { findColumnId, findTask } from "./utils";
+} from "../types/task";
+import { findColumnId, findTask } from "../utils/task-board";
+
+const KanbanGantt = dynamic(
+  () => import("./kanban-gantt").then((module) => module.KanbanGantt),
+  {
+    ssr: false,
+    loading: () => (
+      <p role="status" className="p-4 text-sm text-muted-foreground">
+        Loading Gantt…
+      </p>
+    ),
+  },
+);
 
 interface KanbanProps {
   initialBoard: BoardState;

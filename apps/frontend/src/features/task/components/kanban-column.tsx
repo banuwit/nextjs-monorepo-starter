@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 import { SortableTaskCard } from "./sortable-task-card";
-import type { Column, Task } from "./types";
+import type { Column, Task } from "../types/task";
 
 interface KanbanColumnProps {
   column: Column;

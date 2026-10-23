@@ -4,7 +4,7 @@ import type {
   TaskOwnerProfile,
   TaskPriority,
   TaskTeam,
-} from "@/features/task/components/types";
+} from "@/features/task/types/task";
 
 export const columns = [
   { id: "ideas", title: "Ideas" },
@@ -344,4 +344,4 @@ export type {
   ColumnId,
   TaskPriority as Priority,
   Task,
-} from "@/features/task/components/types";
+} from "@/features/task/types/task";

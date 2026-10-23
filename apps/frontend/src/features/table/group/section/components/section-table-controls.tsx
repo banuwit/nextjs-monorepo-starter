@@ -9,7 +9,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { emptySectionFilters, type SectionFilters } from "../user-sections";
+import { emptySectionFilters } from "../utils/user-sections";
+import type { SectionFilters } from "../types/user-sections";
 
 function Choice({
   label,

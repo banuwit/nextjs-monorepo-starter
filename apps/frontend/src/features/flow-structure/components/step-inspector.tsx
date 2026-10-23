@@ -12,7 +12,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import type { FlowApp, FlowStep, RunResult } from "../flow-model";
+import type { FlowApp, FlowStep, RunResult } from "../types/flow";
 import { AppIcon } from "./flow-elements";
 
 const apps: FlowApp[] = [

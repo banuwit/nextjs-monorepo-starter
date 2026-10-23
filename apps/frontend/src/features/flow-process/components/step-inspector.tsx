@@ -19,7 +19,7 @@ import {
 } from "@/components/ui/sheet";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { stepOwners } from "@/mocks/flow-process.mock";
-import type { Graph, StepData, StepNode } from "../flow-model";
+import type { Graph, StepData, StepNode } from "../types/flow";
 import { StepStatus, stepIcons } from "./flow-step";
 
 type Props = {

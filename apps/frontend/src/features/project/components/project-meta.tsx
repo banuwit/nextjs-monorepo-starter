@@ -6,7 +6,8 @@ import {
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { projectStatuses, type Project } from "../project-model";
+import { projectStatuses } from "../utils/project";
+import type { Project } from "../types/project";
 
 const statusIcons = {
   planned: CircleDashedIcon,

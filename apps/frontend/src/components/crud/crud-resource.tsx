@@ -24,7 +24,6 @@ type Panel<T> = { mode: "create" } | { mode: "view" | "edit"; record: T };
 export function CrudResource<T extends CrudRecord>({
   title,
   heading,
-  parent,
   description,
   pattern,
   basePath,
@@ -40,7 +39,6 @@ export function CrudResource<T extends CrudRecord>({
 }: {
   title: string;
   heading?: string;
-  parent?: { label: string; href: string };
   description?: string;
   pattern: "page" | "dialog" | "sheet" | "inline";
   basePath?: string;
@@ -141,7 +139,6 @@ export function CrudResource<T extends CrudRecord>({
   return (
     <CrudPage
       title={heading ?? title}
-      parent={parent}
       sidePanel={
         pattern === "inline" && panel ? (
           <CrudInlinePanel

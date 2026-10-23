@@ -30,7 +30,7 @@ import {
   ContextMenuSeparator,
   ContextMenuTrigger,
 } from "@/components/ui/context-menu";
-import type { StepData, StepNode } from "../flow-model";
+import type { StepData, StepNode } from "../types/flow";
 
 export const FlowActions = createContext<{
   locked: boolean;

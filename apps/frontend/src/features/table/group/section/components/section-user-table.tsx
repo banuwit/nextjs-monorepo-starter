@@ -28,8 +28,8 @@ import {
   buildUserSections,
   emptySectionFilters,
   sectionColumns,
-  type SectionFilters,
-} from "../user-sections";
+} from "../utils/user-sections";
+import type { SectionFilters } from "../types/user-sections";
 import { SectionTableControls } from "./section-table-controls";
 import { SectionUserDialog } from "./section-user-dialog";
 

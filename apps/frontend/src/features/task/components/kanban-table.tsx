@@ -12,13 +12,13 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { columns, taskOwners } from "@/mocks/task.mock";
-import type { BoardState, ColumnId, TaskPriority } from "./types";
+import type { BoardState, ColumnId, TaskPriority } from "../types/task";
 import {
   boardFromTasks,
   cloneBoardTask,
   flattenBoard,
-  type BoardTask,
-} from "./utils";
+} from "../utils/task-board";
+import type { BoardTask } from "../types/task-board";
 
 interface KanbanTableProps {
   board: BoardState;

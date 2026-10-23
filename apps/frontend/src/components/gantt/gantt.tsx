@@ -474,7 +474,6 @@ function createGanttStore<TData>(
       invalidate();
     }
     if (!controlled) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (internal as any)[key] = value;
       invalidate();
     }
@@ -856,14 +855,8 @@ function useGanttState<TData = unknown>(
   options: UseGanttStateOptions<TData> = {},
 ): GanttInstance<TData> {
   const [store] = useState(() => createGanttStore<TData>(options));
-  const changed = store.setOptions(options);
-  const changedRef = useRef(false);
-  if (changed) changedRef.current = true;
   useLayoutEffect(() => {
-    if (changedRef.current) {
-      changedRef.current = false;
-      store.notify();
-    }
+    if (store.setOptions(options)) store.notify();
   });
   useEffect(() => {
     store.emitRangeIfChanged();
@@ -873,9 +866,7 @@ function useGanttState<TData = unknown>(
   return store.instance;
 }
 
-const GanttContext =
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  createContext<GanttInstance<any> | null>(null);
+const GanttContext = createContext<GanttInstance<any> | null>(null);
 
 /** The stable calendar instance; throws outside <Gantt>. */
 function useGantt<TData = unknown>(): GanttInstance<TData> {
@@ -905,11 +896,9 @@ function useGanttSelector<TData = unknown, TSelected = unknown>(
   }
   const isEqual = options?.isEqual ?? Object.is;
   const lastRef = useRef<{ value: TSelected } | null>(null);
-  const selectorRef = useRef(selector);
-  selectorRef.current = selector;
 
   const getSnapshot = () => {
-    const next = selectorRef.current(instance.getState() as GanttState<TData>);
+    const next = selector(instance.getState() as GanttState<TData>);
     if (lastRef.current && isEqual(lastRef.current.value, next)) {
       return lastRef.current.value;
     }
@@ -1546,10 +1535,8 @@ const DEFAULT_VIEW_CONFIG: GanttViewConfig = {
   rowAlign: "start",
 };
 
-const GanttViewConfigContext = createContext<
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  GanttViewConfig<any>
->(DEFAULT_VIEW_CONFIG);
+const GanttViewConfigContext =
+  createContext<GanttViewConfig<any>>(DEFAULT_VIEW_CONFIG);
 
 /** Root-level display props + render overrides, for view components. */
 function useGanttViewConfig<TData = unknown>(): GanttViewConfig<TData> {
@@ -1722,16 +1709,15 @@ function Gantt<TData = unknown>({
   // Stable context identity: splitOptions builds a fresh object per render,
   // and every row subscribes to this context - hand out the previous object
   // unless a config value actually changed.
-  const viewConfigRef = useRef(viewConfig);
+  const [stableViewConfig, setStableViewConfig] = useState(viewConfig);
   if (
     !shallowEqualRecord(
-      viewConfigRef.current as unknown as Record<string, unknown>,
+      stableViewConfig as unknown as Record<string, unknown>,
       viewConfig as unknown as Record<string, unknown>,
     )
   ) {
-    viewConfigRef.current = viewConfig;
+    setStableViewConfig(viewConfig);
   }
-  const stableViewConfig = viewConfigRef.current;
 
   if (calendar && Object.keys(options).length > 0) {
     warnOnce(

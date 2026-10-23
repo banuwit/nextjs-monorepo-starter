@@ -11,7 +11,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-import type { FileManagerFile } from "../file-manager-model";
+import type { FileManagerFile } from "../types/file-manager";
 
 interface FileActionsProps {
   file: FileManagerFile;

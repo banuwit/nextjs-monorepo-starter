@@ -1,4 +1,4 @@
-import { SalesDashboardPage } from "@/features/dashboard/sales/sales-dashboard-page";
+import { SalesDashboardPage } from "@/features/dashboard/sales/components/sales-dashboard-page";
 
 export const metadata = { title: "Sales | Dashboard" };
 
@@ -9,7 +9,13 @@ export default function Page() {
       year: "numeric",
       month: "2-digit",
       day: "2-digit",
-    }).formatToParts(new Date()).map(({ type, value }) => [type, value]),
+    })
+      .formatToParts(new Date())
+      .map(({ type, value }) => [type, value]),
   );
-  return <SalesDashboardPage today={`${parts.year}-${parts.month}-${parts.day}T12:00:00Z`} />;
+  return (
+    <SalesDashboardPage
+      today={`${parts.year}-${parts.month}-${parts.day}T12:00:00Z`}
+    />
+  );
 }

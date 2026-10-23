@@ -25,7 +25,7 @@ import {
   EmptyTitle,
 } from "@/components/ui/empty";
 
-import type { FileManagerFolder } from "../file-manager-model";
+import type { FileManagerFolder } from "../types/file-manager";
 
 export function FoldersSection({
   folders,

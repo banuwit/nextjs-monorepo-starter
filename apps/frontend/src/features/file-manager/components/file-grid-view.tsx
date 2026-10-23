@@ -13,7 +13,8 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 
-import { type FileManagerFile, fileKindLabels } from "../file-manager-model";
+import type { FileManagerFile } from "../types/file-manager";
+import { fileKindLabels } from "../utils/file-manager";
 import { fileIcons } from "./file-icons";
 import { FileActions } from "./file-actions";
 

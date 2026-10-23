@@ -23,10 +23,9 @@ import {
   calendars,
   calendarOwners,
   createCalendarEvent,
-  eventFormSchema,
-  type CalendarEvent,
-  type EventForm,
-} from "../calendar-model";
+} from "../utils/calendar";
+import { eventFormSchema } from "../schemas/calendar.schema";
+import type { CalendarEvent, EventForm } from "../types/calendar";
 
 export function EventFormDialog({
   initialValue,

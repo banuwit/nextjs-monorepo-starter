@@ -1,5 +1,5 @@
 import { addDays, format, parseISO } from "date-fns";
-import type { Invoice, InvoiceClient } from "../features/invoice/invoice-model";
+import type { Invoice, InvoiceClient } from "../features/invoice/types/invoice";
 
 const defaultInvoiceValues: Invoice = {
   referenceNumber: "FL-0425",

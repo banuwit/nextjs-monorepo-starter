@@ -51,7 +51,7 @@ import {
 import type {
   InfrastructureEnvironment,
   InfrastructureGroup,
-} from "../infrastructure-model";
+} from "../types/infrastructure";
 
 export function ProjectEnvironments({
   group,

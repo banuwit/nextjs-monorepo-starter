@@ -36,7 +36,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
-import type { FlowApp, FlowStep, RunResult } from "../flow-model";
+import type { FlowApp, FlowStep, RunResult } from "../types/flow";
 
 const icons = {
   Stripe: CreditCardIcon,

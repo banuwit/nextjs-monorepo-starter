@@ -32,7 +32,7 @@ import {
 
 import { columns } from "@/mocks/task.mock";
 import { TaskOwner, TaskPriorityBadge } from "./task-meta";
-import type { BoardState, ColumnId, Task } from "./types";
+import type { BoardState, ColumnId, Task } from "../types/task";
 
 interface KanbanGanttProps {
   board: BoardState;

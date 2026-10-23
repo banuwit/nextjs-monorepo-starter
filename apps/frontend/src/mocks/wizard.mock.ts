@@ -1,4 +1,4 @@
-import type { BillingDraft } from "../features/wizard/wizard-model";
+import type { BillingDraft } from "../features/wizard/types/wizard";
 
 export const billingPlans = [
   {

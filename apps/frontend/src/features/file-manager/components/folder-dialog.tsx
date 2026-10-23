@@ -12,10 +12,8 @@ import {
 } from "@/components/ui/dialog";
 import { Field, FieldError, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import {
-  folderNameSchema,
-  type FileManagerFolder,
-} from "../file-manager-model";
+import { folderNameSchema } from "../schemas/file-manager.schema";
+import type { FileManagerFolder } from "../types/file-manager";
 
 export function FolderDialog({
   folder,

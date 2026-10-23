@@ -5,7 +5,7 @@ import {
   FileImage,
   FileText,
 } from "lucide-react";
-import type { FileKind } from "../file-manager-model";
+import type { FileKind } from "../types/file-manager";
 
 export const fileIcons = {
   other: File,

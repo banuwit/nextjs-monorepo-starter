@@ -104,7 +104,6 @@ export function TimelineWorkflowPage() {
       <PageHeading
         title="Timeline Workflow"
         currentPage="Timeline Workflow"
-        parents={[{ label: "Dashboard", href: "/dashboard" }]}
       />
       <section
         aria-labelledby="workflow-heading"

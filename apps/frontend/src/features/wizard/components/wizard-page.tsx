@@ -56,12 +56,8 @@ import {
 } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 import { billingDraft, billingPlans } from "@/mocks/wizard.mock";
-import {
-  calculateInvoice,
-  validateStep,
-  type BillingDraft,
-  type BillingErrors,
-} from "../wizard-model";
+import { calculateInvoice, validateStep } from "../utils/wizard";
+import type { BillingDraft, BillingErrors } from "../types/wizard";
 
 const steps = [
   {
@@ -234,11 +230,7 @@ export function WizardPage() {
 
   return (
     <AppBody>
-      <PageHeading
-        title="Wizard"
-        currentPage="Wizard"
-        parents={[{ label: "Playground", href: "/playground/wizard" }]}
-      >
+      <PageHeading title="Wizard" currentPage="Wizard">
         <Badge variant="outline">Demo</Badge>
       </PageHeading>
       <div className="flex flex-1 items-start justify-center py-4 sm:py-8">

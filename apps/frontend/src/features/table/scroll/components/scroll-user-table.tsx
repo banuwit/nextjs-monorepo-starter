@@ -21,7 +21,7 @@ import {
   nextLoadedCount,
   SCROLL_BATCH_SIZE,
   SCROLL_USER_COUNT,
-} from "../user-scroll";
+} from "../utils/user-scroll";
 
 const fields = [
   { id: "name", title: "Name", width: 230 },
