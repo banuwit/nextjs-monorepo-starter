@@ -14,6 +14,7 @@ import { usePathname, useRouter } from "next/navigation"
 
 import { FacetedFilter } from "@/components/filters/faceted-filter"
 import { SelectBox } from "@/components/filters/select-box"
+import { cn } from "@/lib/utils"
 import {
   Table,
   TableBody,
@@ -33,6 +34,7 @@ import { DataGridPaginationAdvance } from "./data-grid-pagination-advance"
 import { DataGridPaginationSimple } from "./data-grid-pagination-simple"
 import { getPinnedCellProps, useColumnPinOffsets } from "./data-grid-pinning"
 import { DataGridSearchInput } from "./data-grid-search-input"
+import { DataGridScrollArea } from "./data-grid-scroll-area"
 import { getDataGridBodyState } from "./data-grid-state"
 import { DataGridVisibilityToggle } from "./data-grid-visibility-toggle"
 import { buildDataGridUrl } from "./query"
@@ -60,6 +62,14 @@ interface DataGridServerBaseProps<TData extends RowData> {
   actions?: React.ReactNode
   /** Hide the toolbar's column visibility toggle. Default: true. */
   showVisibilityToggle?: boolean
+  /** Use compact row spacing. Default: true. */
+  compact?: boolean
+  /** Shade alternating data rows. Default: false. */
+  striped?: boolean
+  /** Draw separators between columns. Default: false. */
+  columnLines?: boolean
+  /** Keep the header visible in a scroll viewport. Default: false. */
+  stickyHeader?: boolean
   /**
    * Show the "View columns" submenu inside every `DataGridHeaderDropdown`.
    * Default: true. A column can still override it per header.
@@ -165,6 +175,10 @@ export function DataGridServer<TData extends RowData>({
   toolbar,
   actions,
   showVisibilityToggle = true,
+  compact = true,
+  striped = false,
+  columnLines = false,
+  stickyHeader = false,
   showHeaderVisibilityToggle = true,
   enableColumnPinning = false,
   enableColumnOrdering = false,
@@ -181,6 +195,7 @@ export function DataGridServer<TData extends RowData>({
   const facets = toolbar?.facets ?? []
   const selects = toolbar?.selects ?? []
   const searchConfigs = toolbar?.searches ?? []
+  const scrollRef = React.useRef<HTMLDivElement>(null)
 
   // True when a search box, facet, or select is currently narrowing the
   // result set — distinguishes "no rows in this filter" from "no rows at
@@ -360,8 +375,19 @@ export function DataGridServer<TData extends RowData>({
       )}
 
       <div className="overflow-hidden rounded-md border">
-        <Table>
-          <TableHeader className="bg-muted">
+        <Table
+          className={cn(columnLines && "[&_th:not(:last-child)]:border-r [&_td:not(:last-child)]:border-r")}
+          renderContainer={stickyHeader ? (children) => (
+            <DataGridScrollArea
+              scrollRef={scrollRef}
+              label="Scrollable data grid"
+              height="min(35rem, 65vh)"
+            >
+              {children}
+            </DataGridScrollArea>
+          ) : undefined}
+        >
+          <TableHeader className={cn("bg-muted", stickyHeader && "sticky top-0 z-20")}>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => (
@@ -415,19 +441,32 @@ export function DataGridServer<TData extends RowData>({
               </TableRow>
             ) : bodyState === "rows" ? (
               table.getRowModel().rows.map((row) => (
-                <TableRow key={row.id} className="group/row">
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell
-                      key={cell.id}
-                      {...getPinnedCellProps(
-                        cell.column.getIsPinned(),
-                        offsets,
-                        cell.column.id,
-                      )}
-                    >
-                      <table.FlexRender cell={cell} />
-                    </TableCell>
-                  ))}
+                <TableRow
+                  key={row.id}
+                  className={cn(
+                    "group/row",
+                    striped && row.index % 2 === 1 && "bg-muted/30",
+                  )}
+                >
+                  {row.getVisibleCells().map((cell) => {
+                    const pinnedProps = getPinnedCellProps(
+                      cell.column.getIsPinned(),
+                      offsets,
+                      cell.column.id,
+                    )
+                    return (
+                      <TableCell
+                        key={cell.id}
+                        {...pinnedProps}
+                        className={cn(
+                          pinnedProps.className,
+                          !compact && "py-3.5",
+                        )}
+                      >
+                        <table.FlexRender cell={cell} />
+                      </TableCell>
+                    )
+                  })}
                 </TableRow>
               ))
             ) : (

@@ -1,7 +1,7 @@
 "use client";
 
 import type { ColumnDef } from "@tanstack/react-table";
-import { ChevronRight, Ellipsis, Plus } from "lucide-react";
+import { ChevronRight, Ellipsis } from "lucide-react";
 import { useState } from "react";
 import { DataGridClient } from "@/components/data-grid/data-grid-client";
 import type { DataGridFeatures } from "@/components/data-grid/data-grid-features";
@@ -9,7 +9,13 @@ import { DataGridHeader } from "@/components/data-grid/data-grid-header";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -24,11 +30,7 @@ import {
   sectionColumns,
   type SectionFilters,
 } from "../user-sections";
-import {
-  defaultSectionDisplay,
-  SectionTableControls,
-  type SectionDisplay,
-} from "./section-table-controls";
+import { SectionTableControls } from "./section-table-controls";
 import { SectionUserDialog } from "./section-user-dialog";
 
 const dateFormatter = new Intl.DateTimeFormat("en-GB", {
@@ -50,21 +52,10 @@ function exportUser(user: User) {
 }
 
 export function SectionUserTable({ users }: { users: User[] }) {
-  const [data, setData] = useState(users);
   const [filters, setFilters] = useState<SectionFilters>(emptySectionFilters);
-  const [display, setDisplay] = useState<SectionDisplay>(defaultSectionDisplay);
-  const [dialog, setDialog] = useState<{
-    user?: User;
-    role?: User["role"];
-  } | null>(null);
+  const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [collapsed, setCollapsed] = useState<Set<string>>(() => new Set());
-  const sections = buildUserSections(data, filters);
-  const visibleSections = sections.filter(
-    (section) => section.users.length > 0,
-  );
-  const allCollapsed =
-    visibleSections.length > 0 &&
-    visibleSections.every((section) => collapsed.has(section.role));
+  const sections = buildUserSections(users, filters);
   const toggleGroup = (role: string) =>
     setCollapsed((current) => {
       const next = new Set(current);
@@ -73,11 +64,8 @@ export function SectionUserTable({ users }: { users: User[] }) {
       return next;
     });
   const visibleUsers = sections.flatMap((section) => section.users);
-  const visibleColumns = sectionColumns.filter(
-    ({ id }) => !display.hidden.includes(id),
-  );
   const widths: Record<string, number> = Object.fromEntries(
-    visibleColumns.map(({ id, width }) => [id, width]),
+    sectionColumns.map(({ id, width }) => [id, width]),
   );
   widths.actions = 48;
   const totalWidth = Object.values(widths).reduce(
@@ -85,7 +73,7 @@ export function SectionUserTable({ users }: { users: User[] }) {
     0,
   );
   const columns: ColumnDef<DataGridFeatures, User>[] = [
-    ...visibleColumns.map(
+    ...sectionColumns.map(
       ({ id, label }): ColumnDef<DataGridFeatures, User> => ({
         id,
         ...(id === "no" ? {} : { accessorKey: id }),
@@ -169,7 +157,7 @@ export function SectionUserTable({ users }: { users: User[] }) {
             <Ellipsis />
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <DropdownMenuItem onClick={() => setDialog({ user: row.original })}>
+            <DropdownMenuItem onClick={() => setSelectedUser(row.original)}>
               Open profile
             </DropdownMenuItem>
             <DropdownMenuItem onClick={() => exportUser(row.original)}>
@@ -183,53 +171,14 @@ export function SectionUserTable({ users }: { users: User[] }) {
 
   return (
     <Card>
-      <div className="flex flex-wrap items-center justify-between gap-4 border-b px-4 pb-4 sm:px-6">
-        <div>
-          <h2 className="font-semibold">User directory</h2>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Profil pengguna dikelompokkan berdasarkan role.
-          </p>
-        </div>
-        <div className="flex flex-wrap items-center gap-5">
-          <div>
-            <p className="text-xs text-muted-foreground">Users</p>
-            <p className="font-semibold tabular-nums">{visibleUsers.length}</p>
-          </div>
-          <div>
-            <p className="text-xs text-muted-foreground">Pending</p>
-            <p className="font-semibold tabular-nums">
-              {visibleUsers.filter((user) => user.status === "pending").length}
-            </p>
-          </div>
-          <Button size="sm" onClick={() => setDialog({})}>
-            <Plus />
-            New user
-          </Button>
-        </div>
-      </div>
+      <CardHeader>
+        <CardTitle>User directory</CardTitle>
+        <CardDescription>
+          Profil pengguna dikelompokkan berdasarkan role.
+        </CardDescription>
+      </CardHeader>
       <CardContent className="space-y-5">
-        <SectionTableControls
-          filters={filters}
-          onFiltersChange={setFilters}
-          display={display}
-          onDisplayChange={setDisplay}
-          groupAction={
-            <Button
-              variant="outline"
-              size="sm"
-              disabled={visibleSections.length === 0}
-              onClick={() =>
-                setCollapsed(
-                  allCollapsed
-                    ? new Set()
-                    : new Set(visibleSections.map((section) => section.role)),
-                )
-              }
-            >
-              {allCollapsed ? "Expand groups" : "Collapse groups"}
-            </Button>
-          }
-        />
+        <SectionTableControls filters={filters} onFiltersChange={setFilters} />
         <DataGridClient
           columns={columns}
           data={visibleUsers}
@@ -246,9 +195,6 @@ export function SectionUserTable({ users }: { users: User[] }) {
           }}
           getHeaderProps={(id) => ({
             style: { width: `${((widths[id] ?? 48) / totalWidth) * 100}%` },
-          })}
-          getCellProps={() => ({
-            className: display.compact ? "py-2" : "py-4",
           })}
           rowGrouping={{
             getKey: (user) => user.role,
@@ -284,40 +230,17 @@ export function SectionUserTable({ users }: { users: User[] }) {
                       {rows.length}
                     </Badge>
                   </Button>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="ml-auto size-7 text-inherit"
-                    aria-label={`Add user to ${section.label}`}
-                    onClick={() => setDialog({ role: section.role })}
-                  >
-                    <Plus />
-                  </Button>
                 </div>
               );
             },
           }}
         />
-        <p className="text-xs text-muted-foreground" role="status">
-          {visibleUsers.length} of {data.length} users ·{" "}
-          {sections.filter((section) => section.users.length > 0).length} role
-          sections · Perubahan hanya disimpan lokal.
-        </p>
       </CardContent>
-      {dialog && (
+      {selectedUser && (
         <SectionUserDialog
-          {...dialog}
-          users={data}
-          onClose={() => setDialog(null)}
-          onCreate={(user) => {
-            setData((current) => [...current, user]);
-            setFilters(emptySectionFilters);
-            setCollapsed((current) => {
-              const next = new Set(current);
-              next.delete(user.role);
-              return next;
-            });
-          }}
+          user={selectedUser}
+          users={users}
+          onClose={() => setSelectedUser(null)}
         />
       )}
     </Card>

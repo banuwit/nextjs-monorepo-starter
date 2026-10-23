@@ -18,10 +18,7 @@ export function RowTablePage() {
         <CardHeader>
           <CardTitle>User profiles</CardTitle>
           <CardDescription>
-            Geser handle di kiri untuk mengatur urutan {users.length} pengguna
-            contoh. Dengan keyboard, tekan Space pada handle, gunakan panah
-            atas/bawah, lalu Space untuk melepas atau Escape untuk membatalkan.
-            Urutan kembali ke awal saat halaman dimuat ulang.
+            Geser handle untuk mengubah urutan pengguna.
           </CardDescription>
         </CardHeader>
         <CardContent>

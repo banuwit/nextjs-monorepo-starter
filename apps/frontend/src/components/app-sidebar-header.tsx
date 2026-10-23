@@ -14,18 +14,11 @@ const user = {
   email: profile.workEmail,
 };
 
-export function AppHeaderActions({
-  showSearch = false,
-  searchIconOnly = false,
-}: {
-  showSearch?: boolean;
-  searchIconOnly?: boolean;
-}) {
+export function AppHeaderActions() {
   const { setPreference } = usePreferences();
 
   return (
     <div className="ml-auto flex items-center gap-1 sm:gap-2">
-      {showSearch && <MenuSearch iconOnly={searchIconOnly} />}
       <Button
         variant="ghost"
         size="icon"

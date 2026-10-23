@@ -75,7 +75,7 @@ export function AppHeaderMenubar() {
     <nav
       data-slot="app-header-menubar"
       aria-label="Main navigation"
-      className="hidden border-y px-2 py-0.5 md:block"
+      className="hidden border-b px-2 py-0.5 md:block"
     >
       <Menubar className="h-7 border-0 bg-transparent p-0">
         {navigation.map((section) => (

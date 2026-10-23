@@ -40,7 +40,7 @@ import {
 } from "../../user-editing";
 
 export type CellUserEditor = {
-  mode: "new" | "duplicate" | "details";
+  mode: "duplicate" | "details";
   draft: UserDraft;
 };
 export function CellUserForm({
@@ -70,12 +70,7 @@ export function CellUserForm({
   const errors = submitted
     ? (getUserEditErrors(candidate)[draft.id] ?? {})
     : {};
-  const title =
-    editor.mode === "details"
-      ? "User details"
-      : editor.mode === "duplicate"
-        ? "Duplicate user"
-        : "New user";
+  const title = editor.mode === "details" ? "User details" : "Duplicate user";
   const description = `${draft.id} · Changes stay in this local table and can be undone.`;
   const form = (
     <form

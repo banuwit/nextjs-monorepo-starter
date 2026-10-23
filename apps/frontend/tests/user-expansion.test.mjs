@@ -4,9 +4,12 @@ import { users } from "../src/mocks/user.mock.ts";
 import { getDirectReports } from "../src/features/table/group/expansion/user-reporting.ts";
 import { applyUserCellChanges } from "../src/features/table/editable/user-editing.ts";
 
-test("mock reporting relationships have existing managers and no cycles", () => {
+test("five users have no manager and reporting relationships have no cycles", () => {
   const byId = new Map(users.map((user) => [user.id, user]));
-  assert.equal(users.filter((user) => !user.managerId).length, 1);
+  assert.deepEqual(
+    users.filter((user) => !user.managerId).map((user) => user.id),
+    ["USR-001", "USR-002", "USR-003", "USR-004", "USR-005"],
+  );
   for (const user of users) {
     const visited = new Set([user.id]);
     let managerId = user.managerId;
@@ -23,7 +26,7 @@ test("expansion resolves direct reports only, including users on other pages", (
   const root = getDirectReports(users, "USR-001");
   assert.deepEqual(
     root.map((user) => user.id),
-    ["USR-002", "USR-003", "USR-004", "USR-005", "USR-006"],
+    ["USR-006"],
   );
   const team = getDirectReports(users, "USR-002");
   assert.equal(team.length, 4);

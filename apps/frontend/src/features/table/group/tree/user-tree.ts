@@ -9,15 +9,19 @@ export type UserTreeNode = {
   totalReports: number;
   matchesFilter: boolean;
 };
+
 export type TreeFilters = {
   search: string;
-  role: User["role"] | "all";
-  status: User["status"] | "all";
+  gender: User["gender"][];
+  role: User["role"][];
+  status: User["status"][];
 };
+
 export const emptyTreeFilters: TreeFilters = {
   search: "",
-  role: "all",
-  status: "all",
+  gender: [],
+  role: [],
+  status: [],
 };
 
 /** Missing managers become roots; visited IDs prevent malformed cycles from losing rows or looping. */
@@ -75,8 +79,9 @@ export function filterUserTree(
   return nodes.flatMap((node) => {
     const user = node.user;
     const matchesFilter =
-      (filters.role === "all" || user.role === filters.role) &&
-      (filters.status === "all" || user.status === filters.status) &&
+      (!filters.gender.length || filters.gender.includes(user.gender)) &&
+      (!filters.role.length || filters.role.includes(user.role)) &&
+      (!filters.status.length || filters.status.includes(user.status)) &&
       [user.id, user.name, user.email].some((value) =>
         value.toLowerCase().includes(search),
       );
@@ -85,10 +90,6 @@ export function filterUserTree(
       ? [{ ...node, children, matchesFilter }]
       : [];
   });
-}
-
-export function getTreeBranchIds(node: UserTreeNode): string[] {
-  return [node.user.id, ...node.children.flatMap(getTreeBranchIds)];
 }
 
 export function getExpandedTreeIds(

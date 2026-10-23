@@ -1,7 +1,6 @@
 "use client";
 
 import type { ColumnDef } from "@tanstack/react-table";
-import { Download, Filter, RefreshCw, Settings2 } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { DataGridClient } from "@/components/data-grid/data-grid-client";
 import type { DataGridFeatures } from "@/components/data-grid/data-grid-features";
@@ -9,27 +8,19 @@ import { DataGridHeader } from "@/components/data-grid/data-grid-header";
 import { DataGridSearchInput } from "@/components/data-grid/data-grid-search-input";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import {
-  NativeSelect,
-  NativeSelectOption,
-} from "@/components/ui/native-select";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTitle,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { Switch } from "@/components/ui/switch";
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { createMockUsers, type User } from "@/mocks/user.mock";
 import {
-  emptyScrollFilters,
   filterScrollUsers,
   nextLoadedCount,
   SCROLL_BATCH_SIZE,
   SCROLL_USER_COUNT,
-  type ScrollFilters,
 } from "../user-scroll";
 
 const fields = [
@@ -111,15 +102,7 @@ const columns: ColumnDef<DataGridFeatures, User>[] = fields.map(
   }),
 );
 
-function ScrollRows({
-  users,
-  compact,
-  striped,
-}: {
-  users: User[];
-  compact: boolean;
-  striped: boolean;
-}) {
+function ScrollRows({ users }: { users: User[] }) {
   const [loaded, setLoaded] = useState(() =>
     Math.min(SCROLL_BATCH_SIZE, users.length),
   );
@@ -143,231 +126,64 @@ function ScrollRows({
   const data = useMemo(() => users.slice(0, loaded), [users, loaded]);
 
   return (
-    <div className="space-y-3">
-      <div className="flex items-center justify-between gap-3 text-sm">
-        <p className="text-muted-foreground" role="status" aria-live="polite">
-          {loaded.toLocaleString("en-US")} of{" "}
-          {users.length.toLocaleString("en-US")} users loaded
-          {loadingMore ? " · Loading more..." : ""}
-        </p>
-        <span className="text-xs text-muted-foreground">
-          Scroll to load more
-        </span>
-      </div>
-      <DataGridClient
-        columns={columns}
-        data={data}
-        getRowId={(user) => user.id}
-        pagination="none"
-        showVisibilityToggle={false}
-        showHeaderVisibilityToggle={false}
-        emptyTitle="No users found"
-        emptyDescription="Try another search or clear the filters."
-        tableProps={{
-          "aria-label": "User directory",
-          className: "table-fixed",
-          style: { minWidth: `${totalWidth / 16}rem` },
-        }}
-        getHeaderProps={(id) => ({
-          style: {
-            width: `${((fields.find((field) => field.id === id)?.width ?? 100) / totalWidth) * 100}%`,
-          },
-        })}
-        getCellProps={() => ({ className: compact ? "py-2" : "py-3.5" })}
-        getRowProps={(user) => ({
-          className:
-            striped && Number(user.id.slice(4)) % 2 === 0
-              ? "bg-muted/30"
-              : undefined,
-        })}
-        virtualScroll={{
-          label: "Scrollable user directory",
-          height: "min(35rem, 65vh)",
-          totalCount: users.length,
-          hasMore: loaded < users.length,
-          loadingMore,
-          onLoadMore: loadMore,
-        }}
-      />
-    </div>
+    <DataGridClient
+      columns={columns}
+      data={data}
+      getRowId={(user) => user.id}
+      pagination="none"
+      showVisibilityToggle={false}
+      showHeaderVisibilityToggle={false}
+      stickyHeader={true}
+      compact={true}
+      striped={false}
+      columnLines={true}
+      emptyTitle="No users found"
+      emptyDescription="Try another search."
+      tableProps={{
+        "aria-label": "User directory",
+        className: "table-fixed",
+        style: { minWidth: `${totalWidth / 16}rem` },
+      }}
+      getHeaderProps={(id) => ({
+        style: {
+          width: `${((fields.find((field) => field.id === id)?.width ?? 100) / totalWidth) * 100}%`,
+        },
+      })}
+      virtualScroll={{
+        label: "Scrollable user directory",
+        height: "min(35rem, 65vh)",
+        totalCount: users.length,
+        hasMore: loaded < users.length,
+        loadingMore,
+        onLoadMore: loadMore,
+      }}
+    />
   );
 }
 
 export function ScrollUserTable() {
   const [users] = useState(() => createMockUsers(SCROLL_USER_COUNT));
-  const [filters, setFilters] = useState<ScrollFilters>(emptyScrollFilters);
-  const [compact, setCompact] = useState(true);
-  const [striped, setStriped] = useState(false);
-  const [refresh, setRefresh] = useState(0);
+  const [search, setSearch] = useState("");
   const matching = useMemo(
-    () => filterScrollUsers(users, filters),
-    [users, filters],
+    () => filterScrollUsers(users, search),
+    [users, search],
   );
-  const count = [filters.gender, filters.role, filters.status].filter(
-    (value) => value !== "all",
-  ).length;
-
-  function exportUsers() {
-    const url = URL.createObjectURL(
-      new Blob([JSON.stringify(matching, null, 2)], {
-        type: "application/json",
-      }),
-    );
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = "users.json";
-    link.click();
-    setTimeout(() => URL.revokeObjectURL(url), 1000);
-  }
 
   return (
     <Card>
-      <div className="flex flex-wrap items-center justify-between gap-3 border-b px-4 pb-4 sm:px-6">
-        <div>
-          <h2 className="font-semibold">User directory</h2>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Jelajahi pengguna dengan scroll berkelanjutan.
-          </p>
-        </div>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={exportUsers}
-          disabled={!matching.length}
-        >
-          <Download />
-          Export
-        </Button>
-      </div>
+      <CardHeader>
+        <CardTitle>User directory</CardTitle>
+        <CardDescription>
+          Jelajahi pengguna dengan scroll berkelanjutan.
+        </CardDescription>
+      </CardHeader>
       <CardContent className="space-y-4">
-        <div className="flex flex-wrap items-center gap-2">
-          <div className="mr-auto">
-            <DataGridSearchInput
-              value={filters.search}
-              placeholder="Search ID, name, or email..."
-              onChange={(search) => setFilters({ ...filters, search })}
-            />
-          </div>
-          <Popover>
-            <PopoverTrigger render={<Button variant="outline" size="sm" />}>
-              <Filter />
-              Filters{count > 0 && <Badge variant="secondary">{count}</Badge>}
-            </PopoverTrigger>
-            <PopoverContent align="end" className="w-72 p-4">
-              <PopoverTitle>Filter users</PopoverTitle>
-              {(
-                [
-                  {
-                    key: "gender",
-                    title: "Gender",
-                    options: ["male", "female"],
-                  },
-                  {
-                    key: "role",
-                    title: "Role",
-                    options: ["admin", "editor", "viewer"],
-                  },
-                  {
-                    key: "status",
-                    title: "Status",
-                    options: ["active", "inactive", "pending"],
-                  },
-                ] as const
-              ).map(({ key, title, options }) => (
-                <label
-                  key={key}
-                  className="flex items-center justify-between gap-3"
-                >
-                  {title}
-                  <NativeSelect
-                    aria-label={`Filter ${key}`}
-                    value={filters[key]}
-                    onChange={(event) =>
-                      setFilters({ ...filters, [key]: event.target.value })
-                    }
-                  >
-                    <NativeSelectOption value="all">All</NativeSelectOption>
-                    {options.map((value) => (
-                      <NativeSelectOption key={value} value={value}>
-                        {value}
-                      </NativeSelectOption>
-                    ))}
-                  </NativeSelect>
-                </label>
-              ))}
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setFilters(emptyScrollFilters)}
-              >
-                Clear filters
-              </Button>
-            </PopoverContent>
-          </Popover>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setRefresh((current) => current + 1)}
-          >
-            <RefreshCw />
-            Refresh
-          </Button>
-          <Popover>
-            <PopoverTrigger render={<Button variant="outline" size="sm" />}>
-              <Settings2 />
-              View settings
-            </PopoverTrigger>
-            <PopoverContent align="end" className="w-72 p-4">
-              <PopoverTitle>View settings</PopoverTitle>
-              <label className="flex items-center justify-between gap-3">
-                Density
-                <NativeSelect
-                  aria-label="Density"
-                  value={compact ? "compact" : "comfortable"}
-                  onChange={(event) =>
-                    setCompact(event.target.value === "compact")
-                  }
-                >
-                  <NativeSelectOption value="compact">
-                    Compact
-                  </NativeSelectOption>
-                  <NativeSelectOption value="comfortable">
-                    Comfortable
-                  </NativeSelectOption>
-                </NativeSelect>
-              </label>
-              <label className="flex items-center justify-between gap-3">
-                Row stripes
-                <Switch checked={striped} onCheckedChange={setStriped} />
-              </label>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => {
-                  setCompact(true);
-                  setStriped(false);
-                }}
-              >
-                Reset view
-              </Button>
-            </PopoverContent>
-          </Popover>
-          {(filters.search || count > 0) && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setFilters(emptyScrollFilters)}
-            >
-              Clear all
-            </Button>
-          )}
-        </div>
-        <ScrollRows
-          key={`${JSON.stringify(filters)}:${refresh}`}
-          users={matching}
-          compact={compact}
-          striped={striped}
+        <DataGridSearchInput
+          value={search}
+          placeholder="Search ID, name, or email..."
+          onChange={setSearch}
         />
+        <ScrollRows key={search} users={matching} />
       </CardContent>
     </Card>
   );

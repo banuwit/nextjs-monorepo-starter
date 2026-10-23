@@ -21,12 +21,8 @@ export function CellTablePage() {
         <CardHeader>
           <CardTitle>User profiles</CardTitle>
           <CardDescription id="cell-editing-help">
-            Klik untuk memilih sel; klik dua kali, Enter, atau langsung ketik
-            untuk mengedit. Enter atau Tab menyimpan, Escape membatalkan.
-            Gunakan Shift + panah atau drag untuk memilih rentang, copy/paste,
-            dan tarik sudut pilihan untuk mengisi sel. Undo/Redo mengembalikan
-            perubahan lokal (Ctrl/⌘ Z dan Ctrl/⌘ Shift Z). Filters menampilkan
-            filter di setiap header; Settings mengatur tampilan spreadsheet.
+            Edit data langsung di sel tabel. Klik dua kali atau tekan Enter
+            untuk mengubah sel; Enter menyimpan dan Escape membatalkan.
           </CardDescription>
         </CardHeader>
         <CardContent>

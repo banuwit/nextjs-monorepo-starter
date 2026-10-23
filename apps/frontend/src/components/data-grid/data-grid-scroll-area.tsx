@@ -9,21 +9,25 @@ import {
   type RefObject,
 } from "react";
 import { ScrollBar } from "@/components/ui/scroll-area";
+import { cn } from "@/lib/utils";
 
-/** One viewport keeps header/body columns aligned; only the vertical track starts below the header. */
+/** One viewport keeps header/body columns aligned; sticky headers leave the vertical track below the header. */
 export function DataGridScrollArea({
   children,
   scrollRef,
   height,
   label,
+  stickyHeader = true,
 }: {
   children: ReactNode;
   scrollRef: RefObject<HTMLDivElement | null>;
   height: CSSProperties["height"];
   label: string;
+  stickyHeader?: boolean;
 }) {
   const rootRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
+    if (!stickyHeader) return;
     const header = scrollRef.current?.querySelector("thead");
     if (!header) return;
     const measure = () =>
@@ -35,7 +39,7 @@ export function DataGridScrollArea({
     const observer = new ResizeObserver(measure);
     observer.observe(header);
     return () => observer.disconnect();
-  }, [scrollRef]);
+  }, [scrollRef, stickyHeader]);
 
   return (
     <ScrollArea.Root
@@ -55,7 +59,13 @@ export function DataGridScrollArea({
       >
         <ScrollArea.Content>{children}</ScrollArea.Content>
       </ScrollArea.Viewport>
-      <ScrollBar className="z-30 data-vertical:top-[var(--data-grid-header-height)]! data-vertical:h-auto" />
+      <ScrollBar
+        className={cn(
+          "z-30",
+          stickyHeader &&
+            "data-vertical:top-[var(--data-grid-header-height)]! data-vertical:h-auto",
+        )}
+      />
       <ScrollBar orientation="horizontal" className="z-30" />
       <ScrollArea.Corner />
     </ScrollArea.Root>

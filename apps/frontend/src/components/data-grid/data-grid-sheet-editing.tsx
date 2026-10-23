@@ -291,7 +291,7 @@ export function DataGridSheetEditing({
         active || (!selection && cell.row === 0 && cell.column === 0) ? 0 : -1,
       ...{ "data-edit-cell": `${cell.row}:${cell.column}` },
       className: cn(
-        "relative cursor-text select-none border-r p-0 outline-none last:border-r-0",
+        "relative cursor-text select-none p-0 outline-none",
         selected &&
           "bg-primary/10 after:pointer-events-none after:absolute after:inset-0 after:border-primary",
         selected && cell.row === bounds?.top && "after:border-t-2",
@@ -413,6 +413,12 @@ export function DataGridSheetEditing({
       },
     };
   }
+
+  const bounds = selection ? getCellRange(selection) : null;
+  const selectedCellCount =
+    rowCount && bounds
+      ? (bounds.bottom - bounds.top + 1) * (bounds.right - bounds.left + 1)
+      : 0;
 
   return (
     <CellEditingContext.Provider
@@ -538,8 +544,9 @@ export function DataGridSheetEditing({
         >
           {children}
           <p role="status" className="min-h-5 text-sm text-muted-foreground">
-            {message ||
-              "Changes are saved locally. Reload restores the sample data."}
+            {selectedCellCount} cell{selectedCellCount === 1 ? "" : "s"}{" "}
+            selected
+            {message && ` · ${message}`}
           </p>
         </ContextMenuTrigger>
         <ContextMenuContent finalFocus={false}>

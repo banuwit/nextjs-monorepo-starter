@@ -283,6 +283,11 @@
   background-color: var(--app-body-dark, #0a0a0a);
 }
 
+[data-sidebar-style="inset"] [data-slot="sidebar-wrapper"],
+.dark[data-sidebar-style="inset"] [data-slot="sidebar-wrapper"] {
+  background-color: var(--sidebar);
+}
+
 [data-slot="app-body"],
 [data-sidebar-style="floating"] [data-slot="sidebar-container"] {
   background-color: transparent;

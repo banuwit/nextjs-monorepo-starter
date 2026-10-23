@@ -84,7 +84,6 @@ export function TeamSwitcher({
             className="min-w-48"
           >
             <DropdownMenuGroup>
-              <DropdownMenuLabel>Teams</DropdownMenuLabel>
               {teams.map((team) => (
                 <DropdownMenuItem
                   key={team}

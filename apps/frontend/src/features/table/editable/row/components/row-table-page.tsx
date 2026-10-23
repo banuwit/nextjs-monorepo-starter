@@ -21,10 +21,7 @@ export function RowTablePage() {
         <CardHeader>
           <CardTitle>User profiles</CardTitle>
           <CardDescription>
-            Klik Edit untuk mengubah satu baris, lalu Save atau Cancel.
-            Duplicate membuat draft user baru yang perlu email unik. Aksi baris
-            lain terkunci selama mengedit. Perubahan hanya disimpan lokal dan
-            kembali ke data contoh saat reload.
+            Edit atau duplikasi pengguna langsung per baris.
           </CardDescription>
         </CardHeader>
         <CardContent>

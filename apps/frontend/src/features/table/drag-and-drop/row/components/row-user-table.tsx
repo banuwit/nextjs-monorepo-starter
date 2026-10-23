@@ -1,7 +1,6 @@
 "use client";
 
 import type { ColumnDef } from "@tanstack/react-table";
-import { RotateCcw } from "lucide-react";
 import { useState } from "react";
 
 import { DataGridClient } from "@/components/data-grid/data-grid-client";
@@ -11,7 +10,6 @@ import { DataGridRowDragHandle } from "@/components/data-grid/data-grid-row-dnd"
 import { reorderDataGridItems } from "@/components/data-grid/data-grid-reordering";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import type { User } from "@/mocks/user.mock";
 
 const getRowId = (user: User) => user.id;
@@ -110,9 +108,6 @@ const columns: ColumnDef<DataGridFeatures, User>[] = [
 
 export function RowUserTable({ users }: { users: User[] }) {
   const [orderedUsers, setOrderedUsers] = useState(users);
-  const reordered = orderedUsers.some(
-    (user, index) => user.id !== users[index]?.id,
-  );
 
   return (
     <DataGridClient
@@ -127,17 +122,6 @@ export function RowUserTable({ users }: { users: User[] }) {
       pagination="none"
       showVisibilityToggle={false}
       showHeaderVisibilityToggle={false}
-      actions={
-        <Button
-          variant="outline"
-          size="sm"
-          disabled={!reordered}
-          onClick={() => setOrderedUsers(users)}
-        >
-          <RotateCcw data-icon="inline-start" />
-          Reset order
-        </Button>
-      }
     />
   );
 }

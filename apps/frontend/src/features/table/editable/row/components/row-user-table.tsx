@@ -228,7 +228,7 @@ export function RowUserTable({ users }: { users: User[] }) {
   const [state, dispatch] = useReducer(rowEditReducer, {
     rows: users,
     editing: null,
-    message: "Choose Edit to change one user at a time.",
+    message: "",
   });
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const rows = getRowEditRows(state);
@@ -240,9 +240,11 @@ export function RowUserTable({ users }: { users: User[] }) {
       value={{ state, errors, dispatch, requestDelete: setDeleteId }}
     >
       <div className="flex flex-col gap-3">
-        <p role="status" className="text-sm text-muted-foreground">
-          {state.message}
-        </p>
+        {state.message && (
+          <p role="status" className="text-sm text-muted-foreground">
+            {state.message}
+          </p>
+        )}
         <DataGridClient
           columns={columns}
           data={rows}

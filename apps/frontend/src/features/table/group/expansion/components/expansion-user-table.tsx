@@ -36,11 +36,7 @@ const dateFormatter = new Intl.DateTimeFormat("en-GB", {
 export function ExpansionUserTable({ users }: { users: User[] }) {
   const gridId = useId();
   const [data, setData] = useState(users);
-  const [expanded, setExpanded] = useState<Set<string>>(
-    () => new Set(users[0] ? [users[0].id] : []),
-  );
-  const [showReports, setShowReports] = useState(true);
-  const [compact, setCompact] = useState(true);
+  const [expanded, setExpanded] = useState<Set<string>>(() => new Set());
   const detailsId = (user: User) => `${gridId}-reports-${user.id}`;
   const toggle = (id: string) =>
     setExpanded((current) => {
@@ -62,7 +58,7 @@ export function ExpansionUserTable({ users }: { users: User[] }) {
       cell: ({ row }) => {
         const user = row.original;
         const reports = getDirectReports(data, user.id);
-        return showReports && reports.length > 0 ? (
+        return reports.length > 0 ? (
           <Button
             variant="ghost"
             size="icon"
@@ -177,12 +173,9 @@ export function ExpansionUserTable({ users }: { users: User[] }) {
           <DropdownMenuContent align="end">
             <DropdownMenuItem
               disabled={getDirectReports(data, row.original.id).length === 0}
-              onClick={() => {
-                setShowReports(true);
-                setExpanded(
-                  (current) => new Set([...current, row.original.id]),
-                );
-              }}
+              onClick={() =>
+                setExpanded((current) => new Set([...current, row.original.id]))
+              }
             >
               View direct reports
             </DropdownMenuItem>
@@ -218,10 +211,10 @@ export function ExpansionUserTable({ users }: { users: User[] }) {
         columns={columns}
         getRowId={(user) => user.id}
         defaultSorting={[{ id: "id", desc: false }]}
-        defaultPageSize={5}
-        pageSizeOptions={[5, 10, 20, 50]}
+        pagination="none"
         showVisibilityToggle={false}
         showHeaderVisibilityToggle={false}
+        compact={true}
         tableProps={{
           "aria-label": "User profiles with expandable direct reports",
           className: "min-w-[65rem]",
@@ -230,23 +223,12 @@ export function ExpansionUserTable({ users }: { users: User[] }) {
           className: columnId === "expand" ? "w-10" : undefined,
         })}
         getCellProps={({ columnId }) => ({
-          className: cn(
-            compact ? "py-2" : "py-4",
-            columnId === "expand" && "w-10",
-          ),
+          className: columnId === "expand" ? "w-10" : undefined,
         })}
-        renderToolbar={(table) => (
-          <ExpansionTableControls
-            table={table}
-            compact={compact}
-            onCompactChange={setCompact}
-            showReports={showReports}
-            onShowReportsChange={setShowReports}
-          />
-        )}
+        renderToolbar={(table) => <ExpansionTableControls table={table} />}
         renderRowDetails={(user) => {
           const reports = getDirectReports(data, user.id);
-          return showReports && expanded.has(user.id) && reports.length > 0 ? (
+          return expanded.has(user.id) && reports.length > 0 ? (
             <UserReportCards
               manager={user}
               reports={reports}

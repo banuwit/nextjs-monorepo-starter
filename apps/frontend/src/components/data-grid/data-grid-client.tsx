@@ -91,6 +91,14 @@ interface DataGridClientBaseProps<TData extends RowData> {
   actions?: React.ReactNode
   /** Hide the toolbar's column visibility toggle. Default: true. */
   showVisibilityToggle?: boolean
+  /** Use compact row spacing. Default: true. */
+  compact?: boolean
+  /** Shade alternating data rows. Default: false. */
+  striped?: boolean
+  /** Draw separators between columns. Default: false. */
+  columnLines?: boolean
+  /** Keep the header visible in a scroll viewport. Defaults to true for virtual scroll, false otherwise. */
+  stickyHeader?: boolean
   /**
    * Show the "View columns" submenu inside every `DataGridHeaderDropdown`.
    * Default: true. A column can still override it per header.
@@ -174,6 +182,10 @@ export function DataGridClient<TData extends RowData>({
   defaultSorting = [],
   actions,
   showVisibilityToggle = true,
+  compact = true,
+  striped = false,
+  columnLines = false,
+  stickyHeader,
   showHeaderVisibilityToggle = true,
   enableColumnPinning = false,
   enableColumnOrdering = false,
@@ -198,6 +210,7 @@ export function DataGridClient<TData extends RowData>({
   const paginate = pagination !== "none"
   const scrollRef = React.useRef<HTMLDivElement>(null)
   const useVirtualRows = !!virtualScroll && !paginate && !rowGrouping && !renderRowDetails && !onRowReorder && !columnDrag
+  const useStickyHeader = stickyHeader ?? useVirtualRows
 
   // Facets/selects carry arrays; TanStack's automatic string filter does not
   // interpret those as a set of allowed values.
@@ -332,7 +345,7 @@ export function DataGridClient<TData extends RowData>({
           {...(columnIndex >= 0 ? {
             "data-column-id": cell.column.id,
           } : {})}
-          className={cn(pinnedProps.className, columnIndex >= 0 && "motion-reduce:transition-none!", customProps?.className, cell.column.getIsPinned() && "sticky", cell.column.getIsPinned() && customProps?.["aria-selected"] === true && "bg-[color-mix(in_srgb,var(--primary)_10%,var(--background))]")}
+          className={cn(pinnedProps.className, !compact && "py-3.5", columnIndex >= 0 && "motion-reduce:transition-none!", customProps?.className, cell.column.getIsPinned() && "sticky", cell.column.getIsPinned() && customProps?.["aria-selected"] === true && "bg-[color-mix(in_srgb,var(--primary)_10%,var(--background))]")}
           style={{ ...customProps?.style, ...pinnedProps.style, ...(columnIndex >= 0 ? getColumnMotionStyle(columnIndex) : {}) }}
         >
           <table.FlexRender cell={cell} />
@@ -346,7 +359,7 @@ export function DataGridClient<TData extends RowData>({
         {cells}
       </DataGridSortableRow>
     ) : (
-      <TableRow key={row.id} {...rowProps} {...virtualProps} className={cn("group/row", rowProps?.className)}>
+      <TableRow key={row.id} {...rowProps} {...virtualProps} className={cn("group/row", striped && row.index % 2 === 1 && "bg-muted/30", rowProps?.className)}>
         {cells}
       </TableRow>
     )
@@ -417,13 +430,18 @@ export function DataGridClient<TData extends RowData>({
       )}
 
       <div className="overflow-hidden rounded-md border">
-        <Table {...tableProps} aria-rowcount={useVirtualRows ? virtualScroll!.totalCount + 1 : tableProps?.["aria-rowcount"]}
-          renderContainer={useVirtualRows ? (children) => (
-            <DataGridScrollArea scrollRef={scrollRef} label={virtualScroll!.label} height={virtualScroll!.height ?? "min(35rem, 65vh)"}>
+        <Table {...tableProps} className={cn(columnLines && "[&_th:not(:last-child)]:border-r [&_td:not(:last-child)]:border-r", tableProps?.className)} aria-rowcount={useVirtualRows ? virtualScroll!.totalCount + 1 : tableProps?.["aria-rowcount"]}
+          renderContainer={useVirtualRows || useStickyHeader ? (children) => (
+            <DataGridScrollArea
+              scrollRef={scrollRef}
+              label={virtualScroll?.label ?? tableProps?.["aria-label"] ?? "Scrollable data grid"}
+              height={virtualScroll?.height ?? "min(35rem, 65vh)"}
+              stickyHeader={useStickyHeader}
+            >
               {children}
             </DataGridScrollArea>
           ) : undefined}>
-          <TableHeader className={cn("bg-muted", useVirtualRows && "sticky top-0 z-20")}>
+          <TableHeader className={cn("bg-muted", useStickyHeader && "sticky top-0 z-20")}>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => {

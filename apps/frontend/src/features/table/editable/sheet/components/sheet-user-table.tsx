@@ -3,21 +3,11 @@
 import type {
   Column,
   ColumnDef,
-  ReactTable,
   ColumnOrderState,
   ColumnPinningState,
   ColumnVisibilityState,
 } from "@tanstack/react-table";
-import {
-  ArrowDownToLine,
-  ListFilter,
-  FilterX,
-  Download,
-  RotateCcw,
-  Plus,
-  Redo2,
-  Undo2,
-} from "lucide-react";
+import { ListFilter, FilterX, Redo2, Undo2 } from "lucide-react";
 import {
   createContext,
   useContext,
@@ -30,7 +20,6 @@ import {
   DataGridClient,
   type DataGridColumnState,
 } from "@/components/data-grid/data-grid-client";
-import { DataGridVisibilityToggle } from "@/components/data-grid/data-grid-visibility-toggle";
 import { getUserCellColumnOrder } from "../user-sheet-columns";
 import { DataGridHeaderDropdown } from "@/components/data-grid/data-grid-header-dropdown";
 import {
@@ -39,7 +28,6 @@ import {
   useDataGridSheetEditing,
 } from "@/components/data-grid/data-grid-sheet-editing";
 import {
-  getCellRange,
   quoteClipboardValue,
   type CellChange,
   type CellPosition,
@@ -69,12 +57,6 @@ import {
   type UserFilter,
   type UserFilterField,
 } from "../user-sheet-filters";
-import {
-  CellTableControls,
-  defaultSettings,
-  defaultWidths,
-  type CellTableSettings,
-} from "./sheet-table-controls";
 import { CellColumnFilter } from "./sheet-table-filters";
 import {
   CellUserDelete,
@@ -104,13 +86,22 @@ const filterFields = [
   { field: "id" as const, title: "User ID" },
   ...fields,
 ];
+const defaultWidths: Record<string, number> = {
+  no: 60,
+  id: 150,
+  name: 240,
+  email: 280,
+  gender: 140,
+  role: 140,
+  joinDate: 170,
+  status: 160,
+};
 const ViewContext = createContext<{
   baseline: User[];
   allRows: User[];
   visible: typeof fields;
   visibleIds: string[];
   columnState: DataGridColumnState;
-  settings: CellTableSettings;
   filters: UserFilter[];
   showFilters: boolean;
   setFilter: (filter: UserFilter) => void;
@@ -276,80 +267,43 @@ function UserGrid({
   rows: User[];
   canUndo: boolean;
   canRedo: boolean;
-  toolbar: (table: ReactTable<DataGridFeatures, User>) => ReactNode;
+  toolbar: () => ReactNode;
 }) {
-  const { selection, editing, getCellProps, fillDown, undo, redo } =
-    useDataGridSheetEditing();
-  const { visible, visibleIds, columnState, settings, allRows, sorting } =
-    useView();
-  const bounds = selection ? getCellRange(selection) : null;
-  const count =
-    rows.length && bounds
-      ? (bounds.bottom - bounds.top + 1) * (bounds.right - bounds.left + 1)
-      : 0;
+  const { editing, getCellProps, undo, redo } = useDataGridSheetEditing();
+  const { visible, visibleIds, columnState, sorting } = useView();
   return (
     <>
-      <div
-        className={cn(
-          "min-w-0 [&_th]:h-10 [&_th]:border-r [&_th:last-child]:border-r-0",
-          settings.compact &&
-            "[&_[data-cell-content]]:min-h-9 [&_[data-cell-content]]:py-1 [&_[data-cell-editor]]:h-9!",
-          settings.stripes && "[&_tbody_tr:nth-child(even)]:bg-muted/30",
-          !settings.lines && "[&_td]:border-r-0 [&_th]:border-r-0",
-        )}
-      >
+      <div className="min-w-0 [&_th]:h-10 [&_[data-cell-content]]:min-h-9 [&_[data-cell-content]]:py-1 [&_[data-cell-editor]]:h-9!">
         <DataGridClient
           columns={columns}
           columnState={columnState}
+          columnLines={true}
           enableColumnPinning
           enableColumnOrdering
-          renderToolbar={(table) => (
-            <>
-              {toolbar(table)}
-              <div className="flex flex-wrap items-center justify-between gap-3">
-                <p className="text-sm text-muted-foreground">
-                  {rows.length} of {allRows.length} users · {count} cell
-                  {count === 1 ? "" : "s"} selected
-                </p>
-                <div className="flex flex-wrap items-center gap-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    disabled={!canUndo || Boolean(editing)}
-                    onClick={undo}
-                    title="Ctrl/⌘ Z"
-                  >
-                    <Undo2 />
-                    Undo
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    disabled={!canRedo || Boolean(editing)}
-                    onClick={redo}
-                    title="Ctrl/⌘ Shift Z"
-                  >
-                    <Redo2 />
-                    Redo
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    disabled={
-                      !rows.length ||
-                      !bounds ||
-                      bounds.top === bounds.bottom ||
-                      Boolean(editing)
-                    }
-                    onClick={fillDown}
-                    title="Copy the first selected row down (Ctrl/⌘ D)"
-                  >
-                    <ArrowDownToLine />
-                    Fill down
-                  </Button>
-                </div>
-              </div>
-            </>
+          renderToolbar={() => (
+            <div className="flex flex-wrap items-center gap-2">
+              {toolbar()}
+              <Button
+                variant="outline"
+                size="sm"
+                disabled={!canUndo || Boolean(editing)}
+                onClick={undo}
+                title="Ctrl/⌘ Z"
+              >
+                <Undo2 />
+                Undo
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                disabled={!canRedo || Boolean(editing)}
+                onClick={redo}
+                title="Ctrl/⌘ Shift Z"
+              >
+                <Redo2 />
+                Redo
+              </Button>
+            </div>
           )}
           data={rows}
           getRowId={(user) => user.id}
@@ -387,7 +341,7 @@ function UserGrid({
               ? {
                   role: "gridcell",
                   "aria-readonly": true,
-                  className: "border-r truncate",
+                  className: "truncate",
                 }
               : getCellProps(
                   { row: rowIndex, column },
@@ -463,7 +417,6 @@ export function CellUserTable({ users }: { users: User[] }) {
   const [showFilters, setShowFilters] = useState(false);
   const [search, setSearch] = useState("");
   const [sorting, setSorting] = useState<UserCellSorting>(null);
-  const [settings, setSettings] = useState(defaultSettings);
   const [editor, setEditor] = useState<CellUserEditor | null>(null);
   const [deleting, setDeleting] = useState<User>();
   const rows = useMemo(
@@ -521,7 +474,6 @@ export function CellUserTable({ users }: { users: User[] }) {
         visible,
         visibleIds,
         columnState,
-        settings,
         sorting,
         setSorting,
         filters,
@@ -587,8 +539,8 @@ export function CellUserTable({ users }: { users: User[] }) {
           )}
         >
           <UserGrid
-            toolbar={(table) => (
-              <div className="flex flex-wrap items-center justify-between gap-3">
+            toolbar={() => (
+              <div className="flex flex-wrap items-center gap-2">
                 <Input
                   className="w-full sm:w-64"
                   aria-label="Search users"
@@ -596,83 +548,14 @@ export function CellUserTable({ users }: { users: User[] }) {
                   value={search}
                   onChange={(event) => setSearch(event.target.value)}
                 />
-                <div className="flex flex-wrap items-center gap-2">
-                  <Button
-                    size="sm"
-                    variant={showFilters ? "secondary" : "outline"}
-                    aria-pressed={showFilters}
-                    onClick={() => setShowFilters(!showFilters)}
-                  >
-                    <ListFilter />
-                    Filters{filters.length > 0 && ` (${filters.length})`}
-                  </Button>
-                  <DataGridVisibilityToggle
-                    table={table}
-                    columnVisibility={visibility}
-                  />
-                  <CellTableControls
-                    settings={settings}
-                    setSettings={setSettings}
-                    disabled={Boolean(editor)}
-                  />
-                  <Button
-                    size="icon-sm"
-                    variant="outline"
-                    aria-label="Export users"
-                    title="Export visible users as TSV"
-                    onClick={() => {
-                      const text = [
-                        ["User ID", ...fields.map(({ title }) => title)],
-                        ...rows.map((user) => [
-                          user.id,
-                          ...fields.map(({ field }) => user[field]),
-                        ]),
-                      ]
-                        .map((row) => row.map(quoteClipboardValue).join("\t"))
-                        .join("\n");
-                      const url = URL.createObjectURL(
-                        new Blob([text], {
-                          type: "text/tab-separated-values;charset=utf-8",
-                        }),
-                      );
-                      const link = document.createElement("a");
-                      link.href = url;
-                      link.download = "users.tsv";
-                      link.click();
-                      setTimeout(() => URL.revokeObjectURL(url), 1000);
-                    }}
-                  >
-                    <Download />
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    onClick={() => {
-                      setFilters([]);
-                      setSearch("");
-                      setSorting(null);
-                      setShowFilters(false);
-                      setSettings(defaultSettings);
-                      setVisibility({});
-                      setOrder([]);
-                      setPinning({ start: [], end: [] });
-                    }}
-                  >
-                    <RotateCcw />
-                    Reset View
-                  </Button>
-                </div>
                 <Button
                   size="sm"
-                  onClick={() =>
-                    setEditor({
-                      mode: "new",
-                      draft: createUserCellDraft(state.rows),
-                    })
-                  }
+                  variant={showFilters ? "secondary" : "outline"}
+                  aria-pressed={showFilters}
+                  onClick={() => setShowFilters(!showFilters)}
                 >
-                  <Plus />
-                  New User
+                  <ListFilter />
+                  Filters{filters.length > 0 && ` (${filters.length})`}
                 </Button>
               </div>
             )}

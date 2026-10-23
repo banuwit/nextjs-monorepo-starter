@@ -26,7 +26,7 @@ export type User = {
   role: (typeof roles)[number];
   joinDate: string;
   status: (typeof statuses)[number];
-  /** Direct supervisor; absent for the root of the demo organization. */
+  /** Direct supervisor; absent for users at the top of the demo organization. */
   managerId?: string;
 };
 
@@ -79,11 +79,11 @@ export const users: User[] = names.map((name, index) => ({
     .toISOString()
     .slice(0, 10),
   status: statuses[Math.floor(index / 3) % statuses.length] ?? "active",
-  // Root → managers (002–006) → team members (007–026) → reports (027–036).
+  // Roots 001–005; 006 reports to 001; 007–026 to 002–006; 027–036 to 007–011.
   managerId:
-    index === 0
+    index < 5
       ? undefined
-      : index <= 5
+      : index === 5
         ? "USR-001"
         : index < 26
           ? `USR-${String(2 + ((index - 6) % 5)).padStart(3, "0")}`

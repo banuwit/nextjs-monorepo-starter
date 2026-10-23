@@ -21,11 +21,7 @@ export function InlineTablePage() {
         <CardHeader>
           <CardTitle>User profiles</CardTitle>
           <CardDescription>
-            Klik teks pada sel untuk mengedit. Enter menyelesaikan edit
-            sel, Escape membatalkan edit sel, dan Tab berpindah fokus. Gunakan
-            Save changes untuk menyimpan atau Discard untuk membatalkan
-            perubahan. Data demo hanya disimpan lokal dan kembali ke awal saat
-            halaman dimuat ulang.
+            Edit sel langsung di tabel, lalu simpan atau batalkan perubahan.
           </CardDescription>
         </CardHeader>
         <CardContent>

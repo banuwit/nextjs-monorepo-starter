@@ -17,7 +17,7 @@
 
 > **Amendemen UI, 23 Oktober 2026 (Header style):** Preferences menyediakan gaya Header. Pada desktop, sidebar dan trigger disembunyikan; header menampilkan menubar navigasi ringkas di baris kedua menggunakan komponen shadcn Base UI Menubar. Search menu berada di header tepat di kiri menu akun. Pada mobile, menubar disembunyikan; trigger di kiri logo dan nama aplikasi membuka drawer sidebar yang sama. Permukaan menubar putih pada mode terang dan memakai warna Card pada mode gelap, terlepas dari Header Color. Border header dan menubar mengikuti warna garis Card. Preferences berada dalam menu akun.
 
-> **Amendemen UI, 23 Oktober 2026 (App Body Color):** Warna App Body mengisi seluruh latar shell dashboard pada gaya Sidebar, Inset, Floating, dan Header. Pembungkus konten halaman transparan agar warna dengan alpha tidak ditumpuk dua kali.
+> **Amendemen UI, 23 Oktober 2026 (App Body Color):** Warna App Body mengisi latar shell dashboard pada gaya Sidebar, Floating, dan Header, serta area konten pada gaya Inset. Latar di belakang sidebar gaya Inset mengikuti Sidebar Color, sedangkan gaya Floating mengikuti App Body Color. Pembungkus konten halaman transparan agar warna dengan alpha tidak ditumpuk dua kali.
 
 > **Amendemen UI, 23 Oktober 2026 (Preferences modal):** Preferences dibuka sebagai modal dari menu akun dan tombol pada dashboard Finance. Halaman `/dashboard/preferences` serta direktori `features/preferences` dihapus.
 

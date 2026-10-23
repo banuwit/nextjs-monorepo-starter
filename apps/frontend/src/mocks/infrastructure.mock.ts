@@ -1,4 +1,4 @@
-import type { InfrastructureGroup } from "../features/infrastructre/infrastructure-model";
+import type { InfrastructureGroup } from "../features/infrastructure/infrastructure-model";
 
 export const infrastructureGroups: InfrastructureGroup[] = [
   {

@@ -14,8 +14,8 @@ import {
   filterInfrastructure,
   type InfrastructureFilters,
 } from "./infrastructure-model";
-import { InfrastructureHeader } from "./_components/infrastructure-header";
-import { ProjectEnvironments } from "./_components/project-environments";
+import { InfrastructureHeader } from "./components/infrastructure-header";
+import { ProjectEnvironments } from "./components/project-environments";
 
 export function InfrastructurePage() {
   const [search, setSearch] = useState("");

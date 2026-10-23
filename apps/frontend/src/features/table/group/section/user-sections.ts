@@ -59,4 +59,3 @@ export const sectionColumns = [
   { id: "joinDate", label: "Join Date", width: 128 },
   { id: "status", label: "Status", width: 104 },
 ] as const;
-export type SectionColumnId = (typeof sectionColumns)[number]["id"];

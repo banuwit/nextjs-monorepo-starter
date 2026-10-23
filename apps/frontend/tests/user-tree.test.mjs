@@ -3,20 +3,19 @@ import test from "node:test";
 import { users } from "../src/mocks/user.mock.ts";
 import {
   buildUserTree,
+  emptyTreeFilters,
   filterUserTree,
   flattenUserTree,
   getExpandedTreeIds,
-  getTreeBranchIds,
-  emptyTreeFilters,
 } from "../src/features/table/group/tree/user-tree.ts";
 
 test("reporting tree uses the same 36 users with direct and recursive totals", () => {
   const before = structuredClone(users);
   const tree = buildUserTree(users);
-  assert.equal(tree.length, 1);
+  assert.equal(tree.length, 5);
   assert.equal(tree[0].user.id, "USR-001");
-  assert.equal(tree[0].directReports, 5);
-  assert.equal(tree[0].totalReports, 35);
+  assert.equal(tree[0].directReports, 1);
+  assert.equal(tree[0].totalReports, 7);
   assert.equal(tree[0].children[0].totalReports, 6);
   assert.equal(tree[0].children[0].directReports, 4);
   assert.equal(tree[0].children[0].children[0].directReports, 2);
@@ -28,13 +27,11 @@ test("reporting tree uses the same 36 users with direct and recursive totals", (
   assert.deepEqual(users, before);
 });
 
-test("depth presets and branch collapse preserve the remaining hierarchy", () => {
+test("expanding branches preserves the remaining hierarchy", () => {
   const tree = buildUserTree(users);
-  assert.equal(flattenUserTree(tree, getExpandedTreeIds(tree, 0)).length, 1);
-  assert.equal(flattenUserTree(tree, getExpandedTreeIds(tree, 1)).length, 6);
-  assert.equal(flattenUserTree(tree, getExpandedTreeIds(tree, 2)).length, 26);
-  assert.equal(flattenUserTree(tree, getExpandedTreeIds(tree, 3)).length, 36);
+  assert.equal(flattenUserTree(tree, getExpandedTreeIds(tree, 1)).length, 22);
   const expanded = getExpandedTreeIds(tree, Infinity);
+  assert.equal(flattenUserTree(tree, expanded).length, 36);
   expanded.delete("USR-002");
   const rows = flattenUserTree(tree, expanded);
   assert.equal(rows.length, 30);
@@ -59,11 +56,36 @@ test("search retains ancestor paths while excluding unrelated reporting lines", 
     rows.map((node) => node.matchesFilter),
     [false, false, false, true],
   );
-  assert.equal(rows[0].totalReports, 35);
+  assert.equal(rows[0].totalReports, 7);
   assert.deepEqual(
     filterUserTree(tree, { ...emptyTreeFilters, search: "not-a-user" }),
     [],
   );
+});
+
+test("gender, role, and status facets retain ancestor context", () => {
+  const tree = buildUserTree(users);
+  const filtered = filterUserTree(tree, {
+    ...emptyTreeFilters,
+    gender: ["female"],
+    role: ["viewer"],
+    status: ["pending"],
+  });
+  const nodes = flattenUserTree(
+    filtered,
+    getExpandedTreeIds(filtered, Infinity),
+  );
+  const matches = nodes.filter((node) => node.matchesFilter);
+  assert.ok(matches.length > 0);
+  assert.ok(
+    matches.every(
+      ({ user }) =>
+        user.gender === "female" &&
+        user.role === "viewer" &&
+        user.status === "pending",
+    ),
+  );
+  assert.ok(nodes.length > matches.length);
 });
 
 test("orphan managers, cycles and arbitrary depth remain finite and retain every user once", () => {
@@ -81,6 +103,9 @@ test("orphan managers, cycles and arbitrary depth remain finite and retain every
     { ...users[0], id: "a", managerId: "b" },
     { ...users[1], id: "b", managerId: "a" },
   ]);
-  assert.equal(cycle.flatMap(getTreeBranchIds).length, 2);
+  assert.equal(
+    flattenUserTree(cycle, getExpandedTreeIds(cycle, Infinity)).length,
+    2,
+  );
   assert.deepEqual(buildUserTree([]), []);
 });

@@ -2,7 +2,6 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { createMockUsers, users } from "../src/mocks/user.mock.ts";
 import {
-  emptyScrollFilters,
   filterScrollUsers,
   nextLoadedCount,
   SCROLL_USER_COUNT,
@@ -23,38 +22,15 @@ test("large fixture retains original profiles and creates unique deterministic u
   assert.equal(users.length, 36);
 });
 
-test("search and combined filters include records beyond the loaded batch", () => {
+test("search includes records beyond the loaded batch", () => {
   const generated = createMockUsers(10000);
   const target = generated.at(-1);
   assert.deepEqual(
-    filterScrollUsers(generated, {
-      ...emptyScrollFilters,
-      search: ` ${target.email.toUpperCase()} `,
-    }),
+    filterScrollUsers(generated, ` ${target.email.toUpperCase()} `),
     [target],
   );
-  const filtered = filterScrollUsers(generated, {
-    ...emptyScrollFilters,
-    role: "editor",
-    gender: "female",
-    status: "active",
-  });
-  assert.ok(filtered.length > 25);
-  assert.ok(
-    filtered.every(
-      (user) =>
-        user.role === "editor" &&
-        user.gender === "female" &&
-        user.status === "active",
-    ),
-  );
-  assert.deepEqual(
-    filterScrollUsers(generated, {
-      ...emptyScrollFilters,
-      search: "no-such-user",
-    }),
-    [],
-  );
+  assert.deepEqual(filterScrollUsers(generated, "no-such-user"), []);
+  assert.deepEqual(filterScrollUsers(generated, ""), generated);
 });
 
 test("load more advances a single batch and stops at partial and empty endings", () => {
