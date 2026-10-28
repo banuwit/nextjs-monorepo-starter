@@ -15,7 +15,7 @@
 - Skrip root yang tersedia saat ini adalah `pnpm dev`, `pnpm build`, `pnpm lint`, `pnpm check-types`, dan `pnpm format` (yang menulis ulang file). Aplikasi frontend berjalan pada port 3000. Pengujian, skrip database, dan `pnpm typecheck` masih merupakan target PRD dan belum dikonfigurasi.
 - Untuk frontend saja, gunakan `pnpm --filter frontend <dev|check-types|lint|build>`. `check-types` menjalankan `next typegen && tsc --noEmit`; `lint` memakai `--max-warnings 0` sehingga warning juga menggagalkan pemeriksaan. Karena belum ada test runner, verifikasi dengan check-types, lint, build, dan pemeriksaan manual di dev server. Tambahkan primitive shadcn dengan `pnpm dlx shadcn@latest add <nama-komponen>` dari `apps/frontend` (hasilnya di `src/components/ui/`).
 - Di frontend, gunakan `src/app/` untuk entry point rute, layout, dan Route Handler; simpan UI/logika halaman khusus fitur di `src/features/<fitur>/`. Komponen shadcn dan komponen lintas fitur tetap di `src/components/`; buat paket UI bersama hanya saat ada komponen yang benar-benar dibagikan antar-aplikasi. Jaga impor antar-paket dan konfigurasi TypeScript/ESLint sesuai workspace saat ini.
-- Komponen global yang dipakai ulang, bukan disalin ke fitur: `src/components/crud/` (`CrudResource` memilih pola `page`/`dialog`/`sheet`/`inline`; adapter data dipasok fitur, komponen global tidak mengimpor mock atau domain), `src/components/data-grid/` (`DataGridClient` untuk data lokal, `DataGridServer` untuk halaman REST; ikuti [Panduan Data Grid](.agents/rules/frontend/data-grid.md)), `src/components/filter/`, `src/components/chart/`, dan `src/components/gantt/`. Demo CRUD aktif ada di `/crud/{new-page,modal,sheet,panel-inline}`.
+- Komponen global yang dipakai ulang, bukan disalin ke fitur: `src/components/crud/` (`CrudResource` memilih pola `page`/`dialog`/`sheet`/`inline`, daftarnya memakai `DataGridClient`; adapter data dipasok fitur, komponen global tidak mengimpor mock atau domain; ikuti [Pola halaman CRUD](.agents/rules/frontend/crud-pattern.md)), `src/components/data-grid/` (`DataGridClient` untuk data lokal, `DataGridServer` untuk halaman REST; ikuti [Panduan Data Grid](.agents/rules/frontend/data-grid.md)), `src/components/filter/`, `src/components/chart/`, dan `src/components/gantt/`. Demo CRUD aktif ada di `/crud/{new-page,modal,sheet,panel-inline}`.
 - Shell backoffice disusun di `src/app/(backoffice)/layout.tsx` (sidebar, header, pembungkus multi-sidebar). Menu navigasi dan pencarian menu didefinisikan di `src/components/layout/app-navigation.tsx` dan `menu-search-tree.ts`. Setiap halaman memakai `PageHeading` untuk breadcrumb dan `<h1>` di dalam `AppBody`.
 - Untuk pekerjaan API, Postman CLI tersedia di `/Users/banurusman/.local/bin/postman` (tidak ada di `PATH`).
 - Jalankan pemeriksaan yang relevan dengan file yang diubah, lalu laporkan perintah dan hasil sebenarnya. Pertahankan blok Turborepo yang dikelola di bawah ini; sebelum mengubah konfigurasi atau perintah Turborepo, ikuti petunjuk dokumentasi terpasangnya.
@@ -28,12 +28,13 @@ Urutan prioritas jika terjadi konflik: instruksi pengguna, keputusan **DIKUNCI**
 
 **Rules** (wajib dibaca saat area tersebut disentuh):
 
-| Area tugas                                                                   | Rules                                                                     |
-| ---------------------------------------------------------------------------- | ------------------------------------------------------------------------- |
-| Membuat atau memindahkan fitur/subfitur di `apps/frontend/src/features/`     | [structure-folder.md](.agents/rules/frontend/structure-folder.md)         |
-| Halaman/komponen frontend, dashboard shell, tema, warna, layout, Preferences | [preferences.md](.agents/rules/frontend/preferences.md)                   |
-| Tabel, daftar, filter, `src/components/data-grid/`, `src/components/filter/` | [data-grid.md](.agents/rules/frontend/data-grid.md)                       |
-| `apps/mobile` (Tahap 2) dan `apps/backend` (Tahap 3)                         | `.agents/rules/mobile/` dan `.agents/rules/backend/` (belum berisi rules) |
+| Area tugas                                                                                                              | Rules                                                                     |
+| ----------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------- |
+| Membuat file, folder, fitur, atau subfitur di `apps/frontend/src/`                                                      | [structure-folder.md](.agents/rules/frontend/structure-folder.md)         |
+| Halaman/komponen frontend, dashboard shell, tema, warna, layout, Preferences                                            | [preferences.md](.agents/rules/frontend/preferences.md)                   |
+| Tabel, daftar, filter, `src/components/data-grid/`, `src/components/filter/`                                            | [data-grid.md](.agents/rules/frontend/data-grid.md)                       |
+| Membuat/mengubah halaman CRUD (pola page, dialog, sheet, inline), `src/components/crud/`, `src/features/crud-examples/` | [crud-pattern.md](.agents/rules/frontend/crud-pattern.md)                 |
+| `apps/mobile` (Tahap 2) dan `apps/backend` (Tahap 3)                                                                    | `.agents/rules/mobile/` dan `.agents/rules/backend/` (belum berisi rules) |
 
 Tambahkan rules baru di subfolder area yang sesuai (`frontend/`, `mobile/`, `backend/`) dan daftarkan di tabel ini.
 

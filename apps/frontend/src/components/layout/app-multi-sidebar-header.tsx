@@ -4,25 +4,25 @@ import type { ReactNode } from "react";
 import { MoonIcon, SunIcon } from "lucide-react";
 
 import { MenuSearch } from "@/components/layout/menu-search";
-import { NavUser } from "@/components/layout/nav-user";
+import { NavUser, type NavUserData } from "@/components/layout/nav-user";
 import { PreferencesMenu } from "@/components/layout/preferences";
 import { TeamSwitcher } from "@/components/layout/team-switcher";
 import { Button } from "@/components/ui/button";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { profile } from "@/mocks/profile.mock";
 import { usePreferences } from "@/providers/preferences-provider";
-
-const user = {
-  name: "Banu Rusman",
-  email: profile.workEmail,
-};
 
 /**
  * Header gaya Multi: membentang di atas layer 2 dan konten. Gaya lain
  * merender `children` (AppSidebarHeader) apa adanya.
  */
-export function AppMultiSidebarHeader({ children }: { children: ReactNode }) {
+export function AppMultiSidebarHeader({
+  user,
+  children,
+}: {
+  user: NavUserData;
+  children: ReactNode;
+}) {
   const { values, setPreference } = usePreferences();
   const isMobile = useIsMobile();
   if (values.sidebarStyle !== "multi") return <>{children}</>;

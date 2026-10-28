@@ -50,10 +50,7 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Toaster } from "@/components/ui/toast";
 
 import { TaskFormDialog } from "./task-form-dialog";
-import {
-  selectTasks,
-  mergeVisibleBoard,
-} from "../utils/task-board-operations.js";
+import { selectTasks, mergeVisibleBoard } from "../utils/task-board-operations";
 
 import { columnIds, columns } from "@/mocks/task.mock";
 import { KanbanColumn } from "./kanban-column";
@@ -103,10 +100,7 @@ export function Kanban({ initialBoard }: KanbanProps) {
   );
   const [addTo, setAddTo] = React.useState<ColumnId>("ideas");
   const [addOpen, setAddOpen] = React.useState(false);
-  const selected = selectTasks(board, { query, priority, sort }) as {
-    columnId: ColumnId;
-    task: Task;
-  }[];
+  const selected = selectTasks(board, { query, priority, sort });
   const visibleBoard = Object.fromEntries(
     columnIds.map((id) => [
       id,
@@ -120,10 +114,7 @@ export function Kanban({ initialBoard }: KanbanProps) {
   }
 
   function updateVisibleBoard(updated: BoardState) {
-    setBoard(
-      (current) =>
-        mergeVisibleBoard(current, visibleBoard, updated) as BoardState,
-    );
+    setBoard((current) => mergeVisibleBoard(current, visibleBoard, updated));
   }
 
   const [columnOrder, setColumnOrder] = React.useState<ColumnId[]>(columnIds);

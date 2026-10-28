@@ -15,14 +15,16 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { KeyRound, LogOutIcon, User } from "lucide-react";
 
+export type NavUserData = {
+  name: string;
+  email: string;
+};
+
 export function NavUser({
   user,
   placement = "header",
 }: {
-  user: {
-    name: string;
-    email: string;
-  };
+  user: NavUserData;
   placement?: "header" | "rail";
 }) {
   const inRail = placement === "rail";

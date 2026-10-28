@@ -3,22 +3,18 @@
 import { MoonIcon, SunIcon } from "lucide-react";
 
 import { MenuSearch } from "@/components/layout/menu-search";
-import { NavUser } from "@/components/layout/nav-user";
+import { NavUser, type NavUserData } from "@/components/layout/nav-user";
 import { PreferencesMenu } from "@/components/layout/preferences";
 import { Button } from "@/components/ui/button";
 import { SidebarTrigger } from "@/components/ui/sidebar";
-import { profile } from "@/mocks/profile.mock";
 import { usePreferences } from "@/providers/preferences-provider";
 
-const user = {
-  name: "Banu Rusman",
-  email: profile.workEmail,
-};
-
 export function AppHeaderActions({
+  user,
   showSearch = false,
   searchIconOnly = false,
 }: {
+  user: NavUserData;
   showSearch?: boolean;
   searchIconOnly?: boolean;
 }) {
@@ -50,7 +46,7 @@ export function AppHeaderActions({
   );
 }
 
-export function AppSidebarHeader() {
+export function AppSidebarHeader({ user }: { user: NavUserData }) {
   const { values } = usePreferences();
   if (values.sidebarStyle === "header") return null;
 
@@ -65,7 +61,7 @@ export function AppSidebarHeader() {
       >
         <SidebarTrigger className="-ml-1" />
         <MenuSearch />
-        <AppHeaderActions />
+        <AppHeaderActions user={user} />
       </header>
     </div>
   );

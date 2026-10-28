@@ -6,6 +6,10 @@ import { AppMultiSidebarPanel } from "@/components/layout/app-multi-sidebar-pane
 import { AppSidebarHeader } from "@/components/layout/app-sidebar-header";
 import { TeamSwitcherProvider } from "@/components/layout/team-switcher";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
+import { profile } from "@/mocks/profile.mock";
+
+// Data contoh sampai session Better Auth tersedia.
+const user = { name: profile.name, email: profile.workEmail };
 
 export default function BackofficeLayout({
   children,
@@ -13,14 +17,14 @@ export default function BackofficeLayout({
   return (
     <TeamSwitcherProvider>
       <SidebarProvider>
-        <AppMultiSidebar>
+        <AppMultiSidebar user={user}>
           <AppSidebar />
         </AppMultiSidebar>
         <SidebarInset className="min-w-0">
-          <AppMultiSidebarHeader>
-            <AppSidebarHeader />
+          <AppMultiSidebarHeader user={user}>
+            <AppSidebarHeader user={user} />
           </AppMultiSidebarHeader>
-          <AppHeader />
+          <AppHeader user={user} />
           <AppMultiSidebarPanel>{children}</AppMultiSidebarPanel>
         </SidebarInset>
       </SidebarProvider>

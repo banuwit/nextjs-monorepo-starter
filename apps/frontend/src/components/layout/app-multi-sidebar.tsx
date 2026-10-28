@@ -11,7 +11,7 @@ import {
 } from "@/components/layout/app-navigation";
 import { findActiveNavigationSection } from "@/components/layout/navigation-active";
 import { NavMain } from "@/components/layout/nav-main";
-import { NavUser } from "@/components/layout/nav-user";
+import { NavUser, type NavUserData } from "@/components/layout/nav-user";
 import { TeamSwitcher } from "@/components/layout/team-switcher";
 import { Button } from "@/components/ui/button";
 import {
@@ -25,13 +25,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
-import { profile } from "@/mocks/profile.mock";
 import { usePreferences } from "@/providers/preferences-provider";
-
-const user = {
-  name: "Banu Rusman",
-  email: profile.workEmail,
-};
 
 /*
  * Group yang dipilih dari rail. Klik rail hanya mengganti isi layer 2 tanpa
@@ -74,7 +68,13 @@ export function useMultiSidebarSection(): NavigationSection | undefined {
  * Layer 1 gaya Multi: rail ikon group menu di desktop dan drawer sidebar
  * lengkap di mobile. Gaya lain merender `children` (AppSidebar) apa adanya.
  */
-export function AppMultiSidebar({ children }: { children: ReactNode }) {
+export function AppMultiSidebar({
+  user,
+  children,
+}: {
+  user: NavUserData;
+  children: ReactNode;
+}) {
   const { values } = usePreferences();
   const navigation = useAppNavigation();
   const pathname = usePathname();
