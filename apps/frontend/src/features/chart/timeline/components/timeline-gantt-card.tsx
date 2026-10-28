@@ -2,7 +2,7 @@
 
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from "recharts";
 
-import { ChartCard } from "@/components/chart-card";
+import { ChartCard } from "@/components/chart/chart-card";
 import { ChartTooltip, type ChartConfig } from "@/components/ui/chart";
 import { TimelineChartFrame } from "@/features/chart/timeline/components/timeline-chart-frame";
 import { TimelineTooltip } from "@/features/chart/timeline/components/timeline-tooltip";

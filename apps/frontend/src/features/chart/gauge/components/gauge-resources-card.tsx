@@ -1,6 +1,6 @@
 "use client";
 
-import { ChartCard } from "@/components/chart-card";
+import { ChartCard } from "@/components/chart/chart-card";
 import { GaugeMini } from "@/features/chart/gauge/components/gauge-mini";
 import { serverResources } from "@/mocks/chart-gauge.mock";
 

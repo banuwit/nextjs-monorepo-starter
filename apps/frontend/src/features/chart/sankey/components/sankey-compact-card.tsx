@@ -1,6 +1,6 @@
 "use client";
 
-import { ChartCard } from "@/components/chart-card";
+import { ChartCard } from "@/components/chart/chart-card";
 import { FlowChart } from "@/features/chart/sankey/components/sankey-flow-chart";
 import { regionPlans } from "@/mocks/chart-sankey.mock";
 

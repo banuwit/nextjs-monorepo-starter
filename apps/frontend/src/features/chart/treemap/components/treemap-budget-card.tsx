@@ -1,6 +1,6 @@
 "use client";
 
-import { ChartCard } from "@/components/chart-card";
+import { ChartCard } from "@/components/chart/chart-card";
 import { ToggleTreemap } from "@/features/chart/treemap/components/toggle-treemap";
 import { budgetByDepartment } from "@/mocks/chart.mock";
 

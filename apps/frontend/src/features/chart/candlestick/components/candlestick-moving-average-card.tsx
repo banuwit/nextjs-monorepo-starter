@@ -2,12 +2,12 @@
 
 import { CartesianGrid, ComposedChart, Line, XAxis, YAxis } from "recharts";
 
-import { ChartCard } from "@/components/chart-card";
+import { ChartCard } from "@/components/chart/chart-card";
 import {
   ChartLegendToggle,
   legendItemsFromConfig,
   useChartLegendToggle,
-} from "@/components/chart-legend-toggle";
+} from "@/components/chart/chart-legend-toggle";
 import { ChartContainer, ChartTooltip } from "@/components/ui/chart";
 import { CandlestickBars } from "@/features/chart/candlestick/components/candlestick-bars";
 import { CandlestickTooltip } from "@/features/chart/candlestick/components/candlestick-tooltip";

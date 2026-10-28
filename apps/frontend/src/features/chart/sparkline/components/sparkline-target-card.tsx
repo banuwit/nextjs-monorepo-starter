@@ -1,6 +1,6 @@
 "use client";
 
-import { ChartCard } from "@/components/chart-card";
+import { ChartCard } from "@/components/chart/chart-card";
 import { TargetSparkline } from "@/features/chart/sparkline/components/target-sparkline";
 import { targetMetrics } from "@/mocks/chart-sparkline.mock";
 

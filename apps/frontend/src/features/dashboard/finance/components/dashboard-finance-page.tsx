@@ -18,7 +18,7 @@ import {
 
 import { AppBody } from "@/components/app-body";
 import { PageHeading } from "@/components/page-heading";
-import { PreferencesMenu } from "@/components/preferences";
+import { PreferencesMenu } from "@/components/layout/preferences";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {

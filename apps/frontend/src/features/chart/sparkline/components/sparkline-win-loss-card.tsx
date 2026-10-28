@@ -1,6 +1,6 @@
 "use client";
 
-import { ChartCard } from "@/components/chart-card";
+import { ChartCard } from "@/components/chart/chart-card";
 import { WinLossSparkline } from "@/features/chart/sparkline/components/win-loss-sparkline";
 import { deployResults } from "@/mocks/chart-sparkline.mock";
 

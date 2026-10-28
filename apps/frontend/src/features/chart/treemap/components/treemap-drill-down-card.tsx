@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { ChevronLeftIcon } from "lucide-react";
 
-import { ChartCard } from "@/components/chart-card";
+import { ChartCard } from "@/components/chart/chart-card";
 import { Button } from "@/components/ui/button";
 import { TileTreemap } from "@/features/chart/treemap/components/tile-treemap";
 import type { Tile } from "@/features/chart/treemap/types/treemap";

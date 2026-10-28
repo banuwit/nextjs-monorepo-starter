@@ -1,10 +1,10 @@
 "use client";
 
-import { ChartCard } from "@/components/chart-card";
+import { ChartCard } from "@/components/chart/chart-card";
 import {
   ChartLegendToggle,
   useChartLegendToggle,
-} from "@/components/chart-legend-toggle";
+} from "@/components/chart/chart-legend-toggle";
 import { StatusBlockRow } from "@/features/chart/status-tracker/components/status-block-row";
 import { StatusTrackerAxis } from "@/features/chart/status-tracker/components/status-tracker-axis";
 import {

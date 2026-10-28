@@ -1,6 +1,6 @@
 "use client";
 
-import { ChartCard } from "@/components/chart-card";
+import { ChartCard } from "@/components/chart/chart-card";
 import { TileTreemap } from "@/features/chart/treemap/components/tile-treemap";
 import type { Tile } from "@/features/chart/treemap/types/treemap";
 import {

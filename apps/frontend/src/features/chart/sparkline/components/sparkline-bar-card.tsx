@@ -2,7 +2,7 @@
 
 import { Bar } from "recharts";
 
-import { ChartCard } from "@/components/chart-card";
+import { ChartCard } from "@/components/chart/chart-card";
 import { BarSparkline } from "@/features/chart/sparkline/components/bar-sparkline";
 import { dailyVolumes } from "@/mocks/chart-sparkline.mock";
 

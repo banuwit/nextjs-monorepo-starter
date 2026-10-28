@@ -6,7 +6,7 @@ import { Sankey, type SankeyNodeProps, type SankeyProps } from "recharts";
 import {
   ChartLegendToggle,
   useChartLegendToggle,
-} from "@/components/chart-legend-toggle";
+} from "@/components/chart/chart-legend-toggle";
 import {
   ChartContainer,
   ChartTooltip,

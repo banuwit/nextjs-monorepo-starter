@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 
-import { NavigationBreadcrumb } from "@/components/layout/navigation-breadcrumb";
+import { NavigationBreadcrumb } from "@/components/navigation-breadcrumb";
 
 type PageHeadingProps = {
   title: string;

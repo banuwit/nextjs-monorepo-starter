@@ -8,7 +8,7 @@ import {
   RadialBarChart,
 } from "recharts";
 
-import { ChartCard } from "@/components/chart-card";
+import { ChartCard } from "@/components/chart/chart-card";
 import { ChartContainer, type ChartConfig } from "@/components/ui/chart";
 import { monthlyActiveUsers } from "@/mocks/chart-radial.mock";
 

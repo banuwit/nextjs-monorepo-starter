@@ -5,7 +5,7 @@ import { cn } from "cn";
 
 import type { ChartConfig } from "@/components/ui/chart";
 
-export type ChartLegendItem = {
+type ChartLegendItem = {
   key: string;
   label: ReactNode;
   color: string;

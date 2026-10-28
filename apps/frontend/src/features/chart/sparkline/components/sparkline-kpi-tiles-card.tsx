@@ -1,6 +1,6 @@
 "use client";
 
-import { TrendBadge } from "@/components/chart-card";
+import { TrendBadge } from "@/components/chart/chart-card";
 import { Card, CardContent } from "@/components/ui/card";
 import { Sparkline } from "@/features/chart/sparkline/components/sparkline";
 import { kpiSparklines } from "@/mocks/chart.mock";

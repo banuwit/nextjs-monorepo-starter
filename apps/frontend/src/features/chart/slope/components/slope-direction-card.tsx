@@ -1,6 +1,6 @@
 "use client";
 
-import { ChartCard } from "@/components/chart-card";
+import { ChartCard } from "@/components/chart/chart-card";
 import type { ChartConfig } from "@/components/ui/chart";
 import { SlopeChart } from "@/features/chart/slope/components/slope-chart";
 import { directionColor } from "@/features/chart/slope/utils/slope-change";

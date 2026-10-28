@@ -16,8 +16,8 @@ import type {
 import * as React from "react"
 import { cn } from "@/lib/utils"
 
-import { FacetedFilter } from "@/components/filters/faceted-filter"
-import { SelectBox } from "@/components/filters/select-box"
+import { FacetedFilter } from "@/components/filter/faceted-filter"
+import { SelectBox } from "@/components/filter/select-box"
 import {
   Table,
   TableBody,

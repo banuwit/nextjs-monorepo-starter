@@ -2,7 +2,7 @@
 
 import { DataGridSearchInput } from "@/components/data-grid/data-grid-search-input";
 import { Button } from "@/components/ui/button";
-import { FacetedFilter } from "@/components/filters/faceted-filter";
+import { FacetedFilter } from "@/components/filter/faceted-filter";
 import { emptyTreeFilters } from "../utils/user-tree";
 import type { TreeFilters } from "../types/user-tree";
 

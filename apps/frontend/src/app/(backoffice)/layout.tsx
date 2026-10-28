@@ -1,10 +1,10 @@
-import { AppSidebar } from "@/components/app-sidebar";
-import { AppHeader } from "@/components/app-header";
-import { AppMultiSidebar } from "@/components/app-multi-sidebar";
-import { AppMultiSidebarHeader } from "@/components/app-multi-sidebar-header";
-import { AppMultiSidebarPanel } from "@/components/app-multi-sidebar-panel";
-import { AppSidebarHeader } from "@/components/app-sidebar-header";
-import { TeamSwitcherProvider } from "@/components/team-switcher";
+import { AppSidebar } from "@/components/layout/app-sidebar";
+import { AppHeader } from "@/components/layout/app-header";
+import { AppMultiSidebar } from "@/components/layout/app-multi-sidebar";
+import { AppMultiSidebarHeader } from "@/components/layout/app-multi-sidebar-header";
+import { AppMultiSidebarPanel } from "@/components/layout/app-multi-sidebar-panel";
+import { AppSidebarHeader } from "@/components/layout/app-sidebar-header";
+import { TeamSwitcherProvider } from "@/components/layout/team-switcher";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 
 export default function BackofficeLayout({

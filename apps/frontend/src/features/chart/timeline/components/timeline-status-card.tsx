@@ -10,12 +10,12 @@ import {
   YAxis,
 } from "recharts";
 
-import { ChartCard } from "@/components/chart-card";
+import { ChartCard } from "@/components/chart/chart-card";
 import {
   ChartLegendToggle,
   legendItemsFromConfig,
   useChartLegendToggle,
-} from "@/components/chart-legend-toggle";
+} from "@/components/chart/chart-legend-toggle";
 import { ChartTooltip, type ChartConfig } from "@/components/ui/chart";
 import { TimelineChartFrame } from "@/features/chart/timeline/components/timeline-chart-frame";
 import { TimelineTooltip } from "@/features/chart/timeline/components/timeline-tooltip";

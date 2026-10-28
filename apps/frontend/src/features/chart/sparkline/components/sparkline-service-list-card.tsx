@@ -1,6 +1,6 @@
 "use client";
 
-import { ChartCard } from "@/components/chart-card";
+import { ChartCard } from "@/components/chart/chart-card";
 import { Sparkline } from "@/features/chart/sparkline/components/sparkline";
 import { serviceSparklines } from "@/mocks/chart.mock";
 

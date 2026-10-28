@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { BarChart, CartesianGrid, ReferenceLine, XAxis, YAxis } from "recharts";
 
-import { ChartCard, ChartPeriodTabs } from "@/components/chart-card";
+import { ChartCard, ChartPeriodTabs } from "@/components/chart/chart-card";
 import { ChartContainer, ChartTooltip } from "@/components/ui/chart";
 import { CandlestickBars } from "@/features/chart/candlestick/components/candlestick-bars";
 import { CandlestickTooltip } from "@/features/chart/candlestick/components/candlestick-tooltip";

@@ -9,7 +9,7 @@ import {
 } from "lucide-react";
 import { cn } from "cn";
 
-import { ChartCard } from "@/components/chart-card";
+import { ChartCard } from "@/components/chart/chart-card";
 import type { StageStatus } from "@/features/chart/status-tracker/types/status-tracker";
 import { formatDuration } from "@/features/chart/status-tracker/utils/status-tracker";
 import { deployPipeline } from "@/mocks/chart-status-tracker.mock";

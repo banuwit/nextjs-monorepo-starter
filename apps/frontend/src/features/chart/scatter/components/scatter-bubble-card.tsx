@@ -9,12 +9,12 @@ import {
   ZAxis,
 } from "recharts";
 
-import { ChartCard } from "@/components/chart-card";
+import { ChartCard } from "@/components/chart/chart-card";
 import {
   ChartLegendToggle,
   legendItemsFromConfig,
   useChartLegendToggle,
-} from "@/components/chart-legend-toggle";
+} from "@/components/chart/chart-legend-toggle";
 import {
   ChartContainer,
   ChartTooltip,

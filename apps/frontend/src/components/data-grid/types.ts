@@ -4,7 +4,7 @@ import type {
   FilterOption,
   FilterSelectionVariant,
   SelectOption,
-} from "@/components/filters/types"
+} from "@/components/filter/types"
 
 /**
  * Query string shape shared by every server-driven list page.
@@ -26,7 +26,7 @@ export interface DataGridPageMeta {
   totalPages: number
 }
 
-/** A facet's options are plain filter options — see `@/components/filters`. */
+/** A facet's options are plain filter options — see `@/components/filter`. */
 export type FacetOption = FilterOption
 
 export interface FacetConfig {

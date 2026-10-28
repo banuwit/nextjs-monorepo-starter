@@ -8,7 +8,7 @@ import {
   RadialBarChart,
 } from "recharts";
 
-import { ChartCard } from "@/components/chart-card";
+import { ChartCard } from "@/components/chart/chart-card";
 import { ChartContainer, type ChartConfig } from "@/components/ui/chart";
 import { percentOf } from "@/features/chart/gauge/utils/gauge";
 import { ARC } from "@/features/chart/gauge/utils/gauge-config";

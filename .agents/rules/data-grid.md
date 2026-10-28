@@ -1,6 +1,6 @@
 # Panduan Data Grid
 
-Panduan ini berlaku saat memakai atau mengubah komponen global di [data-grid](../../apps/frontend/src/components/data-grid/) dan kontrol filternya di [filters](../../apps/frontend/src/components/filters/). Ikuti juga [PRD Tahap 1](../../apps/frontend/prd.md) dan [Panduan Preferences](./preferences.md). Jangan menyalin implementasi grid ke setiap fitur.
+Panduan ini berlaku saat memakai atau mengubah komponen global di [data-grid](../../apps/frontend/src/components/data-grid/) dan kontrol filternya di [filter](../../apps/frontend/src/components/filter/). Ikuti juga [PRD Tahap 1](../../apps/frontend/prd.md) dan [Panduan Preferences](./preferences.md). Jangan menyalin implementasi grid ke setiap fitur.
 
 ## Pilih mode yang tepat
 
@@ -16,15 +16,15 @@ Kedua komponen adalah Client Component. Untuk halaman App Router, ambil dan vali
 Definisikan kolom dengan TanStack Table v9 dan `DataGridFeatures`, lalu beri `getRowId` stabil. `accessorKey`/`id` harus sama dengan `toolbar.*.key` bila kontrol itu memfilter kolom. Untuk label biasa gunakan [DataGridHeader](../../apps/frontend/src/components/data-grid/data-grid-header.tsx); untuk judul yang dapat diurutkan gunakan [DataGridHeaderSort](../../apps/frontend/src/components/data-grid/data-grid-header-sort.tsx); untuk menu sort, visibility, pin, dan move gunakan [DataGridHeaderDropdown](../../apps/frontend/src/components/data-grid/data-grid-header-dropdown.tsx).
 
 ```tsx
-"use client"
+"use client";
 
-import type { ColumnDef } from "@tanstack/react-table"
-import { DataGridClient } from "@/components/data-grid/data-grid-client"
-import type { DataGridFeatures } from "@/components/data-grid/data-grid-features"
-import { DataGridHeader } from "@/components/data-grid/data-grid-header"
-import { DataGridHeaderSort } from "@/components/data-grid/data-grid-header-sort"
+import type { ColumnDef } from "@tanstack/react-table";
+import { DataGridClient } from "@/components/data-grid/data-grid-client";
+import type { DataGridFeatures } from "@/components/data-grid/data-grid-features";
+import { DataGridHeader } from "@/components/data-grid/data-grid-header";
+import { DataGridHeaderSort } from "@/components/data-grid/data-grid-header-sort";
 
-type Item = { id: string; name: string; status: string }
+type Item = { id: string; name: string; status: string };
 
 const columns: ColumnDef<DataGridFeatures, Item>[] = [
   {
@@ -32,7 +32,7 @@ const columns: ColumnDef<DataGridFeatures, Item>[] = [
     header: ({ column }) => <DataGridHeaderSort column={column} title="Name" />,
   },
   { accessorKey: "status", header: () => <DataGridHeader title="Status" /> },
-]
+];
 
 export function ItemsGrid({ items }: { items: Item[] }) {
   return (
@@ -51,11 +51,11 @@ export function ItemsGrid({ items }: { items: Item[] }) {
         ],
       }}
     />
-  )
+  );
 }
 ```
 
-Mode client mendukung `pagination="advance" | "simple" | "none"` (bawaan `advance`), `defaultSorting`, `defaultColumnOrder`, `loading`, teks empty state, dan `actions`. `loading={true}` menampilkan skeleton serta menyembunyikan pagination selama pemuatan. `toolbar` opsional; visibility toggle tetap tersedia tanpa toolbar selama `showVisibilityToggle` tidak `false`. `facets` memakai pilihan multi/single dengan tombol Apply, sedangkan `selects` (komponen [SelectBox](../../apps/frontend/src/components/filters/select-box.tsx)) menerapkan satu pilihan segera. Pada mode client, grid mengaitkan facet/select ke filter `multiValue` untuk kolom yang id-nya cocok. Search client bersifat **per kolom**, bukan global lintas kolom.
+Mode client mendukung `pagination="advance" | "simple" | "none"` (bawaan `advance`), `defaultSorting`, `defaultColumnOrder`, `loading`, teks empty state, dan `actions`. `loading={true}` menampilkan skeleton serta menyembunyikan pagination selama pemuatan. `toolbar` opsional; visibility toggle tetap tersedia tanpa toolbar selama `showVisibilityToggle` tidak `false`. `facets` memakai pilihan multi/single dengan tombol Apply, sedangkan `selects` (komponen [SelectBox](../../apps/frontend/src/components/filter/select-box.tsx)) menerapkan satu pilihan segera. Pada mode client, grid mengaitkan facet/select ke filter `multiValue` untuk kolom yang id-nya cocok. Search client bersifat **per kolom**, bukan global lintas kolom.
 
 Jika pemuatan data client gagal, teruskan pesan aman untuk pengguna melalui `error` bersama callback `onRetry`; `data` tetap boleh berupa array kosong. Saat `error` ada, grid menampilkan pesan dan tombol “Try again” sebagai pengganti baris serta menyembunyikan pagination. Callback dimiliki fitur, misalnya memanggil ulang fungsi pemuatan data:
 
@@ -136,7 +136,7 @@ return result.ok ? (
     error="Data could not be loaded."
     filters={filters}
   />
-)
+);
 ```
 
 Komponen server ini tetap Client Component: bila `columns` berisi fungsi render, letakkan percabangan tersebut di komponen fitur client dan teruskan hasil serializable dari halaman Server Component. Error tidak boleh disamakan dengan empty state.
@@ -155,7 +155,7 @@ Pin statis tanpa kontrol unpin:
 
 Gunakan `enableColumnPinning` hanya bila pengguna boleh mengubah pin dari menu [DataGridHeaderDropdown](../../apps/frontend/src/components/data-grid/data-grid-header-dropdown.tsx). Dengan mode dinamis, menu pin/unpin dan ikon unpin pada header yang terpin memang muncul. `enableColumnOrdering` mengaktifkan move. `defaultColumnPinning` dan `defaultColumnOrder` hanya nilai awal, bukan state terkendali. Id pin harus sama dengan id kolom. Pinned column diukur dari lebar header yang dirender; pastikan header tetap ditampilkan. Posisi start/end memakai CSS logical inset untuk RTL.
 
-`showVisibilityToggle` mengontrol tombol “View” di toolbar; `showHeaderVisibilityToggle` mengontrol submenu di header. `actions` menaruh tombol tambahan di sisi kanan toolbar. Komponen [FacetedFilter](../../apps/frontend/src/components/filters/faceted-filter.tsx) dan [SelectBox](../../apps/frontend/src/components/filters/select-box.tsx) boleh dipakai terpisah dari grid, tetapi folder `filters` bukan salinan komponen grid.
+`showVisibilityToggle` mengontrol tombol “View” di toolbar; `showHeaderVisibilityToggle` mengontrol submenu di header. `actions` menaruh tombol tambahan di sisi kanan toolbar. Komponen [FacetedFilter](../../apps/frontend/src/components/filter/faceted-filter.tsx) dan [SelectBox](../../apps/frontend/src/components/filter/select-box.tsx) boleh dipakai terpisah dari grid, tetapi folder `filters` bukan salinan komponen grid.
 
 ## Edit per baris
 

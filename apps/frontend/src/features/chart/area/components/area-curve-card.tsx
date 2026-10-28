@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from "recharts";
 
-import { ChartCard, ChartPeriodTabs } from "@/components/chart-card";
+import { ChartCard, ChartPeriodTabs } from "@/components/chart/chart-card";
 import {
   ChartContainer,
   ChartTooltip,

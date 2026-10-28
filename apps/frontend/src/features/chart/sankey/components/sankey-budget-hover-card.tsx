@@ -3,7 +3,7 @@
 import { useState } from "react";
 import type { SankeyLinkProps, SankeyNodeProps } from "recharts";
 
-import { ChartCard } from "@/components/chart-card";
+import { ChartCard } from "@/components/chart/chart-card";
 import { FlowChart } from "@/features/chart/sankey/components/sankey-flow-chart";
 import { SankeyNode } from "@/features/chart/sankey/components/sankey-node";
 import { linkPath } from "@/features/chart/sankey/utils/sankey-link-path";

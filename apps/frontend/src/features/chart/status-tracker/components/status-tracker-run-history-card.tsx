@@ -2,11 +2,11 @@
 
 import { cn } from "cn";
 
-import { ChartCard } from "@/components/chart-card";
+import { ChartCard } from "@/components/chart/chart-card";
 import {
   ChartLegendToggle,
   useChartLegendToggle,
-} from "@/components/chart-legend-toggle";
+} from "@/components/chart/chart-legend-toggle";
 import {
   Tooltip,
   TooltipContent,

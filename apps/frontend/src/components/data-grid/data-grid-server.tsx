@@ -12,8 +12,8 @@ import type {
 import * as React from "react"
 import { usePathname, useRouter } from "next/navigation"
 
-import { FacetedFilter } from "@/components/filters/faceted-filter"
-import { SelectBox } from "@/components/filters/select-box"
+import { FacetedFilter } from "@/components/filter/faceted-filter"
+import { SelectBox } from "@/components/filter/select-box"
 import { cn } from "@/lib/utils"
 import {
   Table,
