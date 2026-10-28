@@ -1,194 +1,101 @@
-# Turborepo starter
+# nextjs-monorepo-starter
 
-This Turborepo starter is maintained by the Turborepo core team.
+Monorepo Turborepo + pnpm untuk starter backoffice. Saat ini hanya `apps/frontend` (Next.js) yang berisi kode; semua halaman memakai data contoh frontend-only tanpa API atau database.
 
-## Product requirements
+## Spesifikasi produk
 
-The product specification is split by stage: [Stage 1 frontend](apps/frontend/prd.md), [Stage 2 mobile](apps/mobile/prd.md), and [Stage 3 backend](apps/backend/prd.md). Stages 2 and 3 are roadmaps until explicitly requested.
+Spesifikasi dibagi per tahap:
 
-## Using this example
+- [PRD Tahap 1 — frontend](apps/frontend/prd.md): spesifikasi yang disetujui untuk `app-monorepo-starter`. Dokumen ini menjelaskan arsitektur target dan milestone, bukan fitur yang sudah tersedia.
+- [PRD Tahap 2 — mobile](apps/mobile/prd.md) dan [PRD Tahap 3 — backend](apps/backend/prd.md): masih roadmap, belum diimplementasikan.
 
-Run the following command:
+Panduan untuk agen AI ada di [AGENTS.md](AGENTS.md) (`CLAUDE.md` merupakan symlink ke file ini), dengan rules area di [.agents/rules/](.agents/rules/).
 
-```sh
-npx create-turbo@latest
-```
+## Isi repositori
 
-## What's inside?
+| Workspace                    | Isi                                                                                  |
+| ---------------------------- | ------------------------------------------------------------------------------------ |
+| `apps/frontend`              | Aplikasi Next.js (`frontend`), berjalan di port 3000                                 |
+| `apps/mobile`                | Hanya `prd.md` (Tahap 2)                                                             |
+| `apps/backend`               | Hanya `prd.md` (Tahap 3)                                                             |
+| `packages/eslint-config`     | Konfigurasi ESLint bersama (`@repo/eslint-config`), termasuk plugin Next.js/Prettier |
+| `packages/typescript-config` | `tsconfig` bersama (`@repo/typescript-config`)                                       |
 
-### Backoffice app shell
+Stack utama: Next.js 16, React 19, Tailwind CSS v4, shadcn/ui (Base UI), Zod 4, TanStack Table v9, TypeScript 7, ESLint 10, dan Prettier.
 
-[Backoffice layout](<./apps/frontend/src/app/(backoffice)/layout.tsx>) renders the shared sidebar and [AppHeader](./apps/frontend/src/components/layout/app-sidebar-header.tsx) for every backoffice route. Use [PageHeading](./apps/frontend/src/components/page-heading.tsx) inside each page for its breadcrumb and `<h1>`; pass `parents` for linked ancestors and `children` for optional text or badges below the title.
+## Memulai
 
-To check the shell, run `pnpm --filter frontend dev` and open `/dashboard` in a browser.
-
-### Appearance preferences
-
-Edit [preferences-config.ts](./apps/frontend/src/lib/preferences-config.ts) to set the defaults and two independent flags:
-
-- `showPreferences`: shows or hides the header Preferences button. Hiding it does not disable cookie restoration.
-- `persistToCookie`: saves/restores font, page layout, sidebar style, radius and scale when `true`. When `false`, their saved cookies are ignored and changes last until a full page reload (client-side navigation retains them). Existing cookies are not deleted; enabling the flag again restores valid saved choices. Primary, Sidebar and App Body colors never read or write cookies, regardless of this flag; each reload applies their configured defaults.
-
-For centrally managed appearance, set both flags to `false`, edit `defaults`, and deploy. Users see the new defaults on reload without clearing cookies. The theme toggle remains available and **always** saves its choice independently to `app_theme`; Restore Defaults does not change the theme.
-
-The menu offers:
-
-- Fonts: Geist, Inter, Nunito, Roboto, DM Sans, Poppins and Raleway.
-- Page Layout: Centered / Full Width; Sidebar Style: Sidebar / Inset / Floating.
-- Primary Color: Blue, Indigo, Violet, Emerald, Teal, Orange, Rose and Neutral, using Tailwind 600 for filled controls in both modes. Standalone links and status text use a paired 700 shade in light mode and 300 shade in dark mode for readability. Chart palettes stay unchanged.
-- Sidebar Color: the same eight color names as Primary Color plus White and Gray, selected independently, using shade 800 in both light and dark modes. White uses dark text in light mode and a dark neutral surface in dark mode. Old `default`/`primary` cookies fall back to the configured default.
-- App Body Color: the same eight Tailwind 50 colors at 60% background opacity (equivalent to `bg-blue-50/60`). Text and child components remain fully opaque. Dark mode retains the 950 shades. Only the content area's background changes; header, cards, and chart palettes retain their colors.
-- Border Radius: None (`0`), Small (`0.375rem`), Medium (`0.625rem`), Large (`1rem`), applied through shared radius tokens. Circular avatars and explicitly fixed radii retain their shape.
-- Scale: Small (87.5%), Medium (100%), Large (112.5%) of the browser's base font size. This scales text, spacing and components using `rem`; fixed pixel sizes and responsive breakpoints are unchanged.
-
-Navbar behavior stays sticky and sidebar collapse stays icon-only. Defaults are Geist, Full Width, Sidebar, Blue primary, Neutral sidebar, Neutral app body, Medium radius and Medium scale; the initial theme is Light.
-
-Preference cookies last one year from each write. Only the changed persistable preference is written; opening the page does not persist defaults. Restore Defaults resets all eight appearance choices, saving only the five non-color defaults when persistence is enabled. Legacy color cookies are ignored. Invalid cookie values fall back independently to defaults. The old `localStorage.theme` is migrated to the theme cookie once when no theme cookie exists.
-
-The root layout reads cookies for correct initial sidebar rendering, so routes render on demand. A boot script resolves the system theme and legacy theme before hydration. Fonts are served locally through `next/font/local`; the added Latin WOFF2 assets come from Google Fonts, with OFL licenses alongside them in [fonts](./apps/frontend/src/app/fonts/). Only Geist is preloaded; alternative fonts load when used.
-
-After changing preferences, check the controls in a browser across navigation and reload. Follow the cases in [Panduan Preferences](./.agents/rules/frontend/preferences.md).
-
-This Turborepo includes the following packages/apps:
-
-### Apps and Packages
-
-- `frontend`: a [Next.js](https://nextjs.org/) app
-- `@repo/eslint-config`: `eslint` configurations (includes `@next/eslint-plugin-next` and `eslint-config-prettier`)
-- `@repo/typescript-config`: `tsconfig.json`s used throughout the monorepo
-
-Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
-
-### Utilities
-
-This Turborepo has some additional tools already setup for you:
-
-- [TypeScript](https://www.typescriptlang.org/) for static type checking
-- [ESLint](https://eslint.org/) for code linting
-- [Prettier](https://prettier.io) for code formatting
-
-### Build
-
-To build all apps and packages, run the following command:
-
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended):
+Prasyarat: Node.js 24 atau lebih baru dan pnpm 11 (`packageManager: pnpm@11.25.0`).
 
 ```sh
-cd my-turborepo
-turbo build
+pnpm install
+pnpm dev
 ```
 
-Without global `turbo`, use your package manager:
+Buka [http://localhost:3000](http://localhost:3000), lalu `/dashboard` untuk melihat shell backoffice.
 
-```sh
-cd my-turborepo
-npx turbo build
-pnpm exec turbo build
-pnpm exec turbo build
-```
+## Skrip
 
-You can build a specific package by using a [filter](https://turborepo.dev/docs/crafting-your-repository/running-tasks#using-filters):
+Jalankan dari root repositori:
 
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed:
+| Perintah           | Fungsi                                                   |
+| ------------------ | -------------------------------------------------------- |
+| `pnpm dev`         | `turbo run dev` untuk semua aplikasi                     |
+| `pnpm build`       | `turbo run build`                                        |
+| `pnpm lint`        | `turbo run lint` (frontend memakai `--max-warnings 0`)   |
+| `pnpm check-types` | `turbo run check-types` (`next typegen && tsc --noEmit`) |
+| `pnpm format`      | Prettier untuk `**/*.{ts,tsx,md}` — menulis ulang file   |
 
-```sh
-turbo build --filter=frontend
-```
+Untuk frontend saja: `pnpm --filter frontend <dev|build|lint|check-types>`. Test runner, skrip database, dan `pnpm typecheck` masih merupakan target PRD dan belum dikonfigurasi; verifikasi dengan check-types, lint, build, dan pemeriksaan manual di dev server.
 
-Without global `turbo`:
+## Frontend
 
-```sh
-npx turbo build --filter=frontend
-pnpm exec turbo build --filter=frontend
-pnpm exec turbo build --filter=frontend
-```
+### Struktur
 
-### Develop
+- `src/app/` — route, layout, dan Route Handler. `page.tsx` tipis dan merender komponen dari `src/features/`.
+- `src/features/<fitur>/` — UI dan logika khusus fitur, masing-masing dengan lima folder standar `components/`, `hooks/`, `schemas/`, `types/`, `utils/`.
+- `src/components/` — komponen lintas fitur: `ui/` (primitive shadcn), `layout/`, `crud/`, `data-grid/`, `filter/`, `chart/`, `gantt/`.
+- `src/mocks/` — data contoh bertipe (`*.mock.ts`) dan hook mock CRUD berbasis localStorage.
 
-To develop all apps and packages, run the following command:
+Aturan lengkap: [Struktur folder](.agents/rules/frontend/structure-folder.md). Tambahkan primitive shadcn dengan `pnpm dlx shadcn@latest add <nama-komponen>` dari `apps/frontend`.
 
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended):
+### Halaman yang tersedia
 
-```sh
-cd my-turborepo
-turbo dev
-```
+| Grup       | Route                                                                                                                                                                                                             |
+| ---------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Login      | `/login-1` … `/login-5` (pratinjau UI, belum ada autentikasi)                                                                                                                                                     |
+| Dashboard  | `/dashboard/{main,sales,crm,finance,productivity}`, serta aplikasi contoh: AI chat (`float`, `page`, `panel`), calendar, file manager, flow process/structure, invoice, profile, project, receipt, task, timeline |
+| Chart      | `/chart/*` — 21 jenis chart (area, bar, line, pie, sankey, treemap, waterfall, dll.)                                                                                                                              |
+| Table      | `/table/base`, `column`, `scroll`, `drag-and-drop/{row,column}`, `editable/{inline,row,sheet}`, `group/{expansion,section,tree}`                                                                                  |
+| CRUD       | `/crud/{new-page,modal,sheet,panel-inline}` — empat pola CRUD dengan satu sumber data                                                                                                                             |
+| Playground | `/playground/{3d-scenes,invoice,notes,rich-text-editor,wizard}`, `/whiteboard`                                                                                                                                    |
 
-Without global `turbo`, use your package manager:
+Menu navigasi didefinisikan di [app-navigation.tsx](apps/frontend/src/components/layout/app-navigation.tsx) dan pencarian menu di [menu-search-tree.ts](apps/frontend/src/components/layout/menu-search-tree.ts).
 
-```sh
-cd my-turborepo
-npx turbo dev
-pnpm exec turbo dev
-pnpm exec turbo dev
-```
+### Shell backoffice
 
-You can develop a specific package by using a [filter](https://turborepo.dev/docs/crafting-your-repository/running-tasks#using-filters):
+[Layout backoffice](<apps/frontend/src/app/(backoffice)/layout.tsx>) merender sidebar, header, dan pembungkus gaya Multi untuk setiap route backoffice. Setiap halaman memakai [AppBody](apps/frontend/src/components/app-body.tsx) sebagai pembungkus konten dan [PageHeading](apps/frontend/src/components/page-heading.tsx) untuk breadcrumb serta `<h1>` (`parents` untuk induk bertaut, `children` untuk teks/badge di bawah judul).
 
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed:
+### Komponen global
 
-```sh
-turbo dev --filter=frontend
-```
+- **CRUD** — `CrudResource` memilih pola `page`, `dialog`, `sheet`, atau `inline` lewat prop `pattern`; fitur memasok data, kolom, form, dan aksi simpan/hapus. Lihat [Pola halaman CRUD](.agents/rules/frontend/crud-pattern.md).
+- **Data Grid** — `DataGridClient` untuk data lokal dan `DataGridServer` untuk daftar REST (query di URL). Mendukung sort, filter, pin, DnD baris/kolom, inline/sheet editing, grouping, tree, dan virtual scroll. Lihat [Panduan Data Grid](.agents/rules/frontend/data-grid.md).
 
-Without global `turbo`:
+### Preferences tampilan
 
-```sh
-npx turbo dev --filter=frontend
-pnpm exec turbo dev --filter=frontend
-pnpm exec turbo dev --filter=frontend
-```
+Tombol **Preferences** di header membuka popover untuk mengatur Font (Geist, Inter, Nunito, Roboto, DM Sans, Poppins, Raleway), Primary Color, Sidebar Color, Header Color, App Body Color, Page Layout (Centered/Full Width), Sidebar Style (Sidebar, Inset, Floating, Header, Multi), Border Radius, dan Scale. Tombol ikon tema mengganti mode terang/gelap.
 
-### Remote Caching
+Default dan flag diatur di [preferences-config.ts](apps/frontend/src/lib/preferences-config.ts):
 
-> [!TIP]
-> Vercel Remote Cache is free for all plans. Get started today at [vercel.com](https://vercel.com/signup?utm_source=remote-cache-sdk&utm_campaign=free_remote_cache).
+- `showPreferences` — menampilkan/menyembunyikan tombol Preferences.
+- `persistToCookie` — menyimpan font, layout, gaya sidebar, radius, dan scale ke cookie. Keempat warna tidak pernah disimpan; tema selalu disimpan ke cookie `app_theme`.
 
-Turborepo can use a technique known as [Remote Caching](https://turborepo.dev/docs/core-concepts/remote-caching) to share cache artifacts across machines, enabling you to share build caches with your team and CI/CD pipelines.
+Font dilayani lokal melalui `next/font/local` dengan lisensi OFL di [fonts](apps/frontend/src/app/fonts/). Detail perilaku dan kasus verifikasi: [Panduan Preferences](.agents/rules/frontend/preferences.md).
 
-By default, Turborepo will cache locally. To enable Remote Caching you will need an account with Vercel. If you don't have an account you can [create one](https://vercel.com/signup?utm_source=turborepo-examples), then enter the following commands:
+### Data
 
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended):
+Belum ada API atau database. Halaman memakai fixture di `src/mocks/`; contoh CRUD menyimpan perubahan di localStorage dengan validasi Zod di `crud-model.ts`. Ini hanya pratinjau, bukan otorisasi server. Hook mock tersebut nantinya diganti hook TanStack Query dan endpoint terpusat sesuai PRD.
 
-```sh
-cd my-turborepo
-turbo login
-```
+## Turborepo
 
-Without global `turbo`, use your package manager:
-
-```sh
-cd my-turborepo
-npx turbo login
-pnpm exec turbo login
-pnpm exec turbo login
-```
-
-This will authenticate the Turborepo CLI with your [Vercel account](https://vercel.com/docs/concepts/personal-accounts/overview).
-
-Next, you can link your Turborepo to your Remote Cache by running the following command from the root of your Turborepo:
-
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed:
-
-```sh
-turbo link
-```
-
-Without global `turbo`:
-
-```sh
-npx turbo link
-pnpm exec turbo link
-pnpm exec turbo link
-```
-
-## Useful Links
-
-Learn more about the power of Turborepo:
-
-- [Tasks](https://turborepo.dev/docs/crafting-your-repository/running-tasks)
-- [Caching](https://turborepo.dev/docs/crafting-your-repository/caching)
-- [Remote Caching](https://turborepo.dev/docs/core-concepts/remote-caching)
-- [Filtering](https://turborepo.dev/docs/crafting-your-repository/running-tasks#using-filters)
-- [Configuration Options](https://turborepo.dev/docs/reference/configuration)
-- [CLI Usage](https://turborepo.dev/docs/reference/command-line-reference)
+Konfigurasi task ada di [turbo.json](turbo.json) (`build`, `lint`, `check-types` dengan dependensi `^`, dan `dev` persisten tanpa cache). Sebelum mengubah konfigurasi atau perintah Turborepo, baca dokumentasi paket `turbo` yang terpasang (`node_modules/turbo/docs/`). Referensi: [Running tasks](https://turborepo.dev/docs/crafting-your-repository/running-tasks), [Caching](https://turborepo.dev/docs/crafting-your-repository/caching), [Configuration](https://turborepo.dev/docs/reference/configuration).
