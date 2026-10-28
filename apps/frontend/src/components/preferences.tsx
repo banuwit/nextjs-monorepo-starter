@@ -1,18 +1,17 @@
 "use client";
 
-import type { ComponentProps, ReactNode } from "react";
 import { RotateCcwIcon, SlidersHorizontalIcon } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
 import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
+import {
+  Popover,
+  PopoverContent,
+  PopoverDescription,
+  PopoverHeader,
+  PopoverTitle,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import {
   Select,
   SelectContent,
@@ -50,7 +49,7 @@ const groups = [
   {
     key: "sidebarStyle",
     label: "Sidebar Style",
-    labels: ["Sidebar", "Inset", "Floating", "Header"],
+    labels: ["Sidebar", "Inset", "Floating", "Header", "Multi"],
   },
   {
     key: "borderRadius",
@@ -75,9 +74,11 @@ export function PreferencesControls() {
   const { values, setPreference, resetPreferences } = usePreferences();
   return (
     <>
-      <FieldGroup>
-        <Field>
-          <FieldLabel htmlFor="preference-font">Fonts</FieldLabel>
+      <FieldGroup className="gap-3">
+        <Field className="gap-1.5">
+          <FieldLabel htmlFor="preference-font" className="text-xs">
+            Fonts
+          </FieldLabel>
           <Select
             value={values.font}
             items={fontLabels}
@@ -85,7 +86,7 @@ export function PreferencesControls() {
               if (value) setPreference("font", parsePreference("font", value));
             }}
           >
-            <SelectTrigger id="preference-font" className="w-full">
+            <SelectTrigger id="preference-font" size="sm" className="w-full">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -99,75 +100,86 @@ export function PreferencesControls() {
             </SelectContent>
           </Select>
         </Field>
-        {colorGroups.map(({ key, label }) => (
-          <Field key={key}>
-            <FieldLabel htmlFor={`preference-${key}`}>{label}</FieldLabel>
-            <Select
-              value={values[key]}
-              items={Object.fromEntries(
-                PREFERENCE_OPTIONS[key].map((color) => [
-                  color,
-                  SIDEBAR_COLORS[color].label,
-                ]),
-              )}
-              onValueChange={(value) => {
-                if (value) setPreference(key, parsePreference(key, value));
-              }}
-            >
-              <SelectTrigger id={`preference-${key}`} className="w-full">
-                <span
-                  aria-hidden="true"
-                  className="size-3 shrink-0 rounded-full border border-foreground/20"
-                  style={{
-                    backgroundColor:
-                      key === "appBodyColor"
-                        ? appBodyLightColor(
-                            parsePreference("appBodyColor", values[key]),
-                          )
-                        : key === "primaryColor"
-                          ? PRIMARY_COLORS[
-                              parsePreference("primaryColor", values[key])
-                            ].color
-                          : SIDEBAR_COLORS[values[key]].light,
-                  }}
-                />
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectGroup>
-                  {PREFERENCE_OPTIONS[key].map((color) => (
-                    <SelectItem key={color} value={color}>
-                      <span
-                        aria-hidden="true"
-                        className="size-3 shrink-0 rounded-full border border-foreground/20"
-                        style={{
-                          backgroundColor:
-                            key === "appBodyColor"
-                              ? appBodyLightColor(
-                                  parsePreference("appBodyColor", color),
-                                )
-                              : key === "primaryColor"
-                                ? PRIMARY_COLORS[
-                                    parsePreference("primaryColor", color)
-                                  ].color
-                                : SIDEBAR_COLORS[color].light,
-                        }}
-                      />
-                      {SIDEBAR_COLORS[color].label}
-                    </SelectItem>
-                  ))}
-                </SelectGroup>
-              </SelectContent>
-            </Select>
-          </Field>
-        ))}
+        <div className="grid grid-cols-2 gap-3">
+          {colorGroups.map(({ key, label }) => (
+            <Field key={key} className="gap-1.5">
+              <FieldLabel htmlFor={`preference-${key}`} className="text-xs">
+                {label}
+              </FieldLabel>
+              <Select
+                value={values[key]}
+                items={Object.fromEntries(
+                  PREFERENCE_OPTIONS[key].map((color) => [
+                    color,
+                    SIDEBAR_COLORS[color].label,
+                  ]),
+                )}
+                onValueChange={(value) => {
+                  if (value) setPreference(key, parsePreference(key, value));
+                }}
+              >
+                <SelectTrigger
+                  id={`preference-${key}`}
+                  size="sm"
+                  className="w-full"
+                >
+                  <span
+                    aria-hidden="true"
+                    className="size-3 shrink-0 rounded-full border border-foreground/20"
+                    style={{
+                      backgroundColor:
+                        key === "appBodyColor"
+                          ? appBodyLightColor(
+                              parsePreference("appBodyColor", values[key]),
+                            )
+                          : key === "primaryColor"
+                            ? PRIMARY_COLORS[
+                                parsePreference("primaryColor", values[key])
+                              ].color
+                            : SIDEBAR_COLORS[values[key]].light,
+                    }}
+                  />
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectGroup>
+                    {PREFERENCE_OPTIONS[key].map((color) => (
+                      <SelectItem key={color} value={color}>
+                        <span
+                          aria-hidden="true"
+                          className="size-3 shrink-0 rounded-full border border-foreground/20"
+                          style={{
+                            backgroundColor:
+                              key === "appBodyColor"
+                                ? appBodyLightColor(
+                                    parsePreference("appBodyColor", color),
+                                  )
+                                : key === "primaryColor"
+                                  ? PRIMARY_COLORS[
+                                      parsePreference("primaryColor", color)
+                                    ].color
+                                  : SIDEBAR_COLORS[color].light,
+                          }}
+                        />
+                        {SIDEBAR_COLORS[color].label}
+                      </SelectItem>
+                    ))}
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
+            </Field>
+          ))}
+        </div>
         {groups.map(({ key, label, labels }) => (
-          <Field key={key}>
-            <FieldLabel id={`preference-${key}`}>{label}</FieldLabel>
+          <Field key={key} className="gap-1.5">
+            <FieldLabel id={`preference-${key}`} className="text-xs">
+              {label}
+            </FieldLabel>
             <ToggleGroup
               aria-labelledby={`preference-${key}`}
               value={[values[key]]}
               variant="outline"
+              size="sm"
               spacing={0}
               className="w-full"
               onValueChange={(selected) => {
@@ -176,7 +188,11 @@ export function PreferencesControls() {
               }}
             >
               {PREFERENCE_OPTIONS[key].map((value, index) => (
-                <ToggleGroupItem key={value} value={value} className="flex-1">
+                <ToggleGroupItem
+                  key={value}
+                  value={value}
+                  className="flex-1 text-xs"
+                >
                   {labels[index]}
                 </ToggleGroupItem>
               ))}
@@ -184,7 +200,7 @@ export function PreferencesControls() {
           </Field>
         ))}
       </FieldGroup>
-      <Button variant="outline" onClick={resetPreferences}>
+      <Button variant="outline" size="sm" onClick={resetPreferences}>
         <RotateCcwIcon data-icon="inline-start" />
         Restore Defaults
       </Button>
@@ -192,36 +208,35 @@ export function PreferencesControls() {
   );
 }
 
-export function PreferencesDialog({
-  children,
-  ...props
-}: ComponentProps<typeof Dialog> & { children?: ReactNode }) {
+export function PreferencesMenu() {
   if (!PREFERENCES_CONFIG.showPreferences) return null;
 
   return (
-    <Dialog {...props}>
-      {children}
-      <DialogContent className="max-h-[calc(100svh-2rem)] overflow-y-auto sm:max-w-2xl">
-        <DialogHeader>
-          <DialogTitle>Preferences</DialogTitle>
-          <DialogDescription>
-            Customize your dashboard appearance.
-          </DialogDescription>
-        </DialogHeader>
-        <PreferencesControls />
-      </DialogContent>
-    </Dialog>
-  );
-}
-
-export function PreferencesMenu() {
-  return (
-    <PreferencesDialog>
-      <DialogTrigger
-        render={<Button variant="ghost" size="icon" aria-label="Preferences" />}
+    <Popover>
+      <PopoverTrigger
+        render={
+          <Button
+            variant="ghost"
+            size="icon"
+            aria-label="Preferences"
+            title="Preferences"
+          />
+        }
       >
         <SlidersHorizontalIcon />
-      </DialogTrigger>
-    </PreferencesDialog>
+      </PopoverTrigger>
+      <PopoverContent
+        align="end"
+        className="max-h-(--available-height) w-[min(22rem,calc(100vw-1rem))] gap-3 overflow-y-auto p-4"
+      >
+        <PopoverHeader>
+          <PopoverTitle>Preferences</PopoverTitle>
+          <PopoverDescription className="text-xs">
+            Customize your dashboard appearance.
+          </PopoverDescription>
+        </PopoverHeader>
+        <PreferencesControls />
+      </PopoverContent>
+    </Popover>
   );
 }

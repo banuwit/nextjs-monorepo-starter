@@ -36,8 +36,10 @@ export function TeamSwitcherProvider({ children }: { children: React.ReactNode }
 
 export function TeamSwitcher({
   placement = "sidebar",
+  showLogo = true,
 }: {
   placement?: "sidebar" | "header";
+  showLogo?: boolean;
 }) {
   const { isMobile } = useSidebar();
   const team = React.useContext(TeamContext);
@@ -62,15 +64,17 @@ export function TeamSwitcher({
               />
             }
           >
-            <span
-              className={`flex size-8 items-center justify-center rounded-lg ${
-                inHeader
-                  ? "bg-primary text-primary-foreground"
-                  : "bg-sidebar-primary text-sidebar-primary-foreground"
-              }`}
-            >
-              <GalleryVerticalEndIcon className="size-4" />
-            </span>
+            {showLogo && (
+              <span
+                className={`flex size-8 items-center justify-center rounded-lg ${
+                  inHeader
+                    ? "bg-primary text-primary-foreground"
+                    : "bg-sidebar-primary text-sidebar-primary-foreground"
+                }`}
+              >
+                <GalleryVerticalEndIcon className="size-4" />
+              </span>
+            )}
             <span className="grid min-w-0 flex-1 text-left text-sm leading-tight group-data-[collapsible=icon]:hidden">
               <span className="truncate font-medium">WIT. Indonesia</span>
               <span className="truncate text-xs">{activeTeam}</span>

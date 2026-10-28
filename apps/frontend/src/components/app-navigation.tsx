@@ -4,11 +4,13 @@ import type { ReactNode } from "react";
 import {
   ActivityIcon,
   BlocksIcon,
+  BookOpenIcon,
   BoxIcon,
   CalendarDaysIcon,
   ChartColumnIcon,
   ChartNoAxesCombinedIcon,
   FilePenLineIcon,
+  FlaskConicalIcon,
   GitBranchIcon,
   BanknoteIcon,
   FolderKanbanIcon,
@@ -18,6 +20,7 @@ import {
   LockKeyholeIcon,
   NotebookPenIcon,
   NetworkIcon,
+  PanelsTopLeftIcon,
   PresentationIcon,
   ReceiptIcon,
   ReceiptTextIcon,
@@ -37,12 +40,14 @@ export type NavigationItem = {
 
 export type NavigationSection = {
   title: string;
+  icon?: ReactNode;
   items: NavigationItem[];
 };
 
 export const mainNavigation: NavigationSection[] = [
   {
     title: "Page",
+    icon: <PanelsTopLeftIcon />,
     items: [
       {
         title: "Dashboard",
@@ -124,6 +129,7 @@ export const mainNavigation: NavigationSection[] = [
   },
   {
     title: "Playground",
+    icon: <FlaskConicalIcon />,
     items: [
       {
         title: "Wizard",
@@ -170,6 +176,7 @@ export function useAppNavigation(): NavigationSection[] {
     ...mainNavigation,
     {
       title: "Documentation",
+      icon: <BookOpenIcon />,
       items: [
         {
           title: "CRUD",

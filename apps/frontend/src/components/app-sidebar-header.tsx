@@ -4,6 +4,7 @@ import { MoonIcon, SunIcon } from "lucide-react";
 
 import { MenuSearch } from "@/components/menu-search";
 import { NavUser } from "@/components/nav-user";
+import { PreferencesMenu } from "@/components/preferences";
 import { Button } from "@/components/ui/button";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { profile } from "@/mocks/profile.mock";
@@ -26,6 +27,7 @@ export function AppHeaderActions({
   return (
     <div className="ml-auto flex items-center gap-1 sm:gap-2">
       {showSearch && <MenuSearch iconOnly={searchIconOnly} />}
+      <PreferencesMenu />
       <Button
         variant="ghost"
         size="icon"

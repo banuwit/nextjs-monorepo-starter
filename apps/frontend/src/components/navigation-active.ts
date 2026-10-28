@@ -1,4 +1,7 @@
-import type { NavigationItem } from "@/components/app-navigation";
+import type {
+  NavigationItem,
+  NavigationSection,
+} from "@/components/app-navigation";
 
 export function isNavigationItemActive(
   item: NavigationItem,
@@ -12,5 +15,16 @@ export function isNavigationItemActive(
   return (
     item.url.startsWith("/") &&
     (currentPath === item.url || currentPath.startsWith(`${item.url}/`))
+  );
+}
+
+export function findActiveNavigationSection(
+  sections: NavigationSection[],
+  pathname: string,
+): NavigationSection | undefined {
+  return (
+    sections.find((section) =>
+      section.items.some((item) => isNavigationItemActive(item, pathname)),
+    ) ?? sections[0]
   );
 }

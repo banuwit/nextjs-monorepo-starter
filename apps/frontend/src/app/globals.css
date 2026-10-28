@@ -206,7 +206,8 @@
 }
 
 [data-slot="app-header"],
-[data-slot="app-header-menubar"] {
+[data-slot="app-header-menubar"],
+[data-slot="app-multi-sidebar-panel"] {
   border-color: color-mix(in oklab, var(--card-foreground) 10%, var(--card));
 }
 
@@ -286,6 +287,58 @@
 [data-sidebar-style="inset"] [data-slot="sidebar-wrapper"],
 .dark[data-sidebar-style="inset"] [data-slot="sidebar-wrapper"] {
   background-color: var(--sidebar);
+}
+
+/* Multi: rail dan bingkai memakai Sidebar Color; header + panel + konten dalam kartu inset */
+[data-sidebar-style="multi"] [data-slot="sidebar-wrapper"],
+.dark[data-sidebar-style="multi"] [data-slot="sidebar-wrapper"] {
+  background-color: var(--sidebar);
+}
+
+@media (min-width: 48rem) {
+  [data-sidebar-style="multi"] [data-slot="sidebar"]:not([data-mobile="true"]) {
+    display: none;
+  }
+
+  [data-sidebar-style="multi"] [data-slot="sidebar-inset"] {
+    margin: 0.5rem 0.5rem 0.5rem 0;
+    overflow: clip;
+    border: 1px solid var(--sidebar-border);
+    border-radius: calc(var(--radius) + 0.25rem);
+    box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  }
+}
+
+/* Layer 2 gaya Multi mengikuti Header Color; token sidebar diturunkan dari permukaan header */
+[data-slot="app-multi-sidebar-panel"] {
+  --header-surface: var(--app-header-light, #fff);
+  --sidebar: var(--header-surface);
+  --sidebar-foreground: #171717;
+  --sidebar-primary: var(--sidebar-foreground);
+  --sidebar-primary-foreground: var(--sidebar);
+  --sidebar-accent: color-mix(
+    in srgb,
+    var(--sidebar) 88%,
+    var(--sidebar-foreground)
+  );
+  --sidebar-accent-foreground: var(--sidebar-foreground);
+  --sidebar-border: color-mix(
+    in srgb,
+    var(--sidebar) 78%,
+    var(--sidebar-foreground)
+  );
+  --sidebar-ring: var(--sidebar-foreground);
+  background-color: var(--sidebar);
+  color: var(--sidebar-foreground);
+}
+
+.dark [data-slot="app-multi-sidebar-panel"] {
+  --header-surface: var(--app-header-dark, #0a0a0a);
+  --sidebar-foreground: #fff;
+}
+
+[data-header-color]:not([data-header-color="white"]) [data-slot="app-multi-sidebar-panel"] {
+  --sidebar-foreground: #fff;
 }
 
 [data-slot="app-body"],

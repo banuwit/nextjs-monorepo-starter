@@ -19,7 +19,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
     <Sidebar
       variant={
-        values.sidebarStyle === "header" ? "sidebar" : values.sidebarStyle
+        values.sidebarStyle === "header" || values.sidebarStyle === "multi"
+          ? "sidebar"
+          : values.sidebarStyle
       }
       collapsible="icon"
       {...props}

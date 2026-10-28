@@ -1,11 +1,9 @@
 "use client";
 
-import { useState } from "react";
 import Link from "next/link";
 
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { PreferencesDialog } from "@/components/preferences";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -15,24 +13,19 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import {
-  KeyRound,
-  LogOutIcon,
-  SlidersHorizontalIcon,
-  User,
-} from "lucide-react";
-
-import { PREFERENCES_CONFIG } from "@/lib/preferences-config";
+import { KeyRound, LogOutIcon, User } from "lucide-react";
 
 export function NavUser({
   user,
+  placement = "header",
 }: {
   user: {
     name: string;
     email: string;
   };
+  placement?: "header" | "rail";
 }) {
-  const [preferencesOpen, setPreferencesOpen] = useState(false);
+  const inRail = placement === "rail";
   const initials = user.name
     .trim()
     .split(/\s+/)
@@ -42,14 +35,17 @@ export function NavUser({
     .toUpperCase();
 
   return (
-    <>
     <DropdownMenu>
       <DropdownMenuTrigger
         render={
           <Button
             variant="ghost"
             size="sm"
-            className="h-9 gap-2 px-1.5"
+            className={
+              inRail
+                ? "size-9 p-0 hover:bg-sidebar-accent aria-expanded:bg-sidebar-accent"
+                : "h-9 gap-2 px-1.5"
+            }
             aria-label={`Account menu for ${user.name}`}
           />
         }
@@ -57,11 +53,13 @@ export function NavUser({
         <Avatar size="sm">
           <AvatarFallback>{initials}</AvatarFallback>
         </Avatar>
-        <span className="hidden max-w-28 truncate sm:block">{user.name}</span>
+        {!inRail && (
+          <span className="hidden max-w-28 truncate sm:block">{user.name}</span>
+        )}
       </DropdownMenuTrigger>
       <DropdownMenuContent
         className="w-fit"
-        side="bottom"
+        side={inRail ? "right" : "bottom"}
         align="end"
         sideOffset={4}
       >
@@ -77,15 +75,6 @@ export function NavUser({
               </div>
             </div>
           </DropdownMenuLabel>
-        </DropdownMenuGroup>
-        <DropdownMenuSeparator />
-        <DropdownMenuGroup>
-          {PREFERENCES_CONFIG.showPreferences && (
-            <DropdownMenuItem onClick={() => setPreferencesOpen(true)}>
-              <SlidersHorizontalIcon />
-              Preferences
-            </DropdownMenuItem>
-          )}
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
@@ -108,10 +97,5 @@ export function NavUser({
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
-    <PreferencesDialog
-      open={preferencesOpen}
-      onOpenChange={setPreferencesOpen}
-    />
-    </>
   );
 }
