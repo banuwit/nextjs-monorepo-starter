@@ -1,82 +1,51 @@
-import { addDays, format, parseISO } from "date-fns";
-import type { Invoice, InvoiceClient } from "../features/invoice/types/invoice";
+import type { Invoice } from "../features/invoice/types/invoice";
 
-const defaultInvoiceValues: Invoice = {
-  referenceNumber: "FL-0425",
-  issuedDate: "2026-10-17",
-  paymentDueDate: "2026-10-31",
+export const invoiceExample: Invoice = {
+  reference: "INV-2026-024",
+  issuedDate: "2026-10-28",
+  dueDate: "2026-11-11",
+  currency: "IDR",
   from: {
-    name: "Weblabs Studio",
-    email: "hello@weblabs.studio",
-    phone: "+1-512-555-0184",
-    website: "weblabs.studio",
-    addressLines: ["214 Pixel Avenue", "Austin, TX 78701"],
-    taxId: "WS-1029384756",
-    paymentAccountName: "Mercury Business",
-    routingNumber: "084009519",
-    issuerName: "Arham Khan",
+    name: "Forma Studio",
+    email: "hello@forma.example",
+    address: "Jl. Cihampelas No. 18\nBandung, Jawa Barat 40131",
+    taxId: "",
   },
   to: {
-    id: "aiy-cap",
-    name: "AIY Cap",
-    email: "finance@aiycap.com",
-    addressLines: [
-      "One BKC, Bandra Kurla Complex",
-      "Mumbai, Maharashtra 400051",
-    ],
-    taxId: "GSTIN-27AAICA9102K1Z7",
+    name: "Nusa Creative",
+    email: "finance@nusa.example",
+    address: "Jl. Kemang Raya No. 42\nJakarta Selatan 12730",
+    taxId: "",
   },
-  taxId: "vat",
-  discountType: "fixed",
-  discountValue: 40,
   items: [
     {
-      id: "hosting",
-      description: "Cloud hosting services",
+      id: "brand",
+      description: "Brand identity exploration",
       quantity: 1,
-      unitPrice: 3500,
+      unit: "project",
+      rate: 4500000,
     },
     {
-      id: "analytics",
-      description: "Data analytics report",
-      quantity: 2,
-      unitPrice: 750,
+      id: "design",
+      description: "Website design & art direction",
+      quantity: 5,
+      unit: "pages",
+      rate: 850000,
     },
     {
-      id: "support",
-      description: "Technical support retainer",
+      id: "handoff",
+      description: "Design system & developer handoff",
       quantity: 1,
-      unitPrice: 400,
+      unit: "package",
+      rate: 1750000,
     },
   ],
+  discountType: "percent",
+  discountValue: 5,
+  taxRate: 0,
+  bank: "Bank Central Asia",
+  accountName: "Forma Studio",
+  accountNumber: "123 456 7890",
+  notes:
+    "Thank you for creating with us. Please include the invoice number in your payment reference.",
 };
-
-export const invoiceClients: InvoiceClient[] = [
-  {
-    id: "bright-enterprises",
-    name: "Bright Enterprises",
-    email: "billing@brightenterprises.com",
-    addressLines: [
-      "450 Park Avenue South",
-      "New York, NY 10016",
-      "United States",
-    ],
-    taxId: "US-EIN-84-2938475",
-  },
-  defaultInvoiceValues.to,
-  {
-    id: "northline-gmbh",
-    name: "Northline GmbH",
-    email: "ap@northline.de",
-    addressLines: ["Kastanienallee 32", "10435 Berlin", "Germany"],
-    taxId: "DE-VAT-219384756",
-  },
-];
-
-export function createDemoInvoice(today: string): Invoice {
-  return {
-    ...structuredClone(defaultInvoiceValues),
-    issuedDate: today,
-    paymentDueDate: format(addDays(parseISO(today), 14), "yyyy-MM-dd"),
-  };
-}

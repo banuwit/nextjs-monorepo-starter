@@ -1,48 +1,50 @@
-import type { Invoice, InvoiceLineItem } from "../types/invoice";
-
-export const invoiceTaxOptions = [
-  { id: "gst", name: "GST", rate: 18 },
-  { id: "vat", name: "VAT", rate: 12 },
-  { id: "service-tax", name: "Service Tax", rate: 10 },
-  { id: "none", name: "No Tax", rate: 0 },
-] as const;
-
-const cents = (value: number) => Math.round((value + Number.EPSILON) * 100);
-
-const nonnegative = (value: number) =>
-  Number.isFinite(value) ? Math.max(0, value) : 0;
-
-export function getLineAmount(item: InvoiceLineItem) {
-  return cents(nonnegative(item.quantity) * nonnegative(item.unitPrice)) / 100;
-}
+import type { Invoice } from "../types/invoice";
 
 export function calculateInvoice(invoice: Invoice) {
-  const subtotal = invoice.items.reduce(
-    (sum, item) => sum + cents(getLineAmount(item)),
-    0,
+  const factor = invoice.currency === "IDR" ? 1 : 100;
+  const safe = (n: number) => (Number.isFinite(n) ? Math.max(0, n) : 0);
+  const round = (value: number) =>
+    Math.round(value + Math.max(1, Math.abs(value)) * Number.EPSILON);
+  const amounts = invoice.items.map((item) =>
+    round(safe(item.quantity) * safe(item.rate) * factor),
   );
-  const value = nonnegative(invoice.discountValue);
+  const subtotal = amounts.reduce((sum, value) => sum + value, 0);
   const discount = Math.min(
     subtotal,
-    invoice.discountType === "percent"
-      ? Math.round((subtotal * value) / 100)
-      : cents(value),
+    round(
+      invoice.discountType === "percent"
+        ? (subtotal * safe(invoice.discountValue)) / 100
+        : safe(invoice.discountValue) * factor,
+    ),
   );
-  const rate =
-    invoiceTaxOptions.find((option) => option.id === invoice.taxId)?.rate ?? 0;
-  const tax = Math.round(((subtotal - discount) * rate) / 100);
+  const tax = round(((subtotal - discount) * safe(invoice.taxRate)) / 100);
   return {
-    subtotal: subtotal / 100,
-    discount: discount / 100,
-    tax: tax / 100,
-    total: (subtotal - discount + tax) / 100,
+    lines: amounts.map((amount) => amount / factor),
+    subtotal: subtotal / factor,
+    discount: discount / factor,
+    tax: tax / factor,
+    total: (subtotal - discount + tax) / factor,
   };
 }
 
-const currency = new Intl.NumberFormat("en-US", {
-  style: "currency",
-  currency: "USD",
-});
+export function formatMoney(
+  value: number,
+  currency: Invoice["currency"],
+  maximumFractionDigits = currency === "IDR" ? 0 : 2,
+) {
+  return new Intl.NumberFormat(currency === "IDR" ? "id-ID" : "en-US", {
+    style: "currency",
+    currency,
+    minimumFractionDigits: currency === "IDR" ? 0 : 2,
+    maximumFractionDigits,
+  }).format(value);
+}
 
-export const formatInvoiceCurrency = (value: number) =>
-  currency.format(nonnegative(value));
+export function invoiceFilename(reference: string) {
+  const safe = reference
+    .trim()
+    .replace(/[^a-zA-Z0-9_-]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 60);
+  return `invoice-${safe || "draft"}.pdf`;
+}

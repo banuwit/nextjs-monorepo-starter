@@ -1,113 +1,206 @@
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { DownloadIcon, PrinterIcon } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { ButtonGroup } from "@/components/ui/button-group";
+import Image from "next/image";
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import type { Invoice } from "../types/invoice";
-import { InvoicePaper } from "./invoice-paper";
+  ChevronLeftIcon,
+  ChevronRightIcon,
+  DownloadIcon,
+  LoaderCircleIcon,
+  PrinterIcon,
+  RefreshCwIcon,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import type { useInvoiceExport } from "../hooks/use-invoice-export";
 
-export function InvoicePreview({ invoice }: { invoice: Invoice }) {
-  const container = useRef<HTMLDivElement>(null);
-  const paper = useRef<HTMLDivElement>(null);
-  const [layout, setLayout] = useState({ scale: 0, height: 1056 });
-  const [pdfOpen, setPdfOpen] = useState(false);
+export function InvoicePreview({
+  output,
+  onValidate,
+}: {
+  output: ReturnType<typeof useInvoiceExport>;
+  onValidate: () => void;
+}) {
+  const printRoot = useRef<HTMLDivElement>(null);
+  const [printing, setPrinting] = useState(false);
+  const [printError, setPrintError] = useState("");
+  const [pageIndex, setPageIndex] = useState(0);
+  const pages = output.file?.pages ?? [];
+  const selectedIndex = Math.min(pageIndex, Math.max(0, pages.length - 1));
+  const page = pages[selectedIndex];
 
-  useEffect(() => {
-    const observer = new ResizeObserver(() => {
-      if (!container.current || !paper.current) return;
-      setLayout({
-        scale: Math.min(
-          0.6,
-          Math.max(0, container.current.clientWidth - 32) / 816,
+  async function print() {
+    if (!output.ready) return;
+    setPrinting(true);
+    setPrintError("");
+    try {
+      await Promise.all(
+        Array.from(printRoot.current?.querySelectorAll("img") ?? []).map(
+          (img) => img.decode(),
         ),
-        height: paper.current.offsetHeight,
-      });
-    });
-    if (container.current) observer.observe(container.current);
-    if (paper.current) observer.observe(paper.current);
-    return () => observer.disconnect();
-  }, []);
+      );
+      window.print();
+    } catch {
+      setPrintError(
+        "Printing could not start. Download the PDF and print it from your PDF reader.",
+      );
+    } finally {
+      setPrinting(false);
+    }
+  }
 
   return (
-    <section
-      className="flex min-w-0 flex-col overflow-hidden rounded-xl border bg-card"
-      aria-label="Invoice preview"
-    >
-      <div className="flex flex-wrap items-center justify-between gap-3 p-4">
-        <h2 className="text-lg font-medium">Preview</h2>
-        <ButtonGroup aria-label="Export invoice">
-          <Button
-            type="button"
-            variant="outline"
-            onClick={() => window.print()}
-          >
-            <PrinterIcon data-icon="inline-start" />
-            Print
-          </Button>
-          <Dialog open={pdfOpen} onOpenChange={setPdfOpen}>
-            <DialogTrigger render={<Button type="button" variant="outline" />}>
-              <DownloadIcon data-icon="inline-start" />
-              Download PDF
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Save invoice as PDF</DialogTitle>
-                <DialogDescription>
-                  In the print dialog, choose “Save as PDF” as the destination.
-                  Use Letter paper, no margins, and turn off headers and footers
-                  for the best result.
-                </DialogDescription>
-              </DialogHeader>
-              <DialogFooter>
-                <Button
-                  onClick={() => {
-                    setPdfOpen(false);
-                    window.print();
-                  }}
-                >
-                  Open print dialog
-                </Button>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
-        </ButtonGroup>
-      </div>
-      <div
-        ref={container}
-        className="grid min-w-0 flex-1 place-items-center bg-stone-200 px-4 py-10 dark:bg-stone-800"
+    <>
+      <section
+        aria-label="Invoice preview"
+        className="min-w-0 self-start overflow-hidden rounded-xl border border-border bg-card text-card-foreground @min-[900px]/main:sticky @min-[900px]/main:top-28"
       >
-        <div
-          style={{
-            width: 816 * layout.scale,
-            height: layout.height * layout.scale,
-          }}
-          className="relative"
-        >
-          <div
-            ref={paper}
-            className="absolute left-0 top-0 w-[816px] origin-top-left"
-            style={{ transform: `scale(${layout.scale})` }}
-          >
-            <InvoicePaper invoice={invoice} />
+        <header className="flex flex-wrap items-center justify-between gap-3 border-b px-4 py-3">
+          <div>
+            <h2 className="text-sm font-medium">Print preview</h2>
+            <p className="mt-0.5 text-xs text-muted-foreground">
+              A4 · Fits the entire page
+            </p>
           </div>
+          <div className="flex gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              disabled={!output.ready || printing}
+              onClick={() => void print()}
+            >
+              <PrinterIcon />
+              Print
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              disabled={output.busy}
+              onClick={onValidate}
+            >
+              <DownloadIcon />
+              PDF
+            </Button>
+          </div>
+        </header>
+        <div
+          data-invoice-preview-stage
+          aria-busy={output.busy}
+          className="relative flex h-[clamp(16rem,calc(100dvh-18rem),50rem)] items-center justify-center overflow-hidden bg-muted/60 p-4 sm:p-6"
+        >
+          {page ? (
+            <figure className="contents">
+              <Image
+                unoptimized
+                src={page.image}
+                width={page.width}
+                height={page.height}
+                alt={`Invoice page ${selectedIndex + 1} of ${pages.length}`}
+                className="h-auto max-h-full w-auto max-w-full object-contain shadow-sm"
+                loading="eager"
+              />
+              <figcaption className="sr-only">{page.text}</figcaption>
+            </figure>
+          ) : (
+            <div className="flex flex-col items-center gap-3 text-sm text-muted-foreground">
+              {output.busy && (
+                <LoaderCircleIcon className="size-5 animate-spin" />
+              )}
+              {output.error
+                ? "Preview unavailable."
+                : output.valid
+                  ? "Preparing your preview…"
+                  : "Complete the required details to see your preview."}
+            </div>
+          )}
+          {(output.busy || !output.valid || output.error) && page && (
+            <div
+              className="absolute inset-x-3 bottom-3 rounded-lg border bg-card/95 px-3 py-2 text-center text-xs text-muted-foreground"
+              role="status"
+            >
+              {output.busy
+                ? "Updating preview…"
+                : output.error
+                  ? "Preview could not update."
+                  : "Complete the required details to update this preview."}
+            </div>
+          )}
+          {output.error && (
+            <Button
+              type="button"
+              variant="outline"
+              onClick={output.retry}
+              className="absolute bottom-14"
+            >
+              <RefreshCwIcon />
+              Try again
+            </Button>
+          )}
         </div>
-      </div>
-      {typeof document !== "undefined" &&
+        <footer className="flex items-center justify-between gap-2 border-t px-4 py-3">
+          <span className="text-xs text-muted-foreground" role="status">
+            {pages.length
+              ? `Page ${selectedIndex + 1} of ${pages.length}`
+              : "Preparing document"}
+          </span>
+          <nav
+            aria-label="Preview pagination"
+            className="flex items-center gap-2"
+          >
+            <Button
+              type="button"
+              variant="outline"
+              size="icon-sm"
+              aria-label="Previous invoice page"
+              disabled={selectedIndex === 0 || output.busy}
+              onClick={() => setPageIndex(selectedIndex - 1)}
+            >
+              <ChevronLeftIcon />
+            </Button>
+            <span
+              className="min-w-8 text-center text-xs tabular-nums"
+              aria-hidden="true"
+            >
+              {pages.length ? `${selectedIndex + 1} / ${pages.length}` : "—"}
+            </span>
+            <Button
+              type="button"
+              variant="outline"
+              size="icon-sm"
+              aria-label="Next invoice page"
+              disabled={selectedIndex >= pages.length - 1 || output.busy}
+              onClick={() => setPageIndex(selectedIndex + 1)}
+            >
+              <ChevronRightIcon />
+            </Button>
+          </nav>
+        </footer>
+        {printError && (
+          <p role="alert" className="border-t p-3 text-xs text-destructive">
+            {printError}
+          </p>
+        )}
+      </section>
+      {output.ready &&
+        output.file &&
         createPortal(
-          <div data-invoice-print-root aria-hidden="true">
-            <InvoicePaper invoice={invoice} />
+          <div
+            ref={printRoot}
+            data-playground-invoice-print-root
+            aria-hidden="true"
+          >
+            {pages.map((page, index) => (
+              <Image
+                key={index}
+                unoptimized
+                src={page.image}
+                width={page.width}
+                height={page.height}
+                alt=""
+                loading="eager"
+              />
+            ))}
           </div>,
           document.body,
         )}
-    </section>
+    </>
   );
 }

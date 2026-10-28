@@ -3,9 +3,10 @@
 import type { ReactNode } from "react";
 import {
   ActivityIcon,
-  ChartAreaIcon,
   BlocksIcon,
+  BoxIcon,
   CalendarDaysIcon,
+  ChartColumnIcon,
   ChartNoAxesCombinedIcon,
   FilePenLineIcon,
   GitBranchIcon,
@@ -19,9 +20,11 @@ import {
   NetworkIcon,
   PresentationIcon,
   ReceiptIcon,
-  ServerIcon,
+  ReceiptTextIcon,
   ShoppingBagIcon,
+  SparklesIcon,
   Table2Icon,
+  WandSparklesIcon,
   WorkflowIcon,
 } from "lucide-react";
 
@@ -47,17 +50,20 @@ export const mainNavigation: NavigationSection[] = [
         icon: <HouseIcon />,
         items: [
           { title: "Main", url: "/dashboard/main", icon: <HouseIcon /> },
-          { title: "Sales", url: "/dashboard/sales", icon: <ShoppingBagIcon /> },
-          { title: "Finance", url: "/dashboard/finance", icon: <BanknoteIcon /> },
+          {
+            title: "Sales",
+            url: "/dashboard/sales",
+            icon: <ShoppingBagIcon />,
+          },
+          {
+            title: "Finance",
+            url: "/dashboard/finance",
+            icon: <BanknoteIcon />,
+          },
           {
             title: "CRM",
             url: "/dashboard/crm",
             icon: <ChartNoAxesCombinedIcon />,
-          },
-          {
-            title: "Analytic",
-            url: "/dashboard/analytic",
-            icon: <ChartAreaIcon />,
           },
           {
             title: "Productivity",
@@ -71,11 +77,20 @@ export const mainNavigation: NavigationSection[] = [
         url: "#",
         icon: <LockKeyholeIcon />,
         items: [
-          { title: "Login 1", url: "/login" },
           { title: "Login 2", url: "/login-2" },
           { title: "Login 3", url: "/login-3" },
           { title: "Login 4", url: "/login-4" },
           { title: "Login 5", url: "/login-5" },
+        ],
+      },
+      {
+        title: "AI Chat",
+        url: "#",
+        icon: <SparklesIcon />,
+        items: [
+          { title: "Page", url: "/dashboard/ai-chat/page" },
+          { title: "Sidebar", url: "/dashboard/ai-chat/sidebar" },
+          { title: "Float", url: "/dashboard/ai-chat/float" },
         ],
       },
       {
@@ -85,21 +100,16 @@ export const mainNavigation: NavigationSection[] = [
       },
       { title: "Task", url: "/dashboard/task", icon: <ListTodoIcon /> },
       {
-        title: "Calendar",
-        url: "/dashboard/calendar",
-        icon: <CalendarDaysIcon />,
-      },
-      { title: "Invoice", url: "/dashboard/invoice", icon: <ReceiptIcon /> },
-      {
         title: "File Manager",
         url: "/dashboard/file-manager",
         icon: <FolderOpenIcon />,
       },
       {
-        title: "Infrastructure",
-        url: "/dashboard/infrastructure",
-        icon: <ServerIcon />,
+        title: "Calendar",
+        url: "/dashboard/calendar",
+        icon: <CalendarDaysIcon />,
       },
+      { title: "Receipt", url: "/dashboard/receipt", icon: <ReceiptTextIcon /> },
       {
         title: "Workflow",
         url: "/dashboard/timeline-workflow",
@@ -115,6 +125,12 @@ export const mainNavigation: NavigationSection[] = [
   {
     title: "Playground",
     items: [
+      {
+        title: "Wizard",
+        url: "/playground/wizard",
+        icon: <WandSparklesIcon />,
+      },
+      { title: "Invoice", url: "/playground/invoice", icon: <ReceiptIcon /> },
       {
         title: "Rich Text Editor",
         url: "/playground/rich-text-editor",
@@ -139,6 +155,11 @@ export const mainNavigation: NavigationSection[] = [
         title: "Process",
         url: "/dashboard/flow-process",
         icon: <GitBranchIcon />,
+      },
+      {
+        title: "3D Scenes",
+        url: "/playground/3d-scenes",
+        icon: <BoxIcon />,
       },
     ],
   },
@@ -183,7 +204,10 @@ export function useAppNavigation(): NavigationSection[] {
               url: "#",
               items: [
                 { title: "Drag & Drop Row", url: "/table/drag-and-drop/row" },
-                { title: "Drag & Drop Column", url: "/table/drag-and-drop/column" },
+                {
+                  title: "Drag & Drop Column",
+                  url: "/table/drag-and-drop/column",
+                },
               ],
             },
             {
@@ -195,6 +219,29 @@ export function useAppNavigation(): NavigationSection[] {
                 { title: "Editable Sheet", url: "/table/editable/sheet" },
               ],
             },
+          ],
+        },
+        {
+          title: "Chart",
+          url: "#",
+          icon: <ChartColumnIcon />,
+          items: [
+            { title: "Area", url: "/chart/area" },
+            { title: "Bar", url: "/chart/bar" },
+            { title: "Composed", url: "/chart/composed" },
+            { title: "Funnel", url: "/chart/funnel" },
+            { title: "Gauge", url: "/chart/gauge" },
+            { title: "Line", url: "/chart/line" },
+            { title: "Pie", url: "/chart/pie" },
+            { title: "Radar", url: "/chart/radar" },
+            { title: "Radial", url: "/chart/radial" },
+            { title: "Sankey", url: "/chart/sankey" },
+            { title: "Scatter", url: "/chart/scatter" },
+            { title: "Slope", url: "/chart/slope" },
+            { title: "Sparkline", url: "/chart/sparkline" },
+            { title: "Status Tracker", url: "/chart/status-tracker" },
+            { title: "Treemap", url: "/chart/treemap" },
+            { title: "Waterfall", url: "/chart/waterfall" },
           ],
         },
       ],

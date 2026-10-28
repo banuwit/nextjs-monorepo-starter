@@ -1,7 +1,7 @@
 import { cn } from "@/lib/utils";
 import { AuthPreviewAction } from "./auth-preview-action";
 
-// Google mark reused from auth-1; its MIT notice remains in ../auth-1/LICENSE.
+// Google mark from Studio Admin; see ../LICENSE for its MIT notice.
 function GoogleIcon() {
   return (
     <svg

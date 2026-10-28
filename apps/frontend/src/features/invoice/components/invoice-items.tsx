@@ -1,235 +1,235 @@
-import { useId } from "react";
+import { PlusIcon, Trash2Icon } from "lucide-react";
 import {
-  DndContext,
-  KeyboardSensor,
-  PointerSensor,
-  closestCenter,
-  useSensor,
-  useSensors,
-} from "@dnd-kit/core";
+  DataGridRowDnd,
+  DataGridRowDragHandle,
+  DataGridSortableRow,
+} from "@/components/data-grid/data-grid-row-dnd";
+import { reorderDataGridItems } from "@/components/data-grid/data-grid-reordering";
 import {
-  SortableContext,
-  arrayMove,
-  sortableKeyboardCoordinates,
-  useSortable,
-  verticalListSortingStrategy,
-} from "@dnd-kit/sortable";
-import { GripVerticalIcon, PlusIcon, Trash2Icon } from "lucide-react";
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import {
-  Empty,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyTitle,
-} from "@/components/ui/empty";
-import { cn } from "@/lib/utils";
-import { formatInvoiceCurrency, getLineAmount } from "../utils/invoice";
-import type { InvoiceLineItem } from "../types/invoice";
+import { Textarea } from "@/components/ui/textarea";
+import type { Invoice, InvoiceErrors } from "../types/invoice";
+import { calculateInvoice, formatMoney } from "../utils/invoice";
 
 export function InvoiceItems({
-  items,
+  invoice,
+  errors,
   onChange,
 }: {
-  items: InvoiceLineItem[];
-  onChange: (items: InvoiceLineItem[]) => void;
+  invoice: Invoice;
+  errors: InvoiceErrors;
+  onChange: (items: Invoice["items"]) => void;
 }) {
-  const id = useId();
-  const sensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
-    useSensor(KeyboardSensor, {
-      coordinateGetter: sortableKeyboardCoordinates,
-    }),
-  );
+  const totals = calculateInvoice(invoice);
+  function update(id: string, patch: Partial<Invoice["items"][number]>) {
+    onChange(
+      invoice.items.map((item) =>
+        item.id === id ? { ...item, ...patch } : item,
+      ),
+    );
+  }
   return (
-    <section className="@container/items flex flex-col gap-4">
-      <div className="flex items-center justify-between gap-3">
-        <h2 className="font-medium tracking-tight">Invoice Items</h2>
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          disabled={items.length >= 100}
-          onClick={() =>
-            onChange([
-              ...items,
-              {
-                id: crypto.randomUUID(),
-                description: "",
-                quantity: 1,
-                unitPrice: 0,
-              },
-            ])
-          }
+    <section
+      aria-labelledby="items-heading"
+      className="@container/items px-5 py-6 sm:px-7"
+    >
+      <div className="mb-5 flex items-center justify-between gap-3">
+        <div>
+          <h2 id="items-heading" className="font-medium">
+            Items & services
+          </h2>
+          <p className="mt-1 text-xs text-muted-foreground">
+            A clear breakdown of the work you are billing for.
+          </p>
+        </div>
+        <span className="shrink-0 rounded-md bg-muted px-2 py-1 text-xs text-muted-foreground">
+          {invoice.items.length} items
+        </span>
+      </div>
+      <DataGridRowDnd
+        items={invoice.items.map((item) => item.id)}
+        onReorder={(activeId, overId) =>
+          onChange(
+            reorderDataGridItems(
+              invoice.items,
+              activeId,
+              overId,
+              (item) => item.id,
+            ),
+          )
+        }
+      >
+        <Table
+          aria-label="Invoice items"
+          className="min-w-[36rem] table-fixed"
+          containerProps={{
+            className: "rounded-lg border",
+            tabIndex: 0,
+            role: "region",
+            "aria-label": "Scrollable invoice items",
+          }}
         >
-          <PlusIcon data-icon="inline-start" />
-          Add Item
-        </Button>
-      </div>
-      <div
-        className="hidden grid-cols-[24px_minmax(0,1fr)_56px_88px_96px_32px] items-center gap-2 text-xs text-muted-foreground @min-[560px]/items:grid"
-        aria-hidden="true"
-      >
-        <span />
-        <span>Description</span>
-        <span>Units</span>
-        <span>Unit cost</span>
-        <span className="text-right">Line Total</span>
-        <span />
-      </div>
-      <DndContext
-        id={id}
-        sensors={sensors}
-        collisionDetection={closestCenter}
-        onDragEnd={({ active, over }) => {
-          if (over && active.id !== over.id) {
-            const from = items.findIndex((item) => item.id === active.id);
-            const to = items.findIndex((item) => item.id === over.id);
-            if (from >= 0 && to >= 0) onChange(arrayMove(items, from, to));
-          }
-        }}
-      >
-        <SortableContext items={items} strategy={verticalListSortingStrategy}>
-          <div className="flex flex-col gap-3">
-            {items.map((item, index) => (
-              <InvoiceItemRow
-                key={item.id}
-                item={item}
-                index={index}
-                onChange={(patch) =>
-                  onChange(
-                    items.map((row) =>
-                      row.id === item.id ? { ...row, ...patch } : row,
-                    ),
-                  )
-                }
-                onRemove={() =>
-                  onChange(items.filter((row) => row.id !== item.id))
-                }
-              />
+          <TableCaption className="sr-only">
+            Invoice items. Drag a row handle to reorder, or press Space, use the
+            arrow keys, and press Space to drop.
+          </TableCaption>
+          <TableHeader className="bg-muted/50 [&_th]:h-8 [&_th]:px-1.5 [&_th]:text-xs">
+            <TableRow>
+              <TableHead className="w-8">
+                <span className="sr-only">Reorder</span>
+              </TableHead>
+              <TableHead>Description</TableHead>
+              <TableHead className="w-14">Qty</TableHead>
+              <TableHead className="w-20">Unit</TableHead>
+              <TableHead className="w-28">Unit price</TableHead>
+              <TableHead className="w-24 text-right">Amount</TableHead>
+              <TableHead className="w-8">
+                <span className="sr-only">Actions</span>
+              </TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {invoice.items.map((item, index) => (
+              <DataGridSortableRow key={item.id} id={item.id}>
+                <TableCell className="p-1.5 align-top">
+                  <DataGridRowDragHandle label={`Reorder item ${index + 1}`} />
+                </TableCell>
+                {(["description", "quantity", "unit", "rate"] as const).map(
+                  (key) => {
+                    const id = `items.${index}.${key}`;
+                    const error = errors[id];
+                    const numeric = key === "quantity" || key === "rate";
+                    const label = {
+                      description: "Description",
+                      quantity: "Quantity",
+                      unit: "Unit",
+                      rate: "Unit price",
+                    }[key];
+                    const attrs = {
+                      id,
+                      "aria-label": `Item ${index + 1} ${label.toLowerCase()}`,
+                      "aria-invalid": !!error,
+                      "aria-describedby": error ? `${id}-error` : undefined,
+                    };
+                    return (
+                      <TableCell
+                        key={key}
+                        className="p-1.5 align-top whitespace-normal"
+                      >
+                        {key === "description" ? (
+                          <Textarea
+                            {...attrs}
+                            maxLength={500}
+                            value={item.description}
+                            rows={1}
+                            className="min-h-8 resize-y px-2 py-1 text-xs md:text-xs"
+                            placeholder="Describe your service or product"
+                            onChange={(e) =>
+                              update(item.id, { description: e.target.value })
+                            }
+                          />
+                        ) : (
+                          <Input
+                            {...attrs}
+                            className="h-8 px-2 text-xs md:text-xs"
+                            type={numeric ? "number" : "text"}
+                            min={numeric ? 0 : undefined}
+                            step={numeric ? "any" : undefined}
+                            maxLength={key === "unit" ? 20 : undefined}
+                            value={
+                              numeric && !Number.isFinite(item[key])
+                                ? ""
+                                : item[key]
+                            }
+                            onChange={(e) =>
+                              update(item.id, {
+                                [key]: numeric
+                                  ? e.target.valueAsNumber
+                                  : e.target.value,
+                              })
+                            }
+                          />
+                        )}
+                        {error && (
+                          <p
+                            id={`${id}-error`}
+                            className="mt-1 text-xs text-destructive"
+                          >
+                            {error}
+                          </p>
+                        )}
+                      </TableCell>
+                    );
+                  },
+                )}
+                <TableCell className="px-1.5 py-3 text-right align-top text-xs font-medium tabular-nums">
+                  {Number.isFinite(item.quantity) && Number.isFinite(item.rate)
+                    ? formatMoney(totals.lines[index] ?? 0, invoice.currency)
+                    : "—"}
+                </TableCell>
+                <TableCell className="p-1.5 align-top">
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon-sm"
+                    className="text-muted-foreground hover:text-destructive"
+                    aria-label={`Remove item ${index + 1}`}
+                    onClick={() =>
+                      onChange(
+                        invoice.items.filter((entry) => entry.id !== item.id),
+                      )
+                    }
+                  >
+                    <Trash2Icon />
+                  </Button>
+                </TableCell>
+              </DataGridSortableRow>
             ))}
-          </div>
-        </SortableContext>
-      </DndContext>
-      {!items.length && (
-        <Empty className="border border-dashed">
-          <EmptyHeader>
-            <EmptyTitle>No invoice items</EmptyTitle>
-            <EmptyDescription>
-              Add an item to start building this invoice.
-            </EmptyDescription>
-          </EmptyHeader>
-        </Empty>
+          </TableBody>
+        </Table>
+      </DataGridRowDnd>
+      <p className="mt-2 text-xs text-muted-foreground">
+        Drag the handle to reorder items. Use Space and the arrow keys with a
+        keyboard.
+      </p>
+      {!invoice.items.length && (
+        <p className="py-6 text-sm text-muted-foreground">
+          Add your first item to start this invoice.
+        </p>
+      )}
+      <Button
+        id="items"
+        type="button"
+        variant="outline"
+        className="mt-2 h-10 border-dashed"
+        disabled={invoice.items.length >= 100}
+        onClick={() =>
+          onChange([
+            ...invoice.items,
+            {
+              id: crypto.randomUUID(),
+              description: "",
+              quantity: 1,
+              unit: "item",
+              rate: 0,
+            },
+          ])
+        }
+      >
+        <PlusIcon /> Add item
+      </Button>
+      {errors.items && (
+        <p className="mt-2 text-xs text-destructive">{errors.items}</p>
       )}
     </section>
-  );
-}
-
-function InvoiceItemRow({
-  item,
-  index,
-  onChange,
-  onRemove,
-}: {
-  item: InvoiceLineItem;
-  index: number;
-  onChange: (patch: Partial<InvoiceLineItem>) => void;
-  onRemove: () => void;
-}) {
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    setActivatorNodeRef,
-    transform,
-    transition,
-    isDragging,
-  } = useSortable({ id: item.id });
-  return (
-    <div
-      ref={setNodeRef}
-      style={{
-        transform: transform
-          ? `translate3d(0, ${transform.y}px, 0)`
-          : undefined,
-        transition,
-      }}
-      className={cn(
-        "grid min-w-0 grid-cols-[24px_minmax(0,1fr)_minmax(0,1fr)_32px] items-center gap-2 rounded-lg @min-[560px]/items:grid-cols-[24px_minmax(0,1fr)_56px_88px_96px_32px]",
-        isDragging && "relative opacity-50",
-      )}
-    >
-      <Button
-        ref={setActivatorNodeRef}
-        type="button"
-        variant="ghost"
-        size="icon-sm"
-        className="-ml-1 touch-none cursor-grab active:cursor-grabbing"
-        {...attributes}
-        {...listeners}
-        aria-label={`Reorder item ${index + 1}`}
-      >
-        <GripVerticalIcon />
-      </Button>
-      <Input
-        className="col-span-3 min-w-0 @min-[560px]/items:col-span-1"
-        aria-label={`Item ${index + 1} description`}
-        placeholder="Item description"
-        maxLength={300}
-        value={item.description}
-        onChange={(event) => onChange({ description: event.target.value })}
-      />
-      <Input
-        type="number"
-        min="0"
-        max="1000000"
-        step="1"
-        className="col-start-2 @min-[560px]/items:col-start-auto"
-        aria-label={`Item ${index + 1} quantity`}
-        value={item.quantity}
-        onChange={(event) =>
-          onChange({
-            quantity: Math.min(
-              1_000_000,
-              Math.max(0, Number(event.target.value)),
-            ),
-          })
-        }
-      />
-      <Input
-        type="number"
-        min="0"
-        max="1000000"
-        step="0.01"
-        aria-label={`Item ${index + 1} unit price`}
-        value={item.unitPrice}
-        onChange={(event) =>
-          onChange({
-            unitPrice: Math.min(
-              1_000_000,
-              Math.max(0, Number(event.target.value)),
-            ),
-          })
-        }
-      />
-      <div className="col-span-3 col-start-2 row-start-3 flex min-w-0 justify-between gap-2 text-sm font-medium @min-[560px]/items:col-span-1 @min-[560px]/items:col-start-auto @min-[560px]/items:row-start-auto @min-[560px]/items:justify-end">
-        <span className="text-muted-foreground @min-[560px]/items:hidden">
-          Line total
-        </span>
-        <span className="break-all tabular-nums">
-          {formatInvoiceCurrency(getLineAmount(item))}
-        </span>
-      </div>
-      <Button
-        type="button"
-        variant="ghost"
-        size="icon-sm"
-        className="col-start-4 row-start-2 @min-[560px]/items:col-start-auto @min-[560px]/items:row-start-auto"
-        aria-label={`Remove item ${index + 1}`}
-        onClick={onRemove}
-      >
-        <Trash2Icon />
-      </Button>
-    </div>
   );
 }

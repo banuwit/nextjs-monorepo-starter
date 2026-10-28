@@ -337,8 +337,45 @@ html[data-scale="large"] {
   }
 }
 
-[data-invoice-print-root] {
+[data-playground-invoice-print-root] {
   display: none;
+}
+
+@media print {
+  @page playground-invoice {
+    size: A4;
+    margin: 0;
+  }
+
+  body:has([data-playground-invoice-print-root]) {
+    margin: 0 !important;
+    padding: 0 !important;
+    background: white !important;
+  }
+
+  body:has([data-playground-invoice-print-root]) > :not([data-playground-invoice-print-root]) {
+    display: none !important;
+  }
+
+  [data-playground-invoice-print-root] {
+    display: block;
+    color-scheme: light;
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+
+  [data-playground-invoice-print-root] img {
+    page: playground-invoice;
+    display: block;
+    width: 210mm;
+    height: 297mm;
+    break-after: page;
+    break-inside: avoid;
+  }
+
+  [data-playground-invoice-print-root] img:last-child {
+    break-after: auto;
+  }
 }
 
 .rich-text-editor,
@@ -398,29 +435,43 @@ html[data-scale="large"] {
 .rich-text-prose p.is-editor-empty:first-child::before { content: attr(data-placeholder); color: var(--muted-foreground); float: left; height: 0; pointer-events: none; }
 
 @media print {
-  @page invoice {
-    size: letter;
-    margin: 0;
+  @page receipt {
+    size: A4;
+    margin: 12mm;
   }
 
-  body:has([data-invoice-print-root]) {
-    background: white;
-  }
-
-  body:has([data-invoice-print-root]) > :not([data-invoice-print-root]) {
+  /* Keep the receipt and its ancestor path; remove dashboard chrome and dialogs. */
+  body:has([data-receipt-paper]) *:not(:has([data-receipt-paper])):not([data-receipt-paper]):not([data-receipt-paper] *) {
     display: none !important;
   }
 
-  [data-invoice-print-root] {
-    display: block;
-    color-scheme: light;
+  body:has([data-receipt-paper]),
+  body:has([data-receipt-paper]) *:has([data-receipt-paper]) {
+    display: block !important;
+    position: static !important;
+    width: auto !important;
+    max-width: none !important;
+    min-height: 0 !important;
+    height: auto !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: white !important;
+    box-shadow: none !important;
+  }
+
+  [data-receipt-paper] {
+    page: receipt;
+    --card: white;
+    --card-foreground: black;
+    --foreground: black;
+    --muted-foreground: #444;
+    --border: #aaa;
+    max-width: 26rem;
+    margin-inline: auto;
+    box-shadow: none;
+    break-inside: avoid;
     print-color-adjust: exact;
     -webkit-print-color-adjust: exact;
   }
 
-  [data-invoice-print-root] [data-invoice-paper] {
-    page: invoice;
-    width: 100% !important;
-    min-height: 11in !important;
-  }
 }
