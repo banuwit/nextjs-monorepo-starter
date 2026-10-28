@@ -49,7 +49,7 @@ import {
   composerFiles,
   connectedApps,
 } from "@/mocks/ai-chat.mock";
-import { ChatComposer } from "../../components/chat-composer";
+import { ChatComposer } from "./chat-composer";
 import { useConnectedAppsChat } from "../hooks/use-connected-apps-chat";
 import { AppLogo } from "./app-logo";
 import { RunPanel } from "./run-panel";

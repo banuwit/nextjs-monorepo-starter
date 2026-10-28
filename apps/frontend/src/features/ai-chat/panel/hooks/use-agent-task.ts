@@ -10,7 +10,7 @@ import {
   agentSources,
   aiChatModels,
 } from "@/mocks/ai-chat.mock";
-import { useChatThread } from "../../hooks/use-chat-thread";
+import { useChatThread } from "./use-chat-thread";
 import type {
   AgentFile,
   AgentMessageMeta,

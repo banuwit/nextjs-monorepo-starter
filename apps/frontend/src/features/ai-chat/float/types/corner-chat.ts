@@ -1,4 +1,4 @@
-import type { ChatMessage } from "../../types/ai-chat";
+import type { ChatMessage } from "./chat";
 
 export type PageSource = {
   id: string;

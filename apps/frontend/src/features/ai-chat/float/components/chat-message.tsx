@@ -9,7 +9,7 @@ import {
   MessageFooter,
 } from "@/components/ui/message";
 import { Spinner } from "@/components/ui/spinner";
-import type { ChatMessage } from "../types/ai-chat";
+import type { ChatMessage } from "../types/chat";
 
 export function AssistantAvatar({ className }: { className?: string }) {
   return (

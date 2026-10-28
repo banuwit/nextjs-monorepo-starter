@@ -95,7 +95,7 @@ const mainNavigation: NavigationSection[] = [
         icon: <SparklesIcon />,
         items: [
           { title: "Page", url: "/dashboard/ai-chat/page" },
-          { title: "Sidebar", url: "/dashboard/ai-chat/sidebar" },
+          { title: "Panel", url: "/dashboard/ai-chat/panel" },
           { title: "Float", url: "/dashboard/ai-chat/float" },
         ],
       },

@@ -1,4 +1,4 @@
-import type { ChatOption } from "@/features/ai-chat/types/ai-chat";
+import type { ChatOption } from "@/features/ai-chat/panel/types/chat";
 import type {
   CornerChatThread,
   PageSource,
@@ -16,7 +16,7 @@ import type {
   AgentSource,
   ForkChoice,
   PlanStep,
-} from "@/features/ai-chat/sidebar/types/agent-task";
+} from "@/features/ai-chat/panel/types/agent-task";
 
 export const aiChatModels: ChatOption[] = [
   { value: "claude-opus-5-5", label: "Claude Opus 5.5" },
@@ -108,7 +108,7 @@ export const composerFiles: ComposerFile[] = [
   { id: "notes", name: "notulen-14-okt.docx", size: "88 KB" },
 ];
 
-// Sidebar · Agentic Task Panel
+// Panel · Agentic Task Panel
 
 export const agentSources: AgentSource[] = [
   { id: "crm", name: "CRM Pipeline", kind: "Database", access: "read" },

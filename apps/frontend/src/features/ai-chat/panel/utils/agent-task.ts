@@ -2,7 +2,7 @@ import {
   agentCostPerThousandTokens,
   agentPlanSteps,
 } from "@/mocks/ai-chat.mock";
-import type { ChatMessage } from "../../types/ai-chat";
+import type { ChatMessage } from "../types/chat";
 import type {
   AgentMessageMeta,
   AgentPhase,

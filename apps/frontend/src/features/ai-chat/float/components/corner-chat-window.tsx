@@ -45,9 +45,9 @@ import { Marker, MarkerContent, MarkerIcon } from "@/components/ui/marker";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { cn } from "@/lib/utils";
 import { cornerPageSource, cornerStarters } from "@/mocks/ai-chat.mock";
-import { ChatComposer } from "../../components/chat-composer";
-import { ChatMessageItem } from "../../components/chat-message";
-import { ChatThread, ChatThreadItem } from "../../components/chat-thread";
+import { ChatComposer } from "./chat-composer";
+import { ChatMessageItem } from "./chat-message";
+import { ChatThread, ChatThreadItem } from "./chat-thread";
 import type { CornerChat, CornerChatTab } from "../hooks/use-corner-chat";
 import { CornerChatHistory } from "./corner-chat-history";
 

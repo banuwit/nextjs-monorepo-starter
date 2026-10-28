@@ -26,10 +26,7 @@ import {
 import { Spinner } from "@/components/ui/spinner";
 import { Trace, TraceIcon, TraceLine, TraceTitle } from "@/components/ui/trace";
 import { aiChatModels } from "@/mocks/ai-chat.mock";
-import {
-  AssistantAvatar,
-  ThinkingIndicator,
-} from "../../components/chat-message";
+import { AssistantAvatar, ThinkingIndicator } from "./chat-message";
 import type { ConnectedRun } from "../types/connected-apps";
 import { getApp, getMode } from "../utils/connected-apps";
 import { AppLogo } from "./app-logo";
