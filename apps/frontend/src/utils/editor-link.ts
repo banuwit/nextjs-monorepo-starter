@@ -5,7 +5,7 @@ export function normalizeEditorLink(value: string): string | null {
     const url = new URL(
       /^[a-z][a-z\d+.-]*:/i.test(input) ? input : `https://${input}`,
     );
-    return ["https:", "http:", "mailto:"].includes(url.protocol)
+    return ["https:", "http:", "mailto:", "tel:"].includes(url.protocol)
       ? url.href
       : null;
   } catch {

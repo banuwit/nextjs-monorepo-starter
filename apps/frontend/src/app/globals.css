@@ -470,12 +470,6 @@ html[data-scale="large"] {
   outline: none;
 }
 
-.rich-text-prose:focus-visible {
-  border-radius: var(--radius);
-  outline: 2px solid var(--ring);
-  outline-offset: 8px;
-}
-
 .rich-text-prose > * + * { margin-top: 1rem; }
 .rich-text-prose h1 { font-size: 1.5rem; font-weight: 650; line-height: 1.4; }
 .rich-text-prose h2 { margin-top: 1.8rem; font-size: 1.125rem; font-weight: 600; line-height: 1.5; }
@@ -497,7 +491,12 @@ html[data-scale="large"] {
 .rich-text-prose li[data-type="taskItem"] { display: flex; align-items: flex-start; gap: 0.65rem; }
 .rich-text-prose li[data-type="taskItem"] > label { display: flex; padding-top: 0.4rem; }
 .rich-text-prose li[data-type="taskItem"] > div { flex: 1; min-width: 0; }
-.rich-text-prose input[type="checkbox"] { width: 1rem; height: 1rem; accent-color: var(--primary); cursor: pointer; }
+.rich-text-prose input[type="checkbox"] { appearance: none; display: grid; place-content: center; width: 1rem; height: 1rem; margin: 0; border: 1px solid var(--input); border-radius: 4px; background: transparent; cursor: pointer; transition: background-color 150ms, border-color 150ms; }
+.dark .rich-text-prose input[type="checkbox"] { background: color-mix(in oklab, var(--input) 30%, transparent); }
+.rich-text-prose input[type="checkbox"]::before { content: ""; width: 0.75rem; height: 0.75rem; background: var(--primary-foreground); mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 6 9 17l-5-5'/%3E%3C/svg%3E") center / contain no-repeat; transform: scale(0); }
+.rich-text-prose input[type="checkbox"]:checked { border-color: var(--primary); background: var(--primary); }
+.rich-text-prose input[type="checkbox"]:checked::before { transform: scale(1); }
+.rich-text-prose input[type="checkbox"]:focus-visible { border-color: var(--ring); outline: 3px solid color-mix(in oklab, var(--ring) 50%, transparent); }
 .rich-text-prose[contenteditable="false"] input[type="checkbox"] { pointer-events: none; }
 .rich-text-prose li[data-checked="true"] > div > p { color: var(--muted-foreground); text-decoration: line-through; }
 .rich-text-prose p.is-editor-empty:first-child::before { content: attr(data-placeholder); color: var(--muted-foreground); float: left; height: 0; pointer-events: none; }

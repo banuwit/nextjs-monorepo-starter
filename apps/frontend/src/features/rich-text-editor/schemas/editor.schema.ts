@@ -4,7 +4,7 @@ import Highlight from "@tiptap/extension-highlight";
 import { TaskItem, TaskList } from "@tiptap/extension-list";
 import TextAlign from "@tiptap/extension-text-align";
 import { Placeholder } from "@tiptap/extensions";
-import { normalizeEditorLink } from "../utils/editor-link";
+import { normalizeEditorLink } from "@/utils/editor-link";
 
 export const editorExtensions = [
   StarterKit.configure({

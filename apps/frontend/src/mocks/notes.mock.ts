@@ -1,10 +1,10 @@
 import type { Note, Person } from "../features/notes/types/notes";
 
 export const notePeople: Person[] = [
-  { id: "daniel", label: "Daniel Okafor" },
-  { id: "sofia", label: "Sofia Chen" },
-  { id: "marcus", label: "Marcus Reed" },
-  { id: "priya", label: "Priya Sharma" },
+  { id: "daniel", label: "Daniel Okafor", role: "Support lead" },
+  { id: "sofia", label: "Sofia Chen", role: "Incident manager" },
+  { id: "marcus", label: "Marcus Reed", role: "Site reliability" },
+  { id: "priya", label: "Priya Sharma", role: "Customer success" },
 ];
 const text = (value: string) => ({ type: "text", text: value });
 const paragraph = (value: string) => ({
@@ -33,7 +33,14 @@ export const exampleNote: Note = {
           text(
             "How Loomwell support hands a customer problem to engineering without losing context. ",
           ),
-          { type: "mention", attrs: { id: "daniel", label: "Daniel Okafor" } },
+          {
+            type: "mention",
+            attrs: {
+              id: "daniel",
+              label: "Daniel Okafor",
+              role: "Support lead",
+            },
+          },
           text(" owns this page; propose edits in "),
           { ...text("#support-ops"), marks: [{ type: "code" }] },
           text("."),

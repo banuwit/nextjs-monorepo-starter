@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { Extension, Node, mergeAttributes, type Editor } from "@tiptap/react";
 import {
   NodeViewWrapper,
@@ -27,7 +28,14 @@ export function scrollToHeading(editor: Editor, index: number) {
   heading?.scrollIntoView({ block: "center", behavior: "instant" });
 }
 
-export function NoteOutline({ editor }: { editor: Editor }) {
+export function NoteOutline({
+  editor,
+  active,
+}: {
+  editor: Editor;
+  /** Index of the heading currently in view. */
+  active?: number;
+}) {
   const headings = useEditorState({
     editor,
     selector: ({ editor }) => getOutline(editor.getJSON()),
@@ -45,7 +53,8 @@ export function NoteOutline({ editor }: { editor: Editor }) {
         <button
           key={index}
           type="button"
-          className="w-full rounded text-left hover:text-foreground focus-visible:outline-2 focus-visible:outline-ring"
+          aria-current={index === active ? "location" : undefined}
+          className="w-full rounded text-left hover:text-foreground focus-visible:outline-2 focus-visible:outline-ring aria-[current=location]:font-medium aria-[current=location]:text-foreground"
           style={{ paddingInlineStart: (heading.level - 1) * 16 }}
           onClick={() => scrollToHeading(editor, index)}
         >
@@ -53,6 +62,60 @@ export function NoteOutline({ editor }: { editor: Editor }) {
         </button>
       ))}
     </nav>
+  );
+}
+
+// The heading nearest the top of the viewport, across any scroll container.
+function useActiveHeading(editor: Editor, count: number) {
+  const [active, setActive] = useState(0);
+  useEffect(() => {
+    function update() {
+      let index = 0;
+      editor.view.dom.querySelectorAll("h1, h2, h3").forEach((heading, i) => {
+        if (heading.getBoundingClientRect().top < window.innerHeight * 0.3)
+          index = i;
+      });
+      setActive(index);
+    }
+    const frame = requestAnimationFrame(update);
+    document.addEventListener("scroll", update, {
+      capture: true,
+      passive: true,
+    });
+    return () => {
+      cancelAnimationFrame(frame);
+      document.removeEventListener("scroll", update, { capture: true });
+    };
+  }, [editor, count]);
+  return active;
+}
+
+export function NoteOutlineRail({ editor }: { editor: Editor }) {
+  const levels = useEditorState({
+    editor,
+    selector: ({ editor }) =>
+      getOutline(editor.getJSON())
+        .map((heading) => heading.level)
+        .join(),
+  });
+  const ticks = levels ? levels.split(",") : [];
+  const active = useActiveHeading(editor, ticks.length);
+  if (!ticks.length) return null;
+  return (
+    <aside className="notes-outline-rail" aria-label="Page outline">
+      <div className="notes-outline-ticks" aria-hidden="true">
+        {ticks.map((level, index) => (
+          <span
+            key={index}
+            data-level={level}
+            data-active={index === active || undefined}
+          />
+        ))}
+      </div>
+      <div className="notes-outline-panel">
+        <NoteOutline editor={editor} active={active} />
+      </div>
+    </aside>
   );
 }
 
@@ -147,9 +210,9 @@ export const blockCommands: { label: string; run: (editor: Editor) => void }[] =
   ];
 
 // Tiptap owns positioning and dismissal; keep keyboard selection in the editor.
-function suggestionMenu<Item extends { label: string }>(): NonNullable<
-  SuggestionOptions<Item, Item>["render"]
-> {
+function suggestionMenu<Item extends { label: string }>(
+  decorate?: (item: Item, option: HTMLButtonElement) => void,
+): NonNullable<SuggestionOptions<Item, Item>["render"]> {
   return () => {
     let props: SuggestionProps<Item, Item>;
     let selected = 0;
@@ -168,6 +231,7 @@ function suggestionMenu<Item extends { label: string }>(): NonNullable<
         button.setAttribute("aria-selected", String(index === selected));
         button.className = "note-suggestion-item";
         button.textContent = item.label;
+        decorate?.(item, button);
         button.onmousedown = (event) => {
           event.preventDefault();
         };
@@ -218,6 +282,25 @@ function suggestionMenu<Item extends { label: string }>(): NonNullable<
   };
 }
 
+// Avatar initials and role beside the mention name.
+function decoratePerson(person: Person, option: HTMLButtonElement) {
+  const avatar = document.createElement("span");
+  avatar.className = "note-suggestion-avatar";
+  avatar.setAttribute("aria-hidden", "true");
+  avatar.textContent = person.label
+    .split(" ")
+    .map((part) => part[0])
+    .join("");
+  const name = document.createElement("span");
+  name.className = "note-suggestion-label";
+  name.textContent = person.label;
+  const role = document.createElement("span");
+  role.className = "note-suggestion-description";
+  role.textContent = person.role;
+  option.classList.add("note-suggestion-person");
+  option.replaceChildren(avatar, name, role);
+}
+
 const SlashCommands = Extension.create({
   name: "noteSlashCommands",
   addProseMirrorPlugins() {
@@ -257,7 +340,7 @@ export const noteExtensions = [
     HTMLAttributes: { class: "note-mention" },
     suggestion: {
       items: ({ query }) => filterPeople(notePeople, query),
-      render: suggestionMenu<Person>(),
+      render: suggestionMenu<Person>(decoratePerson),
     },
   }),
   Contents,

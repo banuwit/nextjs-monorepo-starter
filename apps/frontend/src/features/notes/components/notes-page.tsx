@@ -23,6 +23,16 @@ import {
 } from "lucide-react";
 import { AppBody } from "@/components/app-body";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
@@ -45,11 +55,23 @@ import { cn } from "@/lib/utils";
 import { exampleNote, notePeople } from "@/mocks/notes.mock";
 import { noteSchema } from "../schemas/notes.schema";
 import type { Note } from "../types/notes";
-import { blockCommands, noteExtensions, NoteOutline } from "./notes-extensions";
+import {
+  blockCommands,
+  noteExtensions,
+  NoteOutline,
+  NoteOutlineRail,
+} from "./notes-extensions";
 import { NoteFormatting } from "./note-formatting";
 import "./notes.css";
 
 const storageKey = "playground-notes:v1";
+
+const editorAttributes = {
+  class: "notes-prose",
+  role: "textbox",
+  "aria-label": "Note content",
+  "aria-multiline": "true",
+};
 
 export function NotesPage() {
   const [title, setTitle] = useState(exampleNote.title);
@@ -60,17 +82,13 @@ export function NotesPage() {
   const [fullWidth, setFullWidth] = useState(false);
   const [smallText, setSmallText] = useState(false);
   const [locked, setLocked] = useState(false);
+  const [replaceOpen, setReplaceOpen] = useState(false);
   const editor = useEditor({
     extensions: noteExtensions,
     content: exampleNote.content,
     immediatelyRender: false,
     editorProps: {
-      attributes: {
-        class: "notes-prose",
-        role: "textbox",
-        "aria-label": "Note content",
-        "aria-multiline": "true",
-      },
+      attributes: { ...editorAttributes, "aria-readonly": "false" },
     },
     onUpdate: ({ editor }) => {
       if (ready.current)
@@ -152,8 +170,11 @@ export function NotesPage() {
       const link = document.createElement("a");
       link.href = url;
       link.download = raw ? "notes-recovery.json" : "notes.json";
+      // Firefox needs the link in the document; revoke after the download starts.
+      document.body.append(link);
       link.click();
-      URL.revokeObjectURL(url);
+      link.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
     } catch {
       setError(
         "Browser storage is unavailable. You can still export the currently open note.",
@@ -165,15 +186,15 @@ export function NotesPage() {
     <AppBody>
       <section
         aria-label="Notes"
-        className="notes-page min-w-0 flex-1 rounded-xl border bg-background"
+        className="notes-page min-w-0 flex-1 bg-background"
       >
-        <header className="sticky top-12 z-10 flex flex-wrap items-center justify-between gap-3 rounded-t-xl border-b bg-background px-4 py-3">
+        <header className="sticky top-12 z-10 flex flex-wrap items-center justify-between gap-3 bg-background px-4 py-3">
           <div className="min-w-0 flex-1">
             <input
               aria-label="Note title"
               maxLength={200}
               readOnly={locked}
-              className="w-full min-w-0 rounded bg-transparent text-sm font-medium outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              className="w-full min-w-0 bg-transparent text-sm font-medium outline-none"
               value={title}
               onChange={(event) => {
                 setTitle(event.target.value);
@@ -224,6 +245,7 @@ export function NotesPage() {
                     variant="ghost"
                     size="icon-sm"
                     aria-label="Show page outline"
+                    className="lg:hidden"
                   />
                 }
               >
@@ -265,6 +287,14 @@ export function NotesPage() {
                     onCheckedChange={(value) => {
                       setLocked(value);
                       editor?.setEditable(!value);
+                      editor?.setOptions({
+                        editorProps: {
+                          attributes: {
+                            ...editorAttributes,
+                            "aria-readonly": String(value),
+                          },
+                        },
+                      });
                     }}
                   >
                     Lock page
@@ -282,22 +312,7 @@ export function NotesPage() {
                     </DropdownMenuItem>
                   )}
                   {error && (
-                    <DropdownMenuItem
-                      onClick={() => {
-                        if (
-                          editor &&
-                          window.confirm(
-                            "Replace the stored note with the currently open note? Export the stored copy first if you need it.",
-                          )
-                        ) {
-                          ready.current = true;
-                          save({
-                            title: titleRef.current || "Untitled note",
-                            content: editor.getJSON(),
-                          });
-                        }
-                      }}
-                    >
+                    <DropdownMenuItem onClick={() => setReplaceOpen(true)}>
                       Save current note
                     </DropdownMenuItem>
                   )}
@@ -341,19 +356,37 @@ export function NotesPage() {
             </p>
           )}
         </div>
-        {editor && (
-          <aside className="notes-outline-rail" aria-label="Page outline">
-            <div className="notes-outline-ticks" aria-hidden="true">
-              {Array.from({ length: 8 }, (_, index) => (
-                <span key={index} />
-              ))}
-            </div>
-            <div className="notes-outline-panel">
-              <NoteOutline editor={editor} />
-            </div>
-          </aside>
-        )}
+        {editor && <NoteOutlineRail editor={editor} />}
       </section>
+      <AlertDialog open={replaceOpen} onOpenChange={setReplaceOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Replace the stored note?</AlertDialogTitle>
+            <AlertDialogDescription>
+              The copy stored in this browser is overwritten with the note that
+              is open now. Export the stored copy first if you need it.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              variant="destructive"
+              onClick={() => {
+                if (editor) {
+                  ready.current = true;
+                  save({
+                    title: titleRef.current || "Untitled note",
+                    content: editor.getJSON(),
+                  });
+                }
+                setReplaceOpen(false);
+              }}
+            >
+              Replace stored note
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </AppBody>
   );
 }
@@ -400,6 +433,7 @@ function NoteDocument({ editor, locked }: { editor: Editor; locked: boolean }) {
   const wrapper = useRef<HTMLDivElement>(null);
   const dragPosition = useRef<number | null>(null);
   const [block, setBlock] = useState<{ pos: number; top: number } | null>(null);
+  const [deleteTableOpen, setDeleteTableOpen] = useState(false);
   const table = useEditorState({
     editor,
     selector: ({ editor }) => editor.isActive("table"),
@@ -584,6 +618,11 @@ function NoteDocument({ editor, locked }: { editor: Editor; locked: boolean }) {
                   Move up
                 </DropdownMenuItem>
                 <DropdownMenuItem
+                  disabled={
+                    block.pos +
+                      (editor.state.doc.nodeAt(block.pos)?.nodeSize ?? 0) >=
+                    editor.state.doc.content.size
+                  }
                   onClick={() => {
                     const node = editor.state.doc.nodeAt(block.pos);
                     if (!node) return;
@@ -688,12 +727,35 @@ function NoteDocument({ editor, locked }: { editor: Editor; locked: boolean }) {
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => editor.chain().focus().deleteTable().run()}
+            onClick={() => setDeleteTableOpen(true)}
           >
             Delete table
           </Button>
         </div>
       )}
+      <AlertDialog open={deleteTableOpen} onOpenChange={setDeleteTableOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete this table?</AlertDialogTitle>
+            <AlertDialogDescription>
+              The table and all of its cells are removed from the note. You can
+              undo this right after.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              variant="destructive"
+              onClick={() => {
+                editor.chain().focus().deleteTable().run();
+                setDeleteTableOpen(false);
+              }}
+            >
+              Delete table
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
       <EditorContent editor={editor} />
       {!locked && <NoteFormatting editor={editor} />}
     </div>

@@ -8,11 +8,6 @@
   font-size: 0.9375rem;
   line-height: 1.8;
 }
-.notes-prose:focus-visible {
-  outline: 2px solid var(--ring);
-  outline-offset: 8px;
-  border-radius: var(--radius);
-}
 .notes-small .notes-prose {
   font-size: 0.8125rem;
 }
@@ -113,9 +108,50 @@
   flex-shrink: 0;
 }
 .notes-prose input[type="checkbox"] {
-  accent-color: var(--primary);
+  appearance: none;
+  display: grid;
+  place-content: center;
   width: 1rem;
   height: 1rem;
+  margin: 0;
+  border: 1px solid var(--input);
+  border-radius: 4px;
+  background: transparent;
+  cursor: pointer;
+  transform: translateY(0.15em);
+  transition:
+    background-color 150ms,
+    border-color 150ms;
+}
+.dark .notes-prose input[type="checkbox"] {
+  background: color-mix(in oklab, var(--input) 30%, transparent);
+}
+.notes-prose input[type="checkbox"]::before {
+  content: "";
+  width: 0.75rem;
+  height: 0.75rem;
+  background: var(--primary-foreground);
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 6 9 17l-5-5'/%3E%3C/svg%3E")
+    center / contain no-repeat;
+  transform: scale(0);
+}
+.notes-prose input[type="checkbox"]:checked {
+  border-color: var(--primary);
+  background: var(--primary);
+}
+.notes-prose input[type="checkbox"]:checked::before {
+  transform: scale(1);
+}
+.notes-prose input[type="checkbox"]:focus-visible {
+  border-color: var(--ring);
+  outline: 3px solid color-mix(in oklab, var(--ring) 50%, transparent);
+}
+.notes-prose[contenteditable="false"] input[type="checkbox"] {
+  pointer-events: none;
+}
+.notes-prose li[data-checked="true"] > div > p {
+  color: var(--muted-foreground);
+  text-decoration: line-through;
 }
 .notes-prose .tableWrapper {
   max-width: 100%;
@@ -184,18 +220,22 @@
   padding-block: 1rem;
 }
 .notes-outline-ticks span {
-  width: 0.75rem;
+  width: 1.25rem;
   height: 1px;
   background: var(--muted-foreground);
   opacity: 0.45;
 }
-.notes-outline-ticks span:first-child {
-  width: 1.5rem;
+.notes-outline-ticks span[data-level="2"] {
+  width: 1rem;
+}
+.notes-outline-ticks span[data-level="3"] {
+  width: 0.75rem;
+}
+.notes-outline-ticks span[data-active] {
   background: var(--foreground);
   opacity: 1;
 }
 .notes-outline-panel {
-  display: none;
   position: absolute;
   right: 0;
   top: 0;
@@ -207,10 +247,24 @@
   border-radius: var(--radius);
   background: var(--popover);
   box-shadow: 0 4px 16px #0001;
+  /* Hidden visually but still reachable with Tab; focus reveals it. */
+  opacity: 0;
+  pointer-events: none;
+  transform: translateX(0.5rem);
+  transition:
+    opacity 150ms,
+    transform 150ms;
 }
 .notes-outline-rail:hover .notes-outline-panel,
 .notes-outline-rail:focus-within .notes-outline-panel {
-  display: block;
+  opacity: 1;
+  pointer-events: auto;
+  transform: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .notes-outline-panel {
+    transition: none;
+  }
 }
 .note-suggestions {
   z-index: 50;
@@ -232,6 +286,31 @@
   border-radius: calc(var(--radius) - 2px);
   padding: 0.45rem 0.75rem;
   text-align: left;
+}
+.note-suggestion-person {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  column-gap: 0.6rem;
+  align-items: center;
+}
+.note-suggestion-avatar {
+  grid-row: span 2;
+  display: grid;
+  place-content: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: 9999px;
+  background: var(--muted);
+  color: var(--muted-foreground);
+  font-size: 0.7rem;
+  font-weight: 500;
+}
+.note-suggestion-label {
+  font-weight: 500;
+}
+.note-suggestion-description {
+  color: var(--muted-foreground);
+  font-size: 0.75rem;
 }
 .note-suggestion-item:hover,
 .note-suggestion-item[aria-selected="true"] {

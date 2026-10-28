@@ -3,8 +3,10 @@
 import { useState } from "react";
 import { EditorContent, useEditor, useEditorState } from "@tiptap/react";
 import {
+  CopyIcon,
   DownloadIcon,
   EllipsisIcon,
+  EraserIcon,
   EyeIcon,
   KeyboardIcon,
   PencilIcon,
@@ -32,6 +34,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Kbd } from "@/components/ui/kbd";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Toaster, toast } from "@/components/ui/toast";
 import {
   Popover,
   PopoverContent,
@@ -60,22 +64,52 @@ const shortcuts = [
   ["Task list", "⌘ / Ctrl Shift 9"],
 ];
 
+const markdownRules = [
+  ["Heading 1–3", "# Space"],
+  ["Bullet list", "- Space"],
+  ["Numbered list", "1. Space"],
+  ["Task list", "[ ] Space"],
+  ["Blockquote", "> Space"],
+  ["Code block", "``` Space"],
+  ["Horizontal rule", "---"],
+];
+
+const editorAttributes = {
+  class: "rich-text-prose",
+  role: "textbox",
+  "aria-label": "Document content",
+  "aria-multiline": "true",
+};
+
+const confirmations = {
+  clear: {
+    title: "Clear this document?",
+    description:
+      "This removes all content from the document. You can undo it right after.",
+    action: "Clear document",
+  },
+  reset: {
+    title: "Reset this document?",
+    description:
+      "This replaces your local draft with the original launch brief. Export your changes first if you want to keep them.",
+    action: "Reset document",
+  },
+};
+
 export function RichTextEditorPage() {
   const [saveStatus, setSaveStatus] = useState("Demo document");
   const [viewing, setViewing] = useState(false);
-  const [resetOpen, setResetOpen] = useState(false);
+  const [confirm, setConfirm] = useState<keyof typeof confirmations | null>(
+    null,
+  );
+  const [confirmKind, setConfirmKind] =
+    useState<keyof typeof confirmations>("clear");
   const editor = useEditor({
     extensions: editorExtensions,
     content: launchBrief,
     immediatelyRender: false,
     editorProps: {
-      attributes: {
-        class: "rich-text-prose",
-        role: "textbox",
-        "aria-label": "Document content",
-        "aria-multiline": "true",
-        "aria-readonly": String(viewing),
-      },
+      attributes: { ...editorAttributes, "aria-readonly": "false" },
     },
     onCreate: ({ editor }) => {
       try {
@@ -108,6 +142,57 @@ export function RichTextEditorPage() {
     selector: ({ editor }) =>
       editor ? getDocumentStats(editor.getText()) : null,
   });
+
+  function toggleViewing() {
+    if (!editor) return;
+    const next = !viewing;
+    editor.setEditable(!next);
+    editor.setOptions({
+      editorProps: {
+        attributes: { ...editorAttributes, "aria-readonly": String(next) },
+      },
+    });
+    setViewing(next);
+  }
+
+  async function copyDocument(format: "html" | "text") {
+    if (!editor) return;
+    const label = format === "html" ? "HTML" : "plain text";
+    try {
+      await navigator.clipboard.writeText(
+        format === "html" ? editor.getHTML() : editor.getText(),
+      );
+      toast.add({ title: `Copied as ${label}`, type: "success" });
+    } catch {
+      toast.add({
+        title: "Could not copy",
+        description: "Clipboard access is blocked in this browser.",
+        type: "error",
+      });
+    }
+  }
+
+  function openConfirm(kind: keyof typeof confirmations) {
+    setConfirmKind(kind);
+    setConfirm(kind);
+  }
+
+  function confirmAction() {
+    if (!editor) return;
+    if (confirmKind === "clear") {
+      editor.commands.clearContent(true);
+      toast.add({
+        title: "Document cleared",
+        actionProps: {
+          children: "Undo",
+          onClick: () => editor.chain().focus().undo().run(),
+        },
+      });
+    } else {
+      editor.commands.setContent(launchBrief);
+    }
+    setConfirm(null);
+  }
 
   function exportDocument(format: "html" | "json") {
     if (!editor) return;
@@ -186,14 +271,20 @@ export function RichTextEditorPage() {
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-48">
                   <DropdownMenuGroup>
-                    <DropdownMenuItem
-                      onClick={() => {
-                        editor?.setEditable(viewing);
-                        setViewing(!viewing);
-                      }}
-                    >
+                    <DropdownMenuItem onClick={toggleViewing}>
                       {viewing ? <PencilIcon /> : <EyeIcon />}
                       {viewing ? "Switch to editing" : "Switch to viewing"}
+                    </DropdownMenuItem>
+                  </DropdownMenuGroup>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuGroup>
+                    <DropdownMenuItem onClick={() => copyDocument("html")}>
+                      <CopyIcon />
+                      Copy as HTML
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => copyDocument("text")}>
+                      <CopyIcon />
+                      Copy as plain text
                     </DropdownMenuItem>
                     <DropdownMenuItem onClick={() => exportDocument("html")}>
                       <DownloadIcon />
@@ -207,12 +298,19 @@ export function RichTextEditorPage() {
                   <DropdownMenuSeparator />
                   <DropdownMenuGroup>
                     <DropdownMenuItem
-                      variant="destructive"
                       disabled={viewing}
-                      onClick={() => setResetOpen(true)}
+                      onClick={() => openConfirm("reset")}
                     >
                       <RotateCcwIcon />
-                      Reset document
+                      Reset to demo
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      variant="destructive"
+                      disabled={viewing}
+                      onClick={() => openConfirm("clear")}
+                    >
+                      <EraserIcon />
+                      Clear document
                     </DropdownMenuItem>
                   </DropdownMenuGroup>
                 </DropdownMenuContent>
@@ -233,9 +331,19 @@ export function RichTextEditorPage() {
                 {!viewing && <EditorLinkBubble editor={editor} />}
               </>
             ) : (
-              <p role="status" className="p-8 text-sm text-muted-foreground">
-                Loading editor…
-              </p>
+              <div
+                role="status"
+                aria-label="Loading editor"
+                className="mx-auto flex w-full max-w-3xl flex-col gap-3 px-6 py-8 sm:px-12 sm:py-10"
+              >
+                <Skeleton className="h-7 w-2/3" />
+                <Skeleton className="mt-3 h-4 w-full" />
+                <Skeleton className="h-4 w-11/12" />
+                <Skeleton className="h-4 w-4/5" />
+                <Skeleton className="mt-5 h-5 w-1/3" />
+                <Skeleton className="h-4 w-full" />
+                <Skeleton className="h-4 w-3/4" />
+              </div>
             )}
           </div>
           <footer className="flex shrink-0 flex-wrap items-center justify-between gap-2 border-t px-4 py-2 text-xs text-muted-foreground">
@@ -261,19 +369,9 @@ export function RichTextEditorPage() {
                 className="w-80 max-w-[calc(100vw-2rem)]"
               >
                 <PopoverTitle>Keyboard shortcuts</PopoverTitle>
-                <dl className="flex flex-col gap-2">
-                  {shortcuts.map(([label, keys]) => (
-                    <div
-                      key={label}
-                      className="flex items-center justify-between gap-3"
-                    >
-                      <dt>{label}</dt>
-                      <dd>
-                        <Kbd>{keys}</Kbd>
-                      </dd>
-                    </div>
-                  ))}
-                </dl>
+                <ShortcutList items={shortcuts} />
+                <PopoverTitle className="mt-2">Markdown</PopoverTitle>
+                <ShortcutList items={markdownRules} />
               </PopoverContent>
             </Popover>
           </footer>
@@ -282,29 +380,43 @@ export function RichTextEditorPage() {
       <p className="text-xs text-muted-foreground">
         Playground · Demo document. Changes are saved only in this browser.
       </p>
-      <AlertDialog open={resetOpen} onOpenChange={setResetOpen}>
+      <AlertDialog
+        open={confirm !== null}
+        onOpenChange={(open) => !open && setConfirm(null)}
+      >
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Reset this document?</AlertDialogTitle>
+            <AlertDialogTitle>
+              {confirmations[confirmKind].title}
+            </AlertDialogTitle>
             <AlertDialogDescription>
-              This replaces your local draft with the original launch brief.
-              Export your changes first if you want to keep them.
+              {confirmations[confirmKind].description}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction
-              variant="destructive"
-              onClick={() => {
-                editor?.commands.setContent(launchBrief);
-                setResetOpen(false);
-              }}
-            >
-              Reset document
+            <AlertDialogAction variant="destructive" onClick={confirmAction}>
+              {confirmations[confirmKind].action}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+      <Toaster />
     </AppBody>
+  );
+}
+
+function ShortcutList({ items }: { items: string[][] }) {
+  return (
+    <dl className="flex flex-col gap-2">
+      {items.map(([label, keys]) => (
+        <div key={label} className="flex items-center justify-between gap-3">
+          <dt>{label}</dt>
+          <dd>
+            <Kbd>{keys}</Kbd>
+          </dd>
+        </div>
+      ))}
+    </dl>
   );
 }

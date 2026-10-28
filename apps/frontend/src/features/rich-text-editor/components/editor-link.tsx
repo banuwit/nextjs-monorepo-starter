@@ -6,20 +6,46 @@ import { BubbleMenu } from "@tiptap/react/menus";
 import { ExternalLinkIcon, LinkIcon, UnlinkIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Field, FieldError, FieldLabel } from "@/components/ui/field";
-import { Input } from "@/components/ui/input";
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
+} from "@/components/ui/input-group";
 import {
   Popover,
   PopoverContent,
   PopoverTitle,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { normalizeEditorLink } from "../utils/editor-link";
+import { ToolbarButton } from "@/components/ui/toolbar";
+import { cn } from "@/lib/utils";
+import { normalizeEditorLink } from "@/utils/editor-link";
+import { EditorTooltip } from "./editor-tooltip";
 
-export function EditorLink({ editor }: { editor: Editor }) {
+// Keep the editor selection when the trigger is pressed.
+const keepSelection = (event: React.MouseEvent) => event.preventDefault();
+
+export function EditorLink({
+  editor,
+  inToolbar,
+}: {
+  editor: Editor;
+  /** Render the trigger as a roving item of the surrounding `Toolbar`. */
+  inToolbar?: boolean;
+}) {
   const id = useId();
   const [open, setOpen] = useState(false);
   const [url, setUrl] = useState("");
   const [error, setError] = useState(false);
+  const trigger = (
+    <Button
+      type="button"
+      variant="ghost"
+      size="icon-sm"
+      aria-label="Insert or edit link"
+      className={cn(editor.isActive("link") && "bg-muted")}
+    />
+  );
 
   return (
     <Popover
@@ -32,19 +58,22 @@ export function EditorLink({ editor }: { editor: Editor }) {
         }
       }}
     >
-      <PopoverTrigger
+      <EditorTooltip
+        label="Insert or edit link"
         render={
-          <Button
-            type="button"
-            variant="ghost"
-            size="icon-sm"
-            aria-label="Insert or edit link"
-            title="Insert or edit link"
+          <PopoverTrigger
+            render={
+              inToolbar ? (
+                <ToolbarButton render={trigger} onMouseDown={keepSelection} />
+              ) : (
+                trigger
+              )
+            }
           />
         }
       >
         <LinkIcon />
-      </PopoverTrigger>
+      </EditorTooltip>
       <PopoverContent
         align="start"
         className="w-80 max-w-[calc(100vw-2rem)]"
@@ -77,21 +106,26 @@ export function EditorLink({ editor }: { editor: Editor }) {
         >
           <Field data-invalid={error}>
             <FieldLabel htmlFor={id}>URL</FieldLabel>
-            <Input
-              id={id}
-              value={url}
-              onChange={(event) => {
-                setUrl(event.target.value);
-                setError(false);
-              }}
-              placeholder="https://example.com"
-              aria-invalid={error}
-              aria-describedby={error ? `${id}-error` : undefined}
-              autoComplete="url"
-            />
+            <InputGroup>
+              <InputGroupAddon>
+                <LinkIcon />
+              </InputGroupAddon>
+              <InputGroupInput
+                id={id}
+                value={url}
+                onChange={(event) => {
+                  setUrl(event.target.value);
+                  setError(false);
+                }}
+                placeholder="example.com or tel:+62…"
+                aria-invalid={error}
+                aria-describedby={error ? `${id}-error` : undefined}
+                autoComplete="url"
+              />
+            </InputGroup>
             {error && (
               <FieldError id={`${id}-error`}>
-                Enter a valid http, https, or mailto link.
+                Enter a web address, mailto, or tel link.
               </FieldError>
             )}
           </Field>
