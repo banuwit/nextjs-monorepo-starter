@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation";
 import {
   type NavigationItem,
   useAppNavigation,
-} from "@/components/app-navigation";
+} from "@/components/layout/app-navigation";
 import {
   Breadcrumb,
   BreadcrumbItem,
