@@ -52,7 +52,7 @@ export function LoginPage() {
               <CardHeader className="gap-2 text-center">
                 <CardTitle>
                   <h1 className="text-xl font-semibold">
-                    Sign in to Studio Admin
+                    Sign in to WIT. Studio
                   </h1>
                 </CardTitle>
                 <CardDescription>Pick up where you left off.</CardDescription>
@@ -67,7 +67,7 @@ export function LoginPage() {
                   layout="column"
                 />
                 <p className="text-center text-sm text-muted-foreground">
-                  New to Studio Admin?{" "}
+                  New to WIT. Studio?{" "}
                   <AuthPreviewAction
                     variant="link"
                     className="h-auto p-0"

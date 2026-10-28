@@ -67,7 +67,7 @@ export function BarActiveCard() {
               return (
                 <Cell
                   key={row.day}
-                  fill={active ? "var(--chart-4)" : "var(--color-orders)"}
+                  fill={active ? "var(--chart-7)" : "var(--color-orders)"}
                   fillOpacity={active ? 1 : 0.6}
                   stroke={active ? "var(--foreground)" : undefined}
                   strokeWidth={active ? 2 : 0}

@@ -14,7 +14,7 @@ import { sumBy } from "@/features/chart/utils/format";
 import { releaseCommits } from "@/mocks/chart-line.mock";
 
 const commitsConfig = {
-  commits: { label: "Commits", color: "var(--chart-5)" },
+  commits: { label: "Commits", color: "var(--chart-1)" },
 } satisfies ChartConfig;
 
 export function LineDotsCustomCard() {

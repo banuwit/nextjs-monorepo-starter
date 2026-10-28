@@ -23,7 +23,7 @@ const channelConfig = {
   direct: { label: "Direct", color: "var(--chart-2)" },
   referral: { label: "Referral", color: "var(--chart-3)" },
   social: { label: "Social", color: "var(--chart-4)" },
-  email: { label: "Email", color: "var(--chart-5)" },
+  email: { label: "Email", color: "var(--chart-6)" },
 } satisfies ChartConfig;
 
 const channelData = channelVisitors.map((item) => ({

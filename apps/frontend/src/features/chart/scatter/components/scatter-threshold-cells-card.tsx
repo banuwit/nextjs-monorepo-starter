@@ -20,7 +20,7 @@ import {
 import { endpointErrors } from "@/mocks/chart-scatter.mock";
 
 const errorsConfig = {
-  errorRate: { label: "Error rate (%)", color: "var(--chart-3)" },
+  errorRate: { label: "Error rate (%)", color: "var(--chart-1)" },
   requests: { label: "Requests (K/day)" },
 } satisfies ChartConfig;
 

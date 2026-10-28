@@ -18,7 +18,7 @@ import { ARC } from "@/features/chart/gauge/utils/gauge-config";
 import { quarterlySales } from "@/mocks/chart-gauge.mock";
 
 const salesConfig = {
-  actual: { label: "Actual", color: "var(--chart-4)" },
+  actual: { label: "Actual", color: "var(--chart-2)" },
   target: { label: "Target", color: "var(--foreground)" },
 } satisfies ChartConfig;
 

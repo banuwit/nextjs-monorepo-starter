@@ -9,7 +9,7 @@ const rankingConfig = {
   search: { label: "Search", color: "var(--chart-1)" },
   checkout: { label: "Checkout", color: "var(--chart-2)" },
   catalog: { label: "Catalog", color: "var(--chart-4)" },
-  profile: { label: "Profile", color: "var(--chart-5)" },
+  profile: { label: "Profile", color: "var(--chart-6)" },
 } satisfies ChartConfig;
 
 export function SlopeServiceRankCard() {

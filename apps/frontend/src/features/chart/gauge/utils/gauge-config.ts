@@ -11,8 +11,8 @@ export const ARC = {
 
 export const bandColors = [
   "var(--destructive)",
-  "var(--color-amber-500)",
   "var(--chart-3)",
+  "var(--chart-1)",
 ];
 
 export function bandOf<T extends { from: number; to: number }>(

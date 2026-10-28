@@ -25,8 +25,8 @@ const runStatusMeta: Record<
 > = {
   success: {
     label: "Success",
-    className: "bg-chart-3",
-    color: "var(--chart-3)",
+    className: "bg-chart-1",
+    color: "var(--chart-1)",
   },
   failed: {
     label: "Failed",
@@ -35,8 +35,8 @@ const runStatusMeta: Record<
   },
   running: {
     label: "Running",
-    className: "animate-pulse bg-chart-1",
-    color: "var(--chart-1)",
+    className: "animate-pulse bg-chart-2",
+    color: "var(--chart-2)",
   },
   cancelled: {
     label: "Cancelled",

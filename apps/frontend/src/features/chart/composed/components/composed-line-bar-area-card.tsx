@@ -26,9 +26,9 @@ import { sumBy } from "@/features/chart/utils/format";
 import { funnelTrend } from "@/mocks/chart-composed.mock";
 
 const funnelConfig = {
-  sessions: { label: "Sessions", color: "var(--chart-1)" },
-  signups: { label: "Signups", color: "var(--chart-3)" },
-  activations: { label: "Activations", color: "var(--chart-5)" },
+  sessions: { label: "Sessions", color: "var(--chart-2)" },
+  signups: { label: "Signups", color: "var(--chart-4)" },
+  activations: { label: "Activations", color: "var(--chart-1)" },
 } satisfies ChartConfig;
 
 export function ComposedLineBarAreaCard() {

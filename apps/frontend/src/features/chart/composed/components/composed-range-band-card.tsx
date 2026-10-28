@@ -26,7 +26,7 @@ import { latencyRange } from "@/mocks/chart-composed.mock";
 
 const rangeConfig = {
   range: { label: "Min – max", color: "var(--chart-2)" },
-  average: { label: "Average", color: "var(--chart-5)" },
+  average: { label: "Average", color: "var(--chart-3)" },
 } satisfies ChartConfig;
 
 export function ComposedRangeBandCard() {

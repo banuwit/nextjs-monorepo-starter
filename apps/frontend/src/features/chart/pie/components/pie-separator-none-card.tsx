@@ -23,7 +23,7 @@ const ticketConfig = {
   account: { label: "Account", color: "var(--chart-2)" },
   bug: { label: "Bug report", color: "var(--chart-3)" },
   feature: { label: "Feature request", color: "var(--chart-4)" },
-  other: { label: "Other", color: "var(--chart-5)" },
+  other: { label: "Other", color: "var(--chart-10)" },
 } satisfies ChartConfig;
 
 const ticketData = ticketCategories.map((item) => ({

@@ -25,7 +25,7 @@ import { sumBy } from "@/features/chart/utils/format";
 import { regionSales } from "@/mocks/chart-composed.mock";
 
 const regionConfig = {
-  sales: { label: "Sales", color: "var(--chart-3)" },
+  sales: { label: "Sales", color: "var(--chart-2)" },
   target: { label: "Target", color: "var(--foreground)" },
 } satisfies ChartConfig;
 

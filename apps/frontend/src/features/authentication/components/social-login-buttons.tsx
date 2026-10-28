@@ -1,7 +1,7 @@
 import { cn } from "@/lib/utils";
 import { AuthPreviewAction } from "./auth-preview-action";
 
-// Google mark from Studio Admin; see ../LICENSE for its MIT notice.
+// Google mark from WIT. Studio; see ../LICENSE for its MIT notice.
 function GoogleIcon() {
   return (
     <svg
@@ -56,7 +56,13 @@ export function SocialLoginButtons({
   layout?: "row" | "column";
 }) {
   return (
-    <div className={cn("grid gap-3", layout === "row" && "sm:grid-cols-2")}>
+    <div
+      className={cn(
+        "grid gap-3",
+        layout === "row" &&
+          (providers.length >= 3 ? "grid-cols-3" : "sm:grid-cols-2"),
+      )}
+    >
       {providers.map((provider) => {
         const Icon = providerIcons[provider];
         return (

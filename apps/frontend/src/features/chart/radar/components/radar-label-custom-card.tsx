@@ -18,7 +18,7 @@ import { regionOrders } from "@/mocks/chart-radar.mock";
 
 const ordersConfig = {
   online: { label: "Online", color: "var(--chart-2)" },
-  store: { label: "In store", color: "var(--chart-5)" },
+  store: { label: "In store", color: "var(--chart-4)" },
 } satisfies ChartConfig;
 
 /** Each axis label also shows the values of both series. */

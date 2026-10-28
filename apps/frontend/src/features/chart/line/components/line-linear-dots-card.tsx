@@ -12,7 +12,7 @@ import {
 import { conversionRate } from "@/mocks/chart-line.mock";
 
 const conversionConfig = {
-  rate: { label: "Conversion (%)", color: "var(--chart-3)" },
+  rate: { label: "Conversion (%)", color: "var(--chart-1)" },
 } satisfies ChartConfig;
 
 export function LineLinearDotsCard() {

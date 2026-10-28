@@ -31,7 +31,7 @@ const signupConfig = {
   february: { label: "February", color: "var(--chart-2)" },
   march: { label: "March", color: "var(--chart-3)" },
   april: { label: "April", color: "var(--chart-4)" },
-  may: { label: "May", color: "var(--chart-5)" },
+  may: { label: "May", color: "var(--chart-6)" },
 } satisfies ChartConfig;
 
 const signupData = monthlySignups.map((item) => ({

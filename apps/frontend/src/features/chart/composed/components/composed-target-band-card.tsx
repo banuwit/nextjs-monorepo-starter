@@ -25,8 +25,8 @@ import {
 import { fulfillmentTarget } from "@/mocks/chart-composed.mock";
 
 const targetConfig = {
-  hours: { label: "Fulfillment (h)", color: "var(--chart-3)" },
-  average: { label: "3-week average", color: "var(--chart-5)" },
+  hours: { label: "Fulfillment (h)", color: "var(--chart-2)" },
+  average: { label: "3-week average", color: "var(--chart-3)" },
 } satisfies ChartConfig;
 
 export function ComposedTargetBandCard() {

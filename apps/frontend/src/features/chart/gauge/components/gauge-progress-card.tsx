@@ -15,7 +15,7 @@ import { ARC } from "@/features/chart/gauge/utils/gauge-config";
 import { apiQuota } from "@/mocks/chart-gauge.mock";
 
 const quotaConfig = {
-  used: { label: "Used", color: "var(--chart-3)" },
+  used: { label: "Used", color: "var(--chart-2)" },
 } satisfies ChartConfig;
 
 export function GaugeProgressCard() {

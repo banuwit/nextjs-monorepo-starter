@@ -22,7 +22,7 @@ import { formatCurrency, sumBy } from "@/features/chart/utils/format";
 import { monthlyNetIncome } from "@/mocks/chart-bar.mock";
 
 const netConfig = {
-  net: { label: "Net income", color: "var(--chart-3)" },
+  net: { label: "Net income", color: "var(--chart-1)" },
 } satisfies ChartConfig;
 
 export function BarNegativeCard() {

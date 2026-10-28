@@ -6,10 +6,10 @@ import { SlopeChart } from "@/features/chart/slope/components/slope-chart";
 import { channelRetention } from "@/mocks/chart.mock";
 
 const retentionConfig = {
-  referral: { label: "Referral", color: "var(--chart-1)" },
-  organic: { label: "Organic", color: "var(--chart-2)" },
-  paid: { label: "Paid", color: "var(--chart-4)" },
-  social: { label: "Social", color: "var(--chart-5)" },
+  referral: { label: "Referral", color: "var(--chart-3)" },
+  organic: { label: "Organic", color: "var(--chart-1)" },
+  paid: { label: "Paid", color: "var(--chart-2)" },
+  social: { label: "Social", color: "var(--chart-4)" },
 } satisfies ChartConfig;
 
 export function SlopeRetentionCard() {

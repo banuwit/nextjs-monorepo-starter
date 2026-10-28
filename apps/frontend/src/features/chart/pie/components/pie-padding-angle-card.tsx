@@ -22,7 +22,7 @@ const browserConfig = {
   safari: { label: "Safari", color: "var(--chart-2)" },
   edge: { label: "Edge", color: "var(--chart-3)" },
   firefox: { label: "Firefox", color: "var(--chart-4)" },
-  other: { label: "Other", color: "var(--chart-5)" },
+  other: { label: "Other", color: "var(--chart-10)" },
 } satisfies ChartConfig;
 
 const browserData = browserShare.map((item) => ({

@@ -18,9 +18,9 @@ import { sumBy } from "@/features/chart/utils/format";
 import { monthlySessions } from "@/mocks/chart-area.mock";
 
 const sessionsConfig = {
-  organic: { label: "Organic", color: "var(--chart-5)" },
+  organic: { label: "Organic", color: "var(--chart-1)" },
   referral: { label: "Referral", color: "var(--chart-3)" },
-  social: { label: "Social", color: "var(--chart-1)" },
+  social: { label: "Social", color: "var(--chart-4)" },
 } satisfies ChartConfig;
 
 type SessionKey = keyof typeof sessionsConfig;

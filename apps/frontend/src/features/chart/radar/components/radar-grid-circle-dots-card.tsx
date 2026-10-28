@@ -25,7 +25,7 @@ import { productQuality } from "@/mocks/chart.mock";
 
 const qualityConfig = {
   score: { label: "This release", color: "var(--chart-2)" },
-  previous: { label: "Previous release", color: "var(--chart-4)" },
+  previous: { label: "Previous release", color: "var(--chart-10)" },
 } satisfies ChartConfig;
 
 export function RadarGridCircleDotsCard() {

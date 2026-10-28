@@ -17,9 +17,9 @@ import {
 import { customerSegments } from "@/mocks/chart-scatter.mock";
 
 const segmentsConfig = {
-  starter: { label: "Starter", color: "var(--chart-1)" },
-  pro: { label: "Pro", color: "var(--chart-3)" },
-  enterprise: { label: "Enterprise", color: "var(--chart-5)" },
+  starter: { label: "Starter", color: "var(--chart-2)" },
+  pro: { label: "Pro", color: "var(--chart-1)" },
+  enterprise: { label: "Enterprise", color: "var(--chart-3)" },
 } satisfies ChartConfig;
 
 export function ScatterMultiGroupCard() {

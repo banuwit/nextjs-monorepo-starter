@@ -17,8 +17,8 @@ import {
 import { channelEngagement } from "@/mocks/chart-radar.mock";
 
 const engagementConfig = {
-  organic: { label: "Organic", color: "var(--chart-2)" },
-  paid: { label: "Paid", color: "var(--chart-5)" },
+  organic: { label: "Organic", color: "var(--chart-1)" },
+  paid: { label: "Paid", color: "var(--chart-4)" },
 } satisfies ChartConfig;
 
 /** Two series drawn as outlines only, on a grid without radial lines. */

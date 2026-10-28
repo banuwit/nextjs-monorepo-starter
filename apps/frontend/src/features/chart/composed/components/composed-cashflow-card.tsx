@@ -26,7 +26,7 @@ import { sumBy } from "@/features/chart/utils/format";
 import { cashflow } from "@/mocks/chart.mock";
 
 const cashflowConfig = {
-  inflow: { label: "Inflow", color: "var(--chart-2)" },
+  inflow: { label: "Inflow", color: "var(--chart-1)" },
   outflow: { label: "Outflow", color: "var(--destructive)" },
   net: { label: "Net", color: "var(--foreground)" },
 } satisfies ChartConfig;

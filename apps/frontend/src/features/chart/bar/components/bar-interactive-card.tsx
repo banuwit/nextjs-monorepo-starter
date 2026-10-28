@@ -16,8 +16,8 @@ import { dailyPageViews } from "@/mocks/chart-bar.mock";
 
 const pageViewsConfig = {
   views: { label: "Page views" },
-  desktop: { label: "Desktop", color: "var(--chart-3)" },
-  mobile: { label: "Mobile", color: "var(--chart-5)" },
+  desktop: { label: "Desktop", color: "var(--chart-2)" },
+  mobile: { label: "Mobile", color: "var(--chart-4)" },
 } satisfies ChartConfig;
 
 type Platform = "desktop" | "mobile";

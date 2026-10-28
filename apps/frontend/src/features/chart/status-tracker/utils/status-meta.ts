@@ -11,13 +11,13 @@ export const dayStatusMeta: Record<
 > = {
   operational: {
     label: "Operational",
-    className: "bg-chart-3",
-    color: "var(--chart-3)",
+    className: "bg-chart-1",
+    color: "var(--chart-1)",
   },
   degraded: {
     label: "Degraded",
-    className: "bg-amber-500",
-    color: "var(--color-amber-500)",
+    className: "bg-chart-3",
+    color: "var(--chart-3)",
   },
   outage: {
     label: "Outage",

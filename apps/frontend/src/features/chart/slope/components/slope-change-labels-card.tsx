@@ -6,10 +6,10 @@ import { SlopeChart } from "@/features/chart/slope/components/slope-chart";
 import { conversionByPlan } from "@/mocks/chart-slope.mock";
 
 const planConfig = {
-  free: { label: "Free", color: "var(--chart-1)" },
+  free: { label: "Free", color: "var(--chart-10)" },
   starter: { label: "Starter", color: "var(--chart-2)" },
-  pro: { label: "Pro", color: "var(--chart-4)" },
-  team: { label: "Team", color: "var(--chart-5)" },
+  pro: { label: "Pro", color: "var(--chart-1)" },
+  team: { label: "Team", color: "var(--chart-4)" },
 } satisfies ChartConfig;
 
 export function SlopeChangeLabelsCard() {

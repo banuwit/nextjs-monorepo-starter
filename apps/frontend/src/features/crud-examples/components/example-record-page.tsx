@@ -50,7 +50,7 @@ export function ExampleRecordPage({
   const record = data.find((item) => item.id === id);
   const title =
     mode === "create"
-      ? "Tambah parameter contoh"
+      ? "Add New"
       : mode === "edit"
         ? "Edit parameter contoh"
         : "Detail parameter contoh";

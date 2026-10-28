@@ -37,3 +37,18 @@ export const regionRevenue = [
   { region: "oceania", label: "Oceania", thisYear: 1200, lastYear: 900 },
   { region: "africa", label: "Africa", thisYear: 800, lastYear: 600 },
 ];
+
+export const storageUsage = [
+  { type: "documents", label: "Documents", gigabytes: 420 },
+  { type: "media", label: "Media", gigabytes: 310 },
+  { type: "backups", label: "Backups", gigabytes: 240 },
+  { type: "logs", label: "Logs", gigabytes: 130 },
+  { type: "other", label: "Other", gigabytes: 70 },
+];
+
+export const departmentBudget = [
+  { department: "engineering", label: "Engineering", budget: 48000 },
+  { department: "marketing", label: "Marketing", budget: 26000 },
+  { department: "sales", label: "Sales", budget: 21000 },
+  { department: "operations", label: "Operations", budget: 14000 },
+];

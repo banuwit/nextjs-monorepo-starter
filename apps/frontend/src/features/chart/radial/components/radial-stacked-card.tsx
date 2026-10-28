@@ -24,7 +24,7 @@ import { planSplit } from "@/mocks/chart-radial.mock";
 
 const splitConfig = {
   monthly: { label: "Monthly plan", color: "var(--chart-2)" },
-  annual: { label: "Annual plan", color: "var(--chart-5)" },
+  annual: { label: "Annual plan", color: "var(--chart-4)" },
 } satisfies ChartConfig;
 
 /** Two values stacked on a half circle with the total in the middle. */

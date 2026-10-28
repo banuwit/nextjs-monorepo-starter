@@ -13,7 +13,7 @@ import { sumBy } from "@/features/chart/utils/format";
 import { monthlySignups } from "@/mocks/chart-area.mock";
 
 const signupsConfig = {
-  signups: { label: "Sign-ups", color: "var(--chart-3)" },
+  signups: { label: "Sign-ups", color: "var(--chart-1)" },
 } satisfies ChartConfig;
 
 export function AreaLinearCard() {

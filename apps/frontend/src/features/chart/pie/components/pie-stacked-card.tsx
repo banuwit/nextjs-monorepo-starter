@@ -23,7 +23,7 @@ const revenueConfig = {
   europe: { label: "Europe", color: "var(--chart-2)" },
   america: { label: "America", color: "var(--chart-3)" },
   oceania: { label: "Oceania", color: "var(--chart-4)" },
-  africa: { label: "Africa", color: "var(--chart-5)" },
+  africa: { label: "Africa", color: "var(--chart-6)" },
 } satisfies ChartConfig;
 
 const revenueData = regionRevenue.map((item) => ({

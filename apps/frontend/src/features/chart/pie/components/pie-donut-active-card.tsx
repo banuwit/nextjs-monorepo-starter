@@ -19,11 +19,11 @@ import { planSubscribers } from "@/mocks/chart-pie.mock";
 
 const planConfig = {
   subscribers: { label: "Subscribers" },
-  free: { label: "Free", color: "var(--chart-1)" },
+  free: { label: "Free", color: "var(--chart-10)" },
   starter: { label: "Starter", color: "var(--chart-2)" },
-  pro: { label: "Pro", color: "var(--chart-3)" },
+  pro: { label: "Pro", color: "var(--chart-1)" },
   team: { label: "Team", color: "var(--chart-4)" },
-  enterprise: { label: "Enterprise", color: "var(--chart-5)" },
+  enterprise: { label: "Enterprise", color: "var(--chart-3)" },
 } satisfies ChartConfig;
 
 const planData = planSubscribers.map((item) => ({

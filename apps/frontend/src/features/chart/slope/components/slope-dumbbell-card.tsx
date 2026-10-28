@@ -16,8 +16,8 @@ import {
 import { resolutionByTeam } from "@/mocks/chart-slope.mock";
 
 const dumbbellConfig = {
-  before: { label: "Q1", color: "var(--chart-2)" },
-  after: { label: "Q2", color: "var(--chart-5)" },
+  before: { label: "Q1", color: "var(--chart-10)" },
+  after: { label: "Q2", color: "var(--chart-2)" },
 } satisfies ChartConfig;
 
 type DumbbellRow = (typeof resolutionByTeam)[number] & {

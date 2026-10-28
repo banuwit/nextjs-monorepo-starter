@@ -13,7 +13,7 @@ export function formatPercentChange(change: number) {
 export function directionColor(
   start: number,
   end: number,
-  up = "var(--chart-4)",
+  up = "var(--chart-1)",
   down = "var(--destructive)",
 ) {
   return end >= start ? up : down;

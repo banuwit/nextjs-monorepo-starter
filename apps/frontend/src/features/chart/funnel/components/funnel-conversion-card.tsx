@@ -29,7 +29,7 @@ import { formatCompact } from "@/features/chart/utils/format";
 import { checkoutFunnel } from "@/mocks/chart-funnel.mock";
 
 const conversionConfig = {
-  value: { label: "Converted", color: "var(--chart-4)" },
+  value: { label: "Converted", color: "var(--chart-1)" },
   dropOff: { label: "Dropped off", color: "var(--muted-foreground)" },
 } satisfies ChartConfig;
 

@@ -21,14 +21,14 @@ const stageStatusMeta: Record<
   success: {
     label: "Passed",
     icon: CircleCheckIcon,
-    className: "text-chart-4",
-    barClassName: "bg-chart-3",
+    className: "text-chart-1",
+    barClassName: "bg-chart-1",
   },
   running: {
     label: "Running",
     icon: LoaderCircleIcon,
     className: "animate-spin text-foreground",
-    barClassName: "animate-pulse bg-chart-1",
+    barClassName: "animate-pulse bg-chart-2",
   },
   failed: {
     label: "Failed",

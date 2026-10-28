@@ -49,3 +49,49 @@ export const dailyVisitors = Array.from({ length: 90 }, (_, index) => {
     mobile: Math.round(160 + trend * 0.8 + weekly * 40 + ((index * 53) % 50)),
   };
 });
+
+/** Weekly net user change — positive weeks gain users, negative weeks lose them. */
+export const weeklyNetUsers = [
+  { week: "W1", net: 420 },
+  { week: "W2", net: 310 },
+  { week: "W3", net: -180 },
+  { week: "W4", net: -360 },
+  { week: "W5", net: -120 },
+  { week: "W6", net: 240 },
+  { week: "W7", net: 510 },
+  { week: "W8", net: 380 },
+  { week: "W9", net: -90 },
+  { week: "W10", net: 260 },
+];
+
+/** Hourly sensor readings (°C); `null` marks a missed reading. */
+export const sensorReadings = [
+  { hour: "00:00", indoor: 21, outdoor: 12 },
+  { hour: "02:00", indoor: 20, outdoor: 10 },
+  { hour: "04:00", indoor: null, outdoor: 9 },
+  { hour: "06:00", indoor: null, outdoor: null },
+  { hour: "08:00", indoor: 22, outdoor: null },
+  { hour: "10:00", indoor: 23, outdoor: 17 },
+  { hour: "12:00", indoor: 24, outdoor: 21 },
+  { hour: "14:00", indoor: null, outdoor: 23 },
+  { hour: "16:00", indoor: 24, outdoor: null },
+  { hour: "18:00", indoor: 23, outdoor: 18 },
+  { hour: "20:00", indoor: 22, outdoor: 15 },
+  { hour: "22:00", indoor: 21, outdoor: 13 },
+];
+
+/** Requests per hour (in K), used to compare curve interpolation types. */
+export const hourlyRequests = [
+  { hour: "08:00", requests: 12 },
+  { hour: "09:00", requests: 28 },
+  { hour: "10:00", requests: 22 },
+  { hour: "11:00", requests: 41 },
+  { hour: "12:00", requests: 18 },
+  { hour: "13:00", requests: 24 },
+  { hour: "14:00", requests: 46 },
+  { hour: "15:00", requests: 39 },
+  { hour: "16:00", requests: 30 },
+  { hour: "17:00", requests: 52 },
+  { hour: "18:00", requests: 33 },
+  { hour: "19:00", requests: 20 },
+];

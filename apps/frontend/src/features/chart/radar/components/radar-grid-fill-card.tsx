@@ -19,7 +19,7 @@ import { sumBy } from "@/features/chart/utils/format";
 import { supportSatisfaction } from "@/mocks/chart-radar.mock";
 
 const satisfactionConfig = {
-  score: { label: "Score", color: "var(--chart-3)" },
+  score: { label: "Score", color: "var(--chart-1)" },
 } satisfies ChartConfig;
 
 /** Single series on a filled polygon grid. */

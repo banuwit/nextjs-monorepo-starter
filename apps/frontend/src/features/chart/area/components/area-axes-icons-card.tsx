@@ -19,8 +19,8 @@ import { formatCompact, sumBy } from "@/features/chart/utils/format";
 import { visitorsByPlatform } from "@/mocks/chart-area.mock";
 
 const platformConfig = {
-  desktop: { label: "Desktop", color: "var(--chart-5)", icon: MonitorIcon },
-  mobile: { label: "Mobile", color: "var(--chart-2)", icon: SmartphoneIcon },
+  desktop: { label: "Desktop", color: "var(--chart-2)", icon: MonitorIcon },
+  mobile: { label: "Mobile", color: "var(--chart-4)", icon: SmartphoneIcon },
 } satisfies ChartConfig;
 
 export function AreaAxesIconsCard() {

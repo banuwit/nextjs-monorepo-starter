@@ -110,6 +110,9 @@ export const SIDEBAR_COLORS = {
   gray: { label: "Gray", light: "#1f2937" },
 } as const;
 
+// Porsi warna asli saat Sidebar/Header Color dirender di mode gelap (sisanya hitam).
+const DARK_MODE_COLOR_MIX = "55%";
+
 // Tailwind's 50/950 shades for the app body.
 export const SURFACE_COLORS = {
   blue: {
@@ -161,10 +164,11 @@ export function preferenceColorStyle(
     const prefix = key === "sidebarColor" ? "sidebar" : "header";
     return {
       [`--app-${prefix}-light`]: SIDEBAR_COLORS[color].light,
+      // Mode gelap: warna dasar dicampur hitam agar otomatis lebih gelap.
       [`--app-${prefix}-dark`]:
         color === "white"
           ? SIDEBAR_COLORS[color].dark
-          : SIDEBAR_COLORS[color].light,
+          : `color-mix(in srgb, ${SIDEBAR_COLORS[color].light} ${DARK_MODE_COLOR_MIX}, black)`,
     };
   }
   const valid = parsePreference(key, color);

@@ -18,8 +18,8 @@ import { sumBy } from "@/features/chart/utils/format";
 import { deploysByEnvironment } from "@/mocks/chart-area.mock";
 
 const deploysConfig = {
-  production: { label: "Production", color: "var(--chart-4)" },
-  staging: { label: "Staging", color: "var(--chart-2)" },
+  production: { label: "Production", color: "var(--chart-2)" },
+  staging: { label: "Staging", color: "var(--chart-6)" },
 } satisfies ChartConfig;
 
 export function AreaStepCard() {

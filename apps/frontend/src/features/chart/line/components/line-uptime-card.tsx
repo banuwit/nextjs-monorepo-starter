@@ -24,7 +24,7 @@ import {
 import { uptimeSeries } from "@/mocks/chart.mock";
 
 const uptimeConfig = {
-  uptime: { label: "Uptime (%)", color: "var(--chart-2)" },
+  uptime: { label: "Uptime (%)", color: "var(--chart-1)" },
   slo: { label: "SLO target", color: "var(--destructive)" },
 } satisfies ChartConfig;
 

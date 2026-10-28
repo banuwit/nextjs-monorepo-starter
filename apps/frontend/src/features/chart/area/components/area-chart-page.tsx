@@ -1,6 +1,9 @@
 import { ChartExamplePage } from "@/features/chart/components/chart-example-page";
 import { AreaAxesIconsCard } from "@/features/chart/area/components/area-axes-icons-card";
 import { AreaComparisonCard } from "@/features/chart/area/components/area-comparison-card";
+import { AreaConnectNullsCard } from "@/features/chart/area/components/area-connect-nulls-card";
+import { AreaCurveCard } from "@/features/chart/area/components/area-curve-card";
+import { AreaFillByValueCard } from "@/features/chart/area/components/area-fill-by-value-card";
 import { AreaInteractiveCard } from "@/features/chart/area/components/area-interactive-card";
 import { AreaLinearCard } from "@/features/chart/area/components/area-linear-card";
 import { AreaStackedCard } from "@/features/chart/area/components/area-stacked-card";
@@ -17,6 +20,9 @@ export function AreaChartPage() {
       <AreaInteractiveCard />
       <AreaStackedExpandCard />
       <AreaAxesIconsCard />
+      <AreaFillByValueCard />
+      <AreaConnectNullsCard />
+      <AreaCurveCard />
     </ChartExamplePage>
   );
 }

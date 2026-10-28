@@ -1,10 +1,10 @@
-/** Chart shades from lightest (index 0) to darkest (index 4). */
+/** Teal shades from lightest (index 0) to darkest (index 4). */
 export const chartShades = [
-  "var(--chart-1)",
-  "var(--chart-2)",
-  "var(--chart-3)",
-  "var(--chart-4)",
-  "var(--chart-5)",
+  "oklch(0.91 0.096 180.426)", // teal-200
+  "oklch(0.855 0.138 181.071)", // teal-300
+  "oklch(0.777 0.152 181.912)", // teal-400
+  "oklch(0.6 0.118 184.704)", // teal-600
+  "oklch(0.437 0.078 188.216)", // teal-800
 ];
 
 /**
@@ -22,7 +22,7 @@ export function shadeIndex(
   return Math.min(steps - 1, Math.floor(ratio * steps));
 }
 
-/** Dark shades (chart-4, chart-5) need light text; lighter ones dark text. */
+/** Dark shades (teal-600, teal-800) need light text; lighter ones dark text. */
 export function isDarkShade(index: number) {
   return index >= 3;
 }

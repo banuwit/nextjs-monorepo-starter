@@ -18,7 +18,7 @@ import { nodeResources } from "@/mocks/chart-scatter.mock";
 
 const resourcesConfig = {
   cpu: { label: "CPU (%)", color: "var(--chart-2)" },
-  memory: { label: "Memory (GB)", color: "var(--chart-5)" },
+  memory: { label: "Memory (GB)", color: "var(--chart-4)" },
 } satisfies ChartConfig;
 
 export function ScatterMultipleYAxesCard() {

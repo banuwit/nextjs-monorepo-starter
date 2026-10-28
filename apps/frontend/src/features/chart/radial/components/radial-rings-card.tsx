@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/chart";
 import { errorBudgets } from "@/mocks/chart.mock";
 
-const budgetColors = ["var(--chart-1)", "var(--chart-3)", "var(--chart-5)"];
+const budgetColors = ["var(--chart-1)", "var(--chart-2)", "var(--chart-4)"];
 
 const budgetConfig = {
   remaining: { label: "Remaining" },

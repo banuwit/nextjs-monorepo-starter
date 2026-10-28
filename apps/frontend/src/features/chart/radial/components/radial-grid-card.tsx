@@ -21,7 +21,7 @@ const uptimeConfig = {
   servers: { label: "Servers", color: "var(--chart-2)" },
   routers: { label: "Routers", color: "var(--chart-3)" },
   storage: { label: "Storage", color: "var(--chart-4)" },
-  sensors: { label: "Sensors", color: "var(--chart-5)" },
+  sensors: { label: "Sensors", color: "var(--chart-6)" },
 } satisfies ChartConfig;
 
 const uptimeData = deviceUptime.map((item) => ({

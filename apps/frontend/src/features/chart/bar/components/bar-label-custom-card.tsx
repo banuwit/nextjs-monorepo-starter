@@ -25,7 +25,7 @@ function formatThousands(value: number) {
 }
 
 const productConfig = {
-  revenue: { label: "Revenue", color: "var(--chart-5)" },
+  revenue: { label: "Revenue", color: "var(--chart-1)" },
 } satisfies ChartConfig;
 
 export function BarLabelCustomCard() {

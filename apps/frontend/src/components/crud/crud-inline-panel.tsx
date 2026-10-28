@@ -44,7 +44,7 @@ export function CrudInlinePanel({
     <section
       aria-label={title}
       data-slot="crud-inline-panel"
-      className="order-first flex h-[calc(100dvh-3rem)] min-w-0 shrink-0 flex-col bg-background md:sticky md:top-12 md:order-last md:w-[min(28rem,45%)] md:border-l"
+      className="flex h-[calc(100dvh-3rem)] w-full min-w-0 flex-col bg-background md:border-l"
     >
       {actions && <CrudInlinePanelHeader title={title} actions={actions} />}
       <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain">

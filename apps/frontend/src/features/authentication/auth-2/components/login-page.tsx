@@ -18,7 +18,7 @@ export function LoginPage() {
               <AuthBrand />
               <div className="flex flex-col gap-2">
                 <h1 className="text-xl font-semibold">
-                  Sign in to Studio Admin
+                  Sign in to WIT. Studio
                 </h1>
                 <p className="text-sm text-muted-foreground">Welcome back.</p>
               </div>

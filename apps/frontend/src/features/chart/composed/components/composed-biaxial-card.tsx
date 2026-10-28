@@ -25,7 +25,7 @@ import { revenueConversion } from "@/mocks/chart-composed.mock";
 
 const biaxialConfig = {
   revenue: { label: "Revenue ($K)", color: "var(--chart-2)" },
-  conversion: { label: "Conversion (%)", color: "var(--chart-5)" },
+  conversion: { label: "Conversion (%)", color: "var(--chart-3)" },
 } satisfies ChartConfig;
 
 export function ComposedBiaxialCard() {

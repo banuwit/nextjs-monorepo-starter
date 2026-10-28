@@ -1,6 +1,6 @@
 import { ExampleRecordPage } from "@/features/crud-examples/components/example-record-page";
 
-export const metadata = { title: "Tambah parameter contoh | Workspace" };
+export const metadata = { title: "Add New | Workspace" };
 
 export default function Page() {
   return <ExampleRecordPage mode="create" />;

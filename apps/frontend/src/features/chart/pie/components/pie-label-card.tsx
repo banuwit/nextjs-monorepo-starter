@@ -23,7 +23,7 @@ const paymentConfig = {
   transfer: { label: "Bank transfer", color: "var(--chart-2)" },
   wallet: { label: "E-wallet", color: "var(--chart-3)" },
   cod: { label: "Cash on delivery", color: "var(--chart-4)" },
-  other: { label: "Other", color: "var(--chart-5)" },
+  other: { label: "Other", color: "var(--chart-10)" },
 } satisfies ChartConfig;
 
 const paymentData = paymentMethods.map((item) => ({

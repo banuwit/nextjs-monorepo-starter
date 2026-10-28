@@ -1,4 +1,4 @@
-// Adapted from Studio Admin by Mohammed Arham Khan; see ../LICENSE.
+// Adapted from WIT. Studio by Mohammed Arham Khan; see ../LICENSE.
 import FullCalendar, {
   type CalendarOptions,
   type DayCellInfo,

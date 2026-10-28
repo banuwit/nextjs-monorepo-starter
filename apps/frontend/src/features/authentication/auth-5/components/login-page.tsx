@@ -60,7 +60,7 @@ export function LoginPage() {
           <div className="flex flex-col items-center gap-3 text-center">
             <AuthBrand />
             <div className="flex flex-col gap-1">
-              <h1 className="text-xl font-semibold">Sign in to Studio Admin</h1>
+              <h1 className="text-xl font-semibold">Sign in to WIT. Studio</h1>
               <p className="text-sm text-muted-foreground">Welcome back.</p>
             </div>
           </div>

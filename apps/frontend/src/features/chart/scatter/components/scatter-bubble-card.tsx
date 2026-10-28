@@ -24,8 +24,8 @@ import {
 import { dealsByStage } from "@/mocks/chart.mock";
 
 const dealsConfig = {
-  won: { label: "Won", color: "var(--chart-2)" },
-  open: { label: "Open", color: "var(--chart-4)" },
+  won: { label: "Won", color: "var(--chart-1)" },
+  open: { label: "Open", color: "var(--chart-2)" },
 } satisfies ChartConfig;
 
 export function ScatterBubbleCard() {

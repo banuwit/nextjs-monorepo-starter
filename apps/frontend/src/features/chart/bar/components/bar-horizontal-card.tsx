@@ -25,7 +25,7 @@ import { formatCompact } from "@/features/chart/utils/format";
 import { trafficChannels } from "@/mocks/chart.mock";
 
 const channelConfig = {
-  visitors: { label: "Visitors", color: "var(--chart-3)" },
+  visitors: { label: "Visitors", color: "var(--chart-2)" },
 } satisfies ChartConfig;
 
 const channelColors = [
@@ -33,7 +33,7 @@ const channelColors = [
   "var(--chart-2)",
   "var(--chart-3)",
   "var(--chart-4)",
-  "var(--chart-5)",
+  "var(--chart-6)",
 ];
 
 const channelData = trafficChannels.map((item, index) => ({

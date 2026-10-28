@@ -2,8 +2,8 @@ import type { ChartConfig } from "@/components/ui/chart";
 
 /** Colors shared by the mini sparkline components. */
 export const miniSparklineConfig = {
-  value: { label: "Value", color: "var(--chart-3)" },
-  latest: { label: "Latest", color: "var(--chart-5)" },
+  value: { label: "Value", color: "var(--chart-2)" },
+  latest: { label: "Latest", color: "var(--chart-3)" },
   negative: { label: "Negative", color: "var(--destructive)" },
 } satisfies ChartConfig;
 

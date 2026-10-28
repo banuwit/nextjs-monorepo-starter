@@ -11,7 +11,7 @@ import {
 import { ChartContainer, type ChartConfig } from "@/components/ui/chart";
 
 const resourceConfig = {
-  value: { label: "Usage", color: "var(--chart-3)" },
+  value: { label: "Usage", color: "var(--chart-2)" },
 } satisfies ChartConfig;
 
 export function GaugeMini({

@@ -6,6 +6,8 @@ import { PieSeparatorNoneCard } from "@/features/chart/pie/components/pie-separa
 import { PieDonutActiveCard } from "@/features/chart/pie/components/pie-donut-active-card";
 import { PieInteractiveCard } from "@/features/chart/pie/components/pie-interactive-card";
 import { PieStackedCard } from "@/features/chart/pie/components/pie-stacked-card";
+import { PieGradientCard } from "@/features/chart/pie/components/pie-gradient-card";
+import { PieStraightAngleCard } from "@/features/chart/pie/components/pie-straight-angle-card";
 
 export function PieChartPage() {
   return (
@@ -17,6 +19,8 @@ export function PieChartPage() {
       <PieDonutActiveCard />
       <PieInteractiveCard />
       <PieStackedCard />
+      <PieGradientCard />
+      <PieStraightAngleCard />
     </ChartExamplePage>
   );
 }

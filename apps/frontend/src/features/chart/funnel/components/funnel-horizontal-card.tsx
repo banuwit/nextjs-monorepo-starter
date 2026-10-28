@@ -16,7 +16,7 @@ import {
 import { signupFunnel } from "@/mocks/chart-funnel.mock";
 
 const horizontalConfig = {
-  value: { label: "Users", color: "var(--chart-3)" },
+  value: { label: "Users", color: "var(--chart-2)" },
 } satisfies ChartConfig;
 
 const signupRates = withConversion(signupFunnel, (row) => row.users);

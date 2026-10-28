@@ -28,7 +28,7 @@ const frameworkConfig = {
   orbit: { label: "Orbit", color: "var(--chart-2)" },
   pulse: { label: "Pulse", color: "var(--chart-3)" },
   relay: { label: "Relay", color: "var(--chart-4)" },
-  vector: { label: "Vector", color: "var(--chart-5)" },
+  vector: { label: "Vector", color: "var(--chart-6)" },
 } satisfies ChartConfig;
 
 const ranks = [1, 2, 3, 4, 5];

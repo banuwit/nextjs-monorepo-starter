@@ -17,8 +17,8 @@ import {
 import { cohortNps } from "@/mocks/chart-scatter.mock";
 
 const npsConfig = {
-  guided: { label: "Guided onboarding", color: "var(--chart-3)" },
-  selfServe: { label: "Self-serve", color: "var(--chart-5)" },
+  guided: { label: "Guided onboarding", color: "var(--chart-2)" },
+  selfServe: { label: "Self-serve", color: "var(--chart-4)" },
 } satisfies ChartConfig;
 
 export function ScatterJointLineCard() {

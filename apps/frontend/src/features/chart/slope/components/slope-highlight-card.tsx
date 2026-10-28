@@ -10,7 +10,7 @@ const regionConfig = {
   na: { label: "N. America", color: "var(--chart-1)" },
   apac: { label: "APAC", color: "var(--chart-2)" },
   latam: { label: "LATAM", color: "var(--chart-3)" },
-  mea: { label: "MEA", color: "var(--chart-5)" },
+  mea: { label: "MEA", color: "var(--chart-6)" },
 } satisfies ChartConfig;
 
 export function SlopeHighlightCard() {

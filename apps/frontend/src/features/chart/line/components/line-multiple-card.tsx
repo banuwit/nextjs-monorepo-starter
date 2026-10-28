@@ -18,8 +18,8 @@ import { formatCompact, sumBy } from "@/features/chart/utils/format";
 import { monthlyActiveUsers } from "@/mocks/chart-line.mock";
 
 const activeUsersConfig = {
-  web: { label: "Web", color: "var(--chart-5)" },
-  ios: { label: "iOS", color: "var(--chart-3)" },
+  web: { label: "Web", color: "var(--chart-2)" },
+  ios: { label: "iOS", color: "var(--chart-4)" },
   android: { label: "Android", color: "var(--chart-1)" },
 } satisfies ChartConfig;
 

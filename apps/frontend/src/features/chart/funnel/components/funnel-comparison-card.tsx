@@ -18,8 +18,8 @@ import { formatCompact } from "@/features/chart/utils/format";
 import { funnelComparison } from "@/mocks/chart-funnel.mock";
 
 const comparisonConfig = {
-  current: { label: "This month", color: "var(--chart-4)" },
-  previous: { label: "Last month", color: "var(--chart-2)" },
+  current: { label: "This month", color: "var(--chart-2)" },
+  previous: { label: "Last month", color: "var(--chart-10)" },
 } satisfies ChartConfig;
 
 export function FunnelComparisonCard() {

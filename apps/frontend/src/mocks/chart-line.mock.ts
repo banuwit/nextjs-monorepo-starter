@@ -45,3 +45,38 @@ export const releaseCommits = [
   { month: "May", commits: 231 },
   { month: "Jun", commits: 289 },
 ];
+
+/** Tickets resolved per month, compared year over year (vertical layout). */
+export const ticketsResolved = [
+  { month: "Jan", lastYear: 186, thisYear: 214 },
+  { month: "Feb", lastYear: 205, thisYear: 238 },
+  { month: "Mar", lastYear: 237, thisYear: 229 },
+  { month: "Apr", lastYear: 173, thisYear: 262 },
+  { month: "May", lastYear: 209, thisYear: 281 },
+  { month: "Jun", lastYear: 214, thisYear: 297 },
+];
+
+/** Daily p95 latency (ms) per region; `null` marks a day without data. */
+export const regionLatency = [
+  { day: "Jun 1", eu: 182, us: 164 },
+  { day: "Jun 2", eu: 176, us: null },
+  { day: "Jun 3", eu: null, us: 171 },
+  { day: "Jun 4", eu: null, us: null },
+  { day: "Jun 5", eu: 194, us: 158 },
+  { day: "Jun 6", eu: 168, us: 149 },
+  { day: "Jun 7", eu: 172, us: null },
+  { day: "Jun 8", eu: null, us: 162 },
+  { day: "Jun 9", eu: 188, us: 170 },
+];
+
+/** Monthly growth (%) per product; negative months shrink. */
+export const productGrowth = [
+  { month: "Jan", core: 4.2, addons: -1.8 },
+  { month: "Feb", core: 2.6, addons: -3.4 },
+  { month: "Mar", core: -1.4, addons: 1.2 },
+  { month: "Apr", core: -2.8, addons: 3.6 },
+  { month: "May", core: 1.9, addons: 2.4 },
+  { month: "Jun", core: 3.7, addons: -0.6 },
+  { month: "Jul", core: 5.1, addons: 1.8 },
+  { month: "Aug", core: 2.2, addons: 4.4 },
+];
