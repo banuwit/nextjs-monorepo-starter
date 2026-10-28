@@ -1,6 +1,6 @@
 # Struktur folder fitur frontend
 
-Keputusan pengguna, 24 Oktober 2026: setiap fitur memiliki lima folder standar, meskipun masih kosong. Ketentuan ini menggantikan ketentuan PRD yang sebelumnya membuat folder fitur hanya ketika diperlukan. Lihat [panduan repositori](../../AGENTS.md) dan [PRD Tahap 1](../../apps/frontend/prd.md) untuk batas arsitektur lainnya.
+Keputusan pengguna, 24 Oktober 2026: setiap fitur memiliki lima folder standar, meskipun masih kosong. Ketentuan ini menggantikan ketentuan PRD yang sebelumnya membuat folder fitur hanya ketika diperlukan. Lihat [panduan repositori](../../../AGENTS.md) dan [PRD Tahap 1](../../../apps/frontend/prd.md) untuk batas arsitektur lainnya.
 
 ## Struktur wajib
 

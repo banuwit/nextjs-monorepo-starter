@@ -47,7 +47,7 @@ Preference cookies last one year from each write. Only the changed persistable p
 
 The root layout reads cookies for correct initial sidebar rendering, so routes render on demand. A boot script resolves the system theme and legacy theme before hydration. Fonts are served locally through `next/font/local`; the added Latin WOFF2 assets come from Google Fonts, with OFL licenses alongside them in [fonts](./apps/frontend/src/app/fonts/). Only Geist is preloaded; alternative fonts load when used.
 
-After changing preferences, check the controls in a browser across navigation and reload. Follow the cases in [Panduan Preferences](./.agents/rule/preferences.md).
+After changing preferences, check the controls in a browser across navigation and reload. Follow the cases in [Panduan Preferences](./.agents/rules/frontend/preferences.md).
 
 This Turborepo includes the following packages/apps:
 
