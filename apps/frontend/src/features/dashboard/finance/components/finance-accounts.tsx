@@ -5,7 +5,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { usdWhole } from "@/features/dashboard/utils/format";
+import { usdWhole } from "../utils/format";
 import { financeAccounts } from "@/mocks/dashboard-finance.mock";
 
 const total = financeAccounts.reduce((sum, account) => sum + account.balance, 0);

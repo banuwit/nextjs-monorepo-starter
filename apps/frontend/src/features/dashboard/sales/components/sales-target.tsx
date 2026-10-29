@@ -1,7 +1,7 @@
 import { Card, CardContent } from "@/components/ui/card";
-import { TrendDelta } from "@/features/dashboard/components/trend-delta";
-import { integer, percentChange, usd, usdWhole } from "@/features/dashboard/utils/format";
-import type { Delta } from "@/features/dashboard/types/dashboard";
+import { TrendDelta } from "./trend-delta";
+import { integer, percentChange, usd, usdWhole } from "../utils/format";
+import type { Delta } from "../types/dashboard";
 import { cn } from "@/lib/utils";
 
 export function SalesTarget({

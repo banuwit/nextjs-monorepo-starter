@@ -1,5 +1,5 @@
 // Data contoh untuk dashboard Main; belum terhubung ke API.
-import type { KpiItem } from "@/features/dashboard/types/dashboard";
+import type { KpiItem } from "@/features/dashboard/main/types/dashboard";
 
 export const dashboardMainMetrics = [
   {

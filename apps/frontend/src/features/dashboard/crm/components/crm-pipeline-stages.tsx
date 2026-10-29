@@ -11,7 +11,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { usdCompact, usdWhole } from "@/features/dashboard/utils/format";
+import { usdCompact, usdWhole } from "../utils/format";
 import { cn } from "@/lib/utils";
 import type { CrmOpportunity } from "@/mocks/dashboard-crm.mock";
 

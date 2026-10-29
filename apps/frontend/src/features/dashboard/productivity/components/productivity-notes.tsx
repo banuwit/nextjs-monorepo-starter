@@ -9,7 +9,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { formatShortDate } from "@/features/dashboard/utils/format";
+import { formatShortDate } from "../utils/format";
 import { productivityNotes } from "@/mocks/dashboard-productivity.mock";
 
 export function ProductivityNotes() {

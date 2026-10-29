@@ -1,7 +1,10 @@
 import type { Metadata } from "next";
 import { FileManagerPage } from "@/features/file-manager/components/file-manager-page";
 
-export const metadata: Metadata = { title: "File Manager" };
+export const metadata: Metadata = {
+  title: "File Manager | Dashboard",
+  description: "Browse, organize, and preview files and folders.",
+};
 
 export default async function Page({
   searchParams,

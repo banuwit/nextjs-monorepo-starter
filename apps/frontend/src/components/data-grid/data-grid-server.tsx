@@ -13,7 +13,7 @@ import * as React from "react"
 import { usePathname, useRouter } from "next/navigation"
 
 import { FacetedFilter } from "@/components/filter/faceted-filter"
-import { SelectBox } from "@/components/filter/select-box"
+import { SearchFilter } from "@/components/filter/search-filter"
 import { cn } from "@/lib/utils"
 import {
   Table,
@@ -33,9 +33,12 @@ import { DataGridLoading } from "./data-grid-loading"
 import { DataGridPaginationAdvance } from "./data-grid-pagination-advance"
 import { DataGridPaginationSimple } from "./data-grid-pagination-simple"
 import { getPinnedCellProps, useColumnPinOffsets } from "./data-grid-pinning"
-import { DataGridSearchInput } from "./data-grid-search-input"
 import { DataGridScrollArea } from "./data-grid-scroll-area"
 import { getDataGridBodyState } from "./data-grid-state"
+import {
+  DataGridToolbarFilters,
+  getToolbarFilterKeys,
+} from "./data-grid-toolbar-filters"
 import { DataGridVisibilityToggle } from "./data-grid-visibility-toggle"
 import { buildDataGridUrl } from "./query"
 import type { GridQuery } from "./query"
@@ -125,46 +128,6 @@ const EMPTY_META: DataGridPageMeta = {
   totalPages: 1,
 }
 
-function ServerSearch({
-  initialValue,
-  placeholder,
-  onSearch,
-}: {
-  initialValue: string
-  placeholder: string
-  onSearch: (value: string) => void
-}) {
-  const [value, setValue] = React.useState(initialValue)
-  const timeout = React.useRef<ReturnType<typeof setTimeout> | null>(null)
-  const onSearchRef = React.useRef(onSearch)
-
-  React.useEffect(() => {
-    onSearchRef.current = onSearch
-  }, [onSearch])
-
-  React.useEffect(
-    () => () => {
-      if (timeout.current) clearTimeout(timeout.current)
-    },
-    [],
-  )
-
-  return (
-    <DataGridSearchInput
-      placeholder={placeholder}
-      value={value}
-      onChange={(next) => {
-        setValue(next)
-        if (timeout.current) clearTimeout(timeout.current)
-        timeout.current = setTimeout(
-          () => onSearchRef.current(next),
-          SEARCH_DEBOUNCE_MS,
-        )
-      }}
-    />
-  )
-}
-
 export function DataGridServer<TData extends RowData>({
   columns,
   data = [],
@@ -193,17 +156,19 @@ export function DataGridServer<TData extends RowData>({
   emptyFilteredDescription,
 }: DataGridServerProps<TData>) {
   const facets = toolbar?.facets ?? []
-  const selects = toolbar?.selects ?? []
   const searchConfigs = toolbar?.searches ?? []
   const scrollRef = React.useRef<HTMLDivElement>(null)
 
-  // True when a search box, facet, or select is currently narrowing the
+  // True when a search box, facet, or toolbar filter is currently narrowing the
   // result set — distinguishes "no rows in this filter" from "no rows at
   // all" in the empty state.
   const isFiltered =
     searchConfigs.some((search) => !!filters[search.key]) ||
-    [...facets, ...selects].some((filter) => {
-      const value = filters[filter.key]
+    [
+      ...facets.map((filter) => filter.key),
+      ...getToolbarFilterKeys(toolbar),
+    ].some((key) => {
+      const value = filters[key]
 
       return Array.isArray(value) ? value.length > 0 : !!value
     })
@@ -304,11 +269,14 @@ export function DataGridServer<TData extends RowData>({
         <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex flex-1 flex-wrap items-center gap-2">
             {searchConfigs.map((search) => (
-              <ServerSearch
+              <SearchFilter
                 key={`${search.key}:${filters[search.key] ?? ""}`}
                 placeholder={search.placeholder}
-                initialValue={String(filters[search.key] ?? "")}
-                onSearch={(value) => visit({ [search.key]: value, page: 1 })}
+                defaultValue={String(filters[search.key] ?? "")}
+                debounceMs={SEARCH_DEBOUNCE_MS}
+                onValueChange={(value) =>
+                  visit({ [search.key]: value, page: 1 })
+                }
               />
             ))}
             {facets.map((facet) => {
@@ -333,34 +301,18 @@ export function DataGridServer<TData extends RowData>({
                 />
               )
             })}
-            {selects.map((select) => {
-              const applied = filters[select.key]
-              const value = Array.isArray(applied)
-                ? (applied[0] ?? null)
-                : (applied ?? null)
-
-              return (
-                <SelectBox
-                  key={select.key}
-                  // `SelectBox` defaults its trigger to
-                  // `w-full` for its form-control use case;
-                  // here it sits beside `FacetedFilter`
-                  // triggers, which shrink to their content,
-                  // so it needs the same to look consistent.
-                  className="w-auto"
-                  options={select.options}
-                  placeholder={select.placeholder}
-                  clearable={select.clearable}
-                  value={value}
-                  onValueChange={(next) =>
-                    visit({
-                      [select.key]: next ?? undefined,
-                      page: 1,
-                    })
-                  }
-                />
-              )
-            })}
+            <DataGridToolbarFilters
+              toolbar={toolbar}
+              getValues={(key) => {
+                const applied = filters[key]
+                return Array.isArray(applied)
+                  ? applied
+                  : applied
+                    ? [applied]
+                    : []
+              }}
+              onChange={(key, values) => visit({ [key]: values, page: 1 })}
+            />
           </div>
           <div className="flex shrink-0 items-center gap-2">
             {showVisibilityToggle && (

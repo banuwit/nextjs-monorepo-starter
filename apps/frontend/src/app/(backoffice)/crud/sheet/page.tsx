@@ -1,7 +1,11 @@
-import { ExamplePage } from "@/features/crud-examples/components/example-page";
+import type { Metadata } from "next";
+import { SheetPage } from "@/features/crud/sheet/components/sheet-page";
 
-export const metadata = { title: "CRUD · Sheet | Workspace" };
+export const metadata: Metadata = {
+  title: "CRUD · Sheet | Workspace",
+  description: "CRUD pattern that creates and edits records in a side sheet.",
+};
 
 export default function Page() {
-  return <ExamplePage variant="sheet" />;
+  return <SheetPage />;
 }

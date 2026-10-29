@@ -1,7 +1,7 @@
 "use client";
 
 import { ChartCard } from "@/components/chart/chart-card";
-import { FlowChart } from "@/features/chart/sankey/components/sankey-flow-chart";
+import { SankeyFlowChart } from "@/features/chart/sankey/components/sankey-flow-chart";
 import { customerJourney } from "@/mocks/chart-sankey.mock";
 
 export function SankeyCustomerJourneyCard() {
@@ -13,7 +13,7 @@ export function SankeyCustomerJourneyCard() {
       change={3.1}
       footer='align="left" keeps exits next to the stage where users left; values are in the tooltip.'
     >
-      <FlowChart
+      <SankeyFlowChart
         data={customerJourney}
         showValues={false}
         className="min-w-[30rem]"

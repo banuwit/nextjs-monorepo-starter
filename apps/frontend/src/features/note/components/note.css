@@ -1,0 +1,324 @@
+.note-page {
+  position: relative;
+}
+.note-prose {
+  min-height: 36rem;
+  outline: none;
+  overflow-wrap: anywhere;
+  font-size: 0.9375rem;
+  line-height: 1.8;
+}
+.note-small .note-prose {
+  font-size: 0.8125rem;
+}
+.note-prose > * + * {
+  margin-top: 1rem;
+}
+.note-prose h1 {
+  font-size: 1.5em;
+  font-weight: 650;
+  line-height: 1.3;
+  letter-spacing: -0.025em;
+}
+.note-prose h2 {
+  margin-top: 2rem;
+  font-size: 1.2em;
+  font-weight: 650;
+  line-height: 1.4;
+}
+.note-prose h3 {
+  margin-top: 1.5rem;
+  font-size: 1.05em;
+  font-weight: 600;
+}
+.note-prose p {
+  min-height: 1.5em;
+}
+.note-prose ul,
+.note-prose ol {
+  padding-left: 1.4rem;
+}
+.note-prose ul {
+  list-style: disc;
+}
+.note-prose ol {
+  list-style: decimal;
+}
+.note-prose li + li {
+  margin-top: 0.25rem;
+}
+.note-prose li p {
+  margin: 0;
+}
+.note-prose blockquote {
+  border-left: 3px solid var(--border);
+  padding-left: 1rem;
+  color: var(--muted-foreground);
+}
+.note-prose pre {
+  overflow-x: auto;
+  border-radius: var(--radius);
+  background: var(--muted);
+  padding: 1rem;
+  font-family: var(--font-mono);
+  font-size: 0.85em;
+}
+.note-prose code {
+  border-radius: 0.2rem;
+  background: var(--muted);
+  padding: 0.1em 0.3em;
+  font-family: var(--font-mono);
+  font-size: 0.85em;
+}
+.note-prose pre code {
+  padding: 0;
+}
+.note-prose a {
+  color: var(--primary-text);
+  text-decoration: underline;
+}
+.note-prose mark {
+  background: color-mix(in oklch, var(--primary) 22%, var(--background));
+  color: var(--foreground);
+}
+.note-prose hr {
+  margin-block: 1.5rem;
+  border-color: var(--border);
+}
+.note-prose .note-mention {
+  border-radius: 0.25rem;
+  background: var(--muted);
+  padding: 0.1em 0.25em;
+  font-weight: 500;
+}
+.note-prose ul[data-type="taskList"] {
+  list-style: none;
+  padding: 0;
+}
+.note-prose li[data-type="taskItem"] {
+  display: flex;
+  align-items: baseline;
+  gap: 0.6rem;
+}
+.note-prose li[data-type="taskItem"] > div {
+  flex: 1;
+  min-width: 0;
+}
+.note-prose li[data-type="taskItem"] label {
+  flex-shrink: 0;
+}
+.note-prose input[type="checkbox"] {
+  appearance: none;
+  display: grid;
+  place-content: center;
+  width: 1rem;
+  height: 1rem;
+  margin: 0;
+  border: 1px solid var(--input);
+  border-radius: 4px;
+  background: transparent;
+  cursor: pointer;
+  transform: translateY(0.15em);
+  transition:
+    background-color 150ms,
+    border-color 150ms;
+}
+.dark .note-prose input[type="checkbox"] {
+  background: color-mix(in oklab, var(--input) 30%, transparent);
+}
+.note-prose input[type="checkbox"]::before {
+  content: "";
+  width: 0.75rem;
+  height: 0.75rem;
+  background: var(--primary-foreground);
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 6 9 17l-5-5'/%3E%3C/svg%3E")
+    center / contain no-repeat;
+  transform: scale(0);
+}
+.note-prose input[type="checkbox"]:checked {
+  border-color: var(--primary);
+  background: var(--primary);
+}
+.note-prose input[type="checkbox"]:checked::before {
+  transform: scale(1);
+}
+.note-prose input[type="checkbox"]:focus-visible {
+  border-color: var(--ring);
+  outline: 3px solid color-mix(in oklab, var(--ring) 50%, transparent);
+}
+.note-prose[contenteditable="false"] input[type="checkbox"] {
+  pointer-events: none;
+}
+.note-prose li[data-checked="true"] > div > p {
+  color: var(--muted-foreground);
+  text-decoration: line-through;
+}
+.note-prose .tableWrapper {
+  max-width: 100%;
+  overflow-x: auto;
+  margin-block: 1.5rem;
+}
+.note-prose table {
+  min-width: 32rem;
+  border-collapse: collapse;
+  table-layout: fixed;
+  width: 100%;
+  font-size: 0.85em;
+}
+.note-prose td,
+.note-prose th {
+  position: relative;
+  border: 1px solid var(--border);
+  min-width: 90px;
+  padding: 0.5rem 0.75rem;
+  vertical-align: top;
+  text-align: left;
+}
+.note-prose th {
+  background: var(--muted);
+  color: var(--muted-foreground);
+  font-weight: 500;
+}
+.note-prose .selectedCell::after {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  content: "";
+  background: color-mix(in oklch, var(--primary) 15%, transparent);
+}
+.note-prose .column-resize-handle {
+  position: absolute;
+  top: 0;
+  right: -2px;
+  bottom: -2px;
+  width: 4px;
+  background: var(--primary);
+  pointer-events: none;
+}
+.note-prose.resize-cursor {
+  cursor: col-resize;
+}
+.note-prose .is-empty::before {
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  pointer-events: none;
+  color: var(--muted-foreground);
+}
+.note-outline-rail {
+  position: fixed;
+  top: 13rem;
+  right: 2rem;
+  z-index: 15;
+}
+.note-outline-ticks {
+  display: flex;
+  width: 1.5rem;
+  align-items: flex-end;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding-block: 1rem;
+}
+.note-outline-ticks span {
+  width: 1.25rem;
+  height: 1px;
+  background: var(--muted-foreground);
+  opacity: 0.45;
+}
+.note-outline-ticks span[data-level="2"] {
+  width: 1rem;
+}
+.note-outline-ticks span[data-level="3"] {
+  width: 0.75rem;
+}
+.note-outline-ticks span[data-active] {
+  background: var(--foreground);
+  opacity: 1;
+}
+.note-outline-panel {
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 16rem;
+  max-height: 70vh;
+  overflow: auto;
+  padding: 1rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--popover);
+  box-shadow: 0 4px 16px #0001;
+  /* Hidden visually but still reachable with Tab; focus reveals it. */
+  opacity: 0;
+  pointer-events: none;
+  transform: translateX(0.5rem);
+  transition:
+    opacity 150ms,
+    transform 150ms;
+}
+.note-outline-rail:hover .note-outline-panel,
+.note-outline-rail:focus-within .note-outline-panel {
+  opacity: 1;
+  pointer-events: auto;
+  transform: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .note-outline-panel {
+    transition: none;
+  }
+}
+.note-suggestions {
+  z-index: 50;
+  min-width: 12rem;
+  max-width: calc(100vw - 2rem);
+  max-height: 18rem;
+  overflow-y: auto;
+  padding: 0.25rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--popover);
+  color: var(--popover-foreground);
+  box-shadow: 0 4px 16px #0002;
+  font-size: 0.875rem;
+}
+.note-suggestion-item {
+  display: block;
+  width: 100%;
+  border-radius: calc(var(--radius) - 2px);
+  padding: 0.45rem 0.75rem;
+  text-align: left;
+}
+.note-suggestion-person {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  column-gap: 0.6rem;
+  align-items: center;
+}
+.note-suggestion-avatar {
+  grid-row: span 2;
+  display: grid;
+  place-content: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: 9999px;
+  background: var(--muted);
+  color: var(--muted-foreground);
+  font-size: 0.7rem;
+  font-weight: 500;
+}
+.note-suggestion-label {
+  font-weight: 500;
+}
+.note-suggestion-description {
+  color: var(--muted-foreground);
+  font-size: 0.75rem;
+}
+.note-suggestion-item:hover,
+.note-suggestion-item[aria-selected="true"] {
+  background: var(--accent);
+  color: var(--accent-foreground);
+}
+@media (max-width: 1023px) {
+  .note-outline-rail {
+    display: none;
+  }
+}

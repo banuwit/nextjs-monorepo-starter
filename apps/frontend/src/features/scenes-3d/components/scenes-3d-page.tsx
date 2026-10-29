@@ -22,7 +22,7 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { Toaster, toast } from "@/components/ui/toast";
-import { stadiumData } from "@/mocks/stadium.mock";
+import { stadiumData } from "@/mocks/scenes-3d.mock";
 import { useSceneColors } from "../hooks/use-scene-colors";
 import { useWebGLSupport } from "../hooks/use-webgl-support";
 import { seatSelectionSchema } from "../schemas/stadium.schema";

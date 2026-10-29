@@ -1,8 +1,8 @@
 import Image from "next/image";
-import { AuthBrand } from "../../components/auth-brand";
-import { AuthPreviewAction } from "../../components/auth-preview-action";
-import { CredentialsForm } from "../../components/credentials-form";
-import { SocialLoginButtons } from "../../components/social-login-buttons";
+import { AuthBrand } from "./auth-brand";
+import { AuthPreviewAction } from "./auth-preview-action";
+import { CredentialsForm } from "./credentials-form";
+import { SocialLoginButtons } from "./social-login-buttons";
 import { FieldSeparator } from "@/components/ui/field";
 import styles from "./login-page.module.css";
 

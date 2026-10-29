@@ -1,5 +1,5 @@
 // Data contoh untuk dashboard Finance; tidak ada rekening atau transfer yang terhubung.
-import type { KpiItem } from "@/features/dashboard/types/dashboard";
+import type { KpiItem } from "@/features/dashboard/finance/types/dashboard";
 
 /** Month-end net worth in USD, oldest first; the last value is this month. */
 export const financeNetWorthHistory = [

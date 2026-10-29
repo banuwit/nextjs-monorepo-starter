@@ -1,6 +1,6 @@
 import { AppBody } from "@/components/app-body";
 import { PageHeading } from "@/components/page-heading";
-import { KpiStrip } from "@/features/dashboard/components/kpi-strip";
+import { KpiStrip } from "./kpi-strip";
 import { crmMetrics } from "@/mocks/dashboard-crm.mock";
 
 import { CrmLeadFlow } from "./crm-lead-flow";

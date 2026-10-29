@@ -1,7 +1,11 @@
-import { ExampleRecordPage } from "@/features/crud-examples/components/example-record-page";
+import type { Metadata } from "next";
+import { NewPageRecordPage } from "@/features/crud/new-page/components/new-page-record-page";
 
-export const metadata = { title: "Add New | Workspace" };
+export const metadata: Metadata = {
+  title: "CRUD · New Page · Add | Workspace",
+  description: "Create a new record on its own page.",
+};
 
 export default function Page() {
-  return <ExampleRecordPage mode="create" />;
+  return <NewPageRecordPage mode="create" />;
 }

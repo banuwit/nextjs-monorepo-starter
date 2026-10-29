@@ -1,7 +1,7 @@
 "use client";
 
 import { ChartCard } from "@/components/chart/chart-card";
-import { FlowChart } from "@/features/chart/sankey/components/sankey-flow-chart";
+import { SankeyFlowChart } from "@/features/chart/sankey/components/sankey-flow-chart";
 import { signupFunnel } from "@/mocks/chart.mock";
 
 export function SankeyTrialJourneyCard() {
@@ -13,7 +13,7 @@ export function SankeyTrialJourneyCard() {
       change={-2.6}
       footer="43% of trials converted to a paid plan."
     >
-      <FlowChart data={signupFunnel} />
+      <SankeyFlowChart data={signupFunnel} />
     </ChartCard>
   );
 }

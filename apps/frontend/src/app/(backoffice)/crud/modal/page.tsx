@@ -1,7 +1,11 @@
-import { ExamplePage } from "@/features/crud-examples/components/example-page";
+import type { Metadata } from "next";
+import { ModalPage } from "@/features/crud/modal/components/modal-page";
 
-export const metadata = { title: "CRUD · Modal | Workspace" };
+export const metadata: Metadata = {
+  title: "CRUD · Modal | Workspace",
+  description: "CRUD pattern that creates and edits records in a modal dialog.",
+};
 
 export default function Page() {
-  return <ExamplePage variant="modal" />;
+  return <ModalPage />;
 }

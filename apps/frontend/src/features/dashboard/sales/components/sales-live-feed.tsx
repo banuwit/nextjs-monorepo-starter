@@ -7,8 +7,8 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { StatusBadge } from "@/features/dashboard/components/status-badge";
-import { usd } from "@/features/dashboard/utils/format";
+import { StatusBadge } from "./status-badge";
+import { usd } from "../utils/format";
 import { cn } from "@/lib/utils";
 
 import type { SalesFeedOrder } from "../types/sales";

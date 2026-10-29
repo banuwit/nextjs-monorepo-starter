@@ -7,7 +7,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { initials, usdWhole } from "@/features/dashboard/utils/format";
+import { initials, usdWhole } from "../utils/format";
 import { cn } from "@/lib/utils";
 import { salesReps } from "@/mocks/dashboard-sales.mock";
 

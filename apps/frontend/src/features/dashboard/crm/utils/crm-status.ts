@@ -6,7 +6,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 
-import type { StatusTone } from "@/features/dashboard/types/dashboard";
+import type { StatusTone } from "../types/dashboard";
 import type { CrmOpportunity } from "@/mocks/dashboard-crm.mock";
 
 export const healthStyles: Record<CrmOpportunity["health"], { tone: StatusTone; icon: LucideIcon }> = {

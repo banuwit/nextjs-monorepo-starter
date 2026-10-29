@@ -1,0 +1,54 @@
+"use client";
+
+import {
+  CrudForm,
+  type CrudField,
+  type CrudFormProps,
+} from "@/components/crud/crud-form";
+import { crudSchemas } from "@/mocks/crud-model";
+import type { PanelInlineExample } from "../types/panel-inline-example";
+
+const fields: CrudField<PanelInlineExample>[] = [
+  { name: "key", label: "Key", required: true, placeholder: "app.name" },
+  {
+    name: "type",
+    label: "Tipe",
+    type: "select",
+    required: true,
+    options: ["string", "number", "boolean", "json"].map((value) => ({
+      value,
+      label: value,
+    })),
+  },
+  {
+    name: "value",
+    label: "Nilai",
+    type: "textarea",
+    description:
+      "Boolean: true / false. JSON harus valid. Jangan isi password, token, atau secret.",
+  },
+  {
+    name: "description",
+    label: "Deskripsi",
+    type: "textarea",
+    placeholder: "Kegunaan parameter ini…",
+  },
+  { name: "isActive", label: "Parameter aktif", type: "boolean" },
+];
+
+export function PanelInlineForm(props: CrudFormProps<PanelInlineExample>) {
+  return (
+    <CrudForm
+      {...props}
+      schema={crudSchemas.parameters}
+      fields={fields}
+      defaults={{
+        key: "",
+        value: "",
+        type: "string",
+        description: "",
+        isActive: true,
+      }}
+    />
+  );
+}

@@ -68,7 +68,7 @@ Aturan lengkap: [Struktur folder](.agents/rules/frontend/structure-folder.md). T
 | Chart      | `/chart/*` — 21 jenis chart (area, bar, line, pie, sankey, treemap, waterfall, dll.)                                                                                                                              |
 | Table      | `/table/base`, `column`, `scroll`, `drag-and-drop/{row,column}`, `editable/{inline,row,sheet}`, `group/{expansion,section,tree}`                                                                                  |
 | CRUD       | `/crud/{new-page,modal,sheet,panel-inline}` — empat pola CRUD dengan satu sumber data                                                                                                                             |
-| Playground | `/playground/{3d-scenes,invoice,notes,rich-text-editor,wizard}`, `/whiteboard`                                                                                                                                    |
+| Playground | `/playground/{scenes-3d,invoice,notes,rich-text-editor,wizard}`, `/whiteboard`                                                                                                                                    |
 
 Menu navigasi didefinisikan di [app-navigation.tsx](apps/frontend/src/components/layout/app-navigation.tsx) dan pencarian menu di [menu-search-tree.ts](apps/frontend/src/components/layout/menu-search-tree.ts).
 

@@ -8,9 +8,9 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { users } from "@/mocks/user.mock";
-import { CellUserTable } from "./sheet-user-table";
+import { SheetUserTable } from "./sheet-user-table";
 
-export function CellTablePage() {
+export function SheetTablePage() {
   return (
     <AppBody>
       <PageHeading
@@ -26,7 +26,7 @@ export function CellTablePage() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <CellUserTable users={users} />
+          <SheetUserTable users={users} />
         </CardContent>
       </Card>
     </AppBody>

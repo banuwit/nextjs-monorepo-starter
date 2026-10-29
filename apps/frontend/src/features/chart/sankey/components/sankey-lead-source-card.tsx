@@ -4,7 +4,7 @@ import { useId } from "react";
 import type { SankeyLinkProps } from "recharts";
 
 import { ChartCard } from "@/components/chart/chart-card";
-import { FlowChart } from "@/features/chart/sankey/components/sankey-flow-chart";
+import { SankeyFlowChart } from "@/features/chart/sankey/components/sankey-flow-chart";
 import {
   getColorIndex,
   nodeColor,
@@ -59,7 +59,7 @@ export function SankeyLeadSourceCard() {
       change={8.4}
       footer="Each link blends from its source color into its target color."
     >
-      <FlowChart
+      <SankeyFlowChart
         data={leadSourceFunnel}
         className="min-w-[30rem]"
         sankeyProps={{ link: createGradientLink(idPrefix) }}

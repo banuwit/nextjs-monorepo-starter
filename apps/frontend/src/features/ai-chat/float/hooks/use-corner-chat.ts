@@ -4,8 +4,8 @@ import { useRef, useState } from "react";
 
 import { cornerPageSource, cornerThreads } from "@/mocks/ai-chat.mock";
 import { useChatThread } from "./use-chat-thread";
-import { useTimers } from "./use-timers";
-import { createId } from "../utils/stream-text";
+import { useTimers } from "@/features/ai-chat/hooks/use-timers";
+import { createId } from "@/features/ai-chat/utils/stream-text";
 import type {
   CornerChatMessage,
   CornerChatMeta,

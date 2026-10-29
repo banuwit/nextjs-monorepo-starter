@@ -1,4 +1,4 @@
-import { daysBetween } from "@/features/dashboard/utils/format";
+import { daysBetween } from "./format";
 import type { FinanceTransaction } from "@/mocks/dashboard-finance.mock";
 
 export const transactionsCsvHeader = ["Name", "Category", "Date", "Amount (USD)"] as const;

@@ -1,7 +1,7 @@
 "use client";
 
 import { ChartCard } from "@/components/chart/chart-card";
-import { FlowChart } from "@/features/chart/sankey/components/sankey-flow-chart";
+import { SankeyFlowChart } from "@/features/chart/sankey/components/sankey-flow-chart";
 import { incomeStatement } from "@/mocks/chart.mock";
 
 export function SankeyIncomeStatementCard() {
@@ -13,7 +13,7 @@ export function SankeyIncomeStatementCard() {
       change={14.2}
       footer="Toggle a revenue source to see how the flows change."
     >
-      <FlowChart data={incomeStatement} />
+      <SankeyFlowChart data={incomeStatement} />
     </ChartCard>
   );
 }

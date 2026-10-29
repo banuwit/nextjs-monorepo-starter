@@ -36,18 +36,18 @@ import { getUserEditErrors } from "../../utils/user-editing";
 import { userEditsSchema } from "../../schemas/user-editing.schema";
 import type { EditableUserField, UserDraft } from "../../types/user-editing";
 
-export type CellUserEditor = {
+export type SheetUserEditor = {
   mode: "duplicate" | "details";
   draft: UserDraft;
 };
-export function CellUserForm({
+export function SheetUserForm({
   editor,
   rows,
   onSave,
   onClose,
   fields,
 }: {
-  editor: CellUserEditor;
+  editor: SheetUserEditor;
   rows: User[];
   onSave: (rows: User[]) => void;
   onClose: () => void;
@@ -165,7 +165,7 @@ export function CellUserForm({
   );
 }
 
-export function CellUserDelete({
+export function SheetUserDelete({
   user,
   onDelete,
   onClose,

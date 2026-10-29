@@ -7,7 +7,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { formatShortDate, usd } from "@/features/dashboard/utils/format";
+import { formatShortDate, usd } from "../utils/format";
 import { cn } from "@/lib/utils";
 import { financeTransactions } from "@/mocks/dashboard-finance.mock";
 

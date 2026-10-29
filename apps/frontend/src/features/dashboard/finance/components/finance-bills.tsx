@@ -7,8 +7,8 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { StatusBadge } from "@/features/dashboard/components/status-badge";
-import { daysBetween, formatShortDate, usd, usdWhole } from "@/features/dashboard/utils/format";
+import { StatusBadge } from "./status-badge";
+import { daysBetween, formatShortDate, usd, usdWhole } from "../utils/format";
 import { financeBills } from "@/mocks/dashboard-finance.mock";
 
 import { dueLabel } from "../utils/finance";

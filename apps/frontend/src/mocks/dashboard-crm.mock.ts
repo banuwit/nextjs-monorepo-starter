@@ -1,5 +1,5 @@
 // Data contoh untuk dashboard CRM; belum terhubung ke API.
-import type { KpiItem } from "@/features/dashboard/types/dashboard";
+import type { KpiItem } from "@/features/dashboard/crm/types/dashboard";
 
 export const crmMetrics = [
   {

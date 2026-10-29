@@ -15,13 +15,13 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { StatusBadge } from "@/features/dashboard/components/status-badge";
-import { downloadCsv } from "@/features/dashboard/utils/csv";
-import { formatShortDate, initials, usdWhole } from "@/features/dashboard/utils/format";
+import { StatusBadge } from "./status-badge";
+import { downloadCsv } from "../utils/csv";
+import { formatShortDate, initials, usdWhole } from "../utils/format";
 import type { DashboardCustomer } from "@/mocks/dashboard-main.mock";
 
 import { customersCsvHeader, customersCsvRows } from "../utils/customers";
-import { accountStyles, billingStyles } from "./customer-status";
+import { accountStyles, billingStyles } from "../utils/customer-status";
 
 const columns: ColumnDef<DataGridFeatures, DashboardCustomer>[] = [
   {

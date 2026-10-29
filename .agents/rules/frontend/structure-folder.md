@@ -24,7 +24,7 @@ src/
 │   ├── layout/             # Sidebar, header, menubar, multi-sidebar, nav, Preferences
 │   ├── crud/               # Empat pola CRUD global (CrudResource, page/dialog/sheet/inline)
 │   ├── data-grid/          # DataGridClient / DataGridServer dan bagiannya
-│   ├── filter/             # FacetedFilter, SelectBox
+│   ├── filter/             # FacetedFilter, SelectFilter, ComboboxFilter, SearchFilter
 │   ├── chart/              # ChartCard, ChartLegendToggle
 │   ├── gantt/              # Komponen Gantt bersama
 │   ├── app-body.tsx        # Pembungkus konten halaman
@@ -74,28 +74,33 @@ apps/frontend/src/features/<fitur>/
 - Aturan berlaku untuk fitur utama, subfitur/varian halaman, dan folder induk kelompok fitur. Contoh: `dashboard/`, `dashboard/sales/`, `authentication/`, `authentication/auth-1/`, `table/editable/`, dan `table/editable/sheet/` masing-masing memiliki lima folder tersebut.
 - Folder standar tidak perlu memiliki lima subfolder standar lagi. Buat subfolder di dalamnya hanya untuk mengelompokkan file nyata.
 - Jangan menaruh modul kode langsung di root fitur atau root kelompok fitur. Dokumen seperti `README.md` dan `LICENSE` boleh berada di root (contoh: `authentication/README.md`, `calendar/LICENSE`).
-- Kerangka fitur tanpa halaman seperti `users/`, `menus/`, dan `parameters/` tetap memiliki struktur ini. Keberadaan folder tidak berarti halaman atau fungsinya telah diimplementasikan.
+- Kerangka fitur tanpa halaman seperti `user/`, `menus/`, dan `parameters/` tetap memiliki struktur ini. Keberadaan folder tidak berarti halaman atau fungsinya telah diimplementasikan.
 
 ### Hubungan route dan fitur
 
 Satu route biasanya dipetakan ke satu fitur atau subfitur. Nama folder fitur mengikuti segmen route bila memungkinkan:
 
-| Route                                       | Fitur                                                   |
-| ------------------------------------------- | ------------------------------------------------------- |
-| `/login-1` … `/login-5`                     | `authentication/auth-1` … `auth-5`                      |
-| `/dashboard/sales`                          | `dashboard/sales`                                       |
-| `/dashboard/ai-chat/float`                  | `ai-chat/float`                                         |
-| `/chart/area`                               | `chart/area`                                            |
-| `/table/editable/sheet`                     | `table/editable/sheet`                                  |
-| `/crud/{new-page,modal,sheet,panel-inline}` | `crud-examples` (satu fitur bersama, varian lewat prop) |
-| `/playground/3d-scenes`                     | `scenes-3d`                                             |
+| Route                                       | Fitur                                                       |
+| ------------------------------------------- | ----------------------------------------------------------- |
+| `/login-1` … `/login-5`                     | `authentication/auth-1` … `auth-5`                          |
+| `/dashboard/sales`                          | `dashboard/sales`                                           |
+| `/dashboard/ai-chat/float`                  | `ai-chat/float`                                             |
+| `/chart/area`                               | `chart/area`                                                |
+| `/table/editable/sheet`                     | `table/editable/sheet`                                      |
+| `/crud/{new-page,modal,sheet,panel-inline}` | `crud` (induk) + `crud/{new-page,modal,sheet,panel-inline}` |
+| `/playground/scenes-3d`                     | `scenes-3d`                                                 |
+| `/dashboard/workflow`                       | `workflow` (juga `activity`, `structure`, `process`)        |
+
+- Pengecualian `/dashboard/*`: dashboard analitik (`main`, `finance`, `sales`, `crm`, `productivity`) berada di kelompok `features/dashboard/<nama>`; halaman aplikasi lain di bawah `/dashboard/*` (`calendar`, `project`, `task`, `file-manager`, `profile`, `receipt`, `workflow`, `activity`, `structure`, `process`, `ai-chat/*`) memakai folder fitur tingkat atas tanpa awalan `dashboard/`. Nama file halaman dashboard analitik: `<nama>-dashboard-page.tsx`.
+- Nama fitur tidak diberi awalan kelompok visual (misalnya `timeline-` atau `flow-`); gunakan nama pendek yang sama dengan segmen route, dan pakai nama itu juga untuk file halaman, mock (`<fitur>.mock.ts`), dan CSS fitur.
 
 ### Subfitur dan kode bersama
 
 - Setiap varian halaman memiliki lima folder standar sendiri (misalnya setiap varian login, chart, dan tabel).
-- Kode yang dipakai beberapa varian dalam satu kelompok ditempatkan di folder standar milik induk kelompok. Contoh: `authentication/components/credentials-form.tsx`, `ai-chat/hooks/use-chat-thread.ts`, `chart/components/chart-example-page.tsx`, serta `table/editable/{schemas,types,utils}/user-editing*`.
+- Kode yang dipakai beberapa varian dalam satu kelompok ditempatkan di folder standar milik induk kelompok. Contoh: `ai-chat/hooks/use-chat-thread.ts`, `chart/components/chart-example-page.tsx`, serta `table/editable/{schemas,types,utils}/user-editing*`.
 - Kode yang dipakai lintas kelompok fitur dipindahkan ke `src/components/`, `src/hooks/`, `src/types/`, atau `src/utils/`; jangan mengimpor modul internal kelompok lain hanya untuk berbagi helper.
-- Empat pola CRUD contoh memakai satu fitur `crud-examples/`; jangan menggandakan komponen untuk setiap route.
+- Empat pola CRUD contoh memakai induk `crud/` dan satu subfitur per route. Keputusan pengguna, 29 Oktober 2026: form, kolom, dan tipe contoh ditulis di masing-masing subfitur, bukan dibagikan lewat induk; sumber data mock tetap satu. Pengecualian ini hanya untuk contoh `/crud/*`.
+- Halaman demo `/filter/{base,advance,group}` juga menyalin skema field, tabel, dan utilitasnya di masing-masing subfitur, bukan di induk `filter/` (keputusan pengguna, 29 Oktober 2026). Komponen filter yang reusable tetap di `src/components/filter/`.
 - Halaman chart: setiap kartu varian berada di file sendiri `<chart>-<varian>-card.tsx`; `<chart>-chart-page.tsx` hanya menyusun kartu.
 - Varian shell/layout baru dibuat di file baru di `src/components/layout/`, bukan dengan menambah percabangan pada komponen shell yang sudah ada.
 
@@ -141,7 +146,7 @@ components/*    → components/ui, lib/, hooks/   (tidak ke features/ atau mocks
 **Route entry (`src/app/(backoffice)/.../page.tsx`)** — Server Component tipis:
 
 ```tsx
-import { ExampleRecordPage } from "@/features/crud-examples/components/example-record-page";
+import { NewPageRecordPage } from "@/features/crud/new-page/components/new-page-record-page";
 
 export const metadata = { title: "Edit parameter contoh | Workspace" };
 
@@ -151,7 +156,7 @@ export default async function Page({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params; // params/searchParams adalah Promise di Next.js 16
-  return <ExampleRecordPage key={id} mode="edit" id={id} />;
+  return <NewPageRecordPage key={id} mode="edit" id={id} />;
 }
 ```
 
@@ -172,6 +177,7 @@ export function ScrollTablePage() {
 }
 ```
 
+- Setiap `page.tsx` yang dapat dikunjungi mengekspor `metadata: Metadata` (`import type { Metadata } from "next"`) dengan `title` berformat `<Nama> | <Bagian>` (`Dashboard`, `Playground`, atau `Workspace`; chart, table, dan CRUD memakai `<Bagian> · <Varian> | Workspace`) serta satu kalimat `description`. Halaman yang hanya `redirect` tidak memerlukannya.
 - Tambahkan `"use client"` hanya pada komponen yang memerlukan state, efek, event handler, atau API browser; jaga komponen halaman tetap Server Component bila tidak perlu.
 - Jangan meneruskan callback dari Server Component ke Client Component; kirim data serializable dan definisikan kolom/handler di komponen client fitur.
 - Gunakan token tema, radius, dan ukuran `rem` sesuai [Panduan Preferences](./preferences.md); gunakan Data Grid dan CRUD global sesuai [Panduan Data Grid](./data-grid.md).

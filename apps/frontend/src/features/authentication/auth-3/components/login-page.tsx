@@ -7,10 +7,10 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { FieldSeparator } from "@/components/ui/field";
-import { AuthBrand } from "../../components/auth-brand";
-import { AuthPreviewAction } from "../../components/auth-preview-action";
-import { CredentialsForm } from "../../components/credentials-form";
-import { SocialLoginButtons } from "../../components/social-login-buttons";
+import { AuthBrand } from "./auth-brand";
+import { AuthPreviewAction } from "./auth-preview-action";
+import { CredentialsForm } from "./credentials-form";
+import { SocialLoginButtons } from "./social-login-buttons";
 
 // Independent implementation of the public @reui/auth-8 preview. See ../../README.md.
 export function LoginPage() {

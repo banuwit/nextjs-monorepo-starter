@@ -20,7 +20,7 @@ import {
   type ChartConfig,
 } from "@/components/ui/chart";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
-import { numberCompact } from "@/features/dashboard/utils/format";
+import { numberCompact } from "../utils/format";
 import { customerActivity } from "@/mocks/dashboard-main.mock";
 
 const chartConfig = {

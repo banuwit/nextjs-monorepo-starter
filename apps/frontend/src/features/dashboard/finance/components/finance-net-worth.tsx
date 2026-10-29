@@ -15,8 +15,8 @@ import {
   ChartTooltipContent,
   type ChartConfig,
 } from "@/components/ui/chart";
-import { TrendDelta } from "@/features/dashboard/components/trend-delta";
-import { percentChange, usdCompact, usdWhole } from "@/features/dashboard/utils/format";
+import { TrendDelta } from "./trend-delta";
+import { percentChange, usdCompact, usdWhole } from "../utils/format";
 import { financeNetWorthHistory } from "@/mocks/dashboard-finance.mock";
 
 const chartConfig = {

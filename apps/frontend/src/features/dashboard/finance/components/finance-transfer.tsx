@@ -18,7 +18,7 @@ import {
   InputGroupInput,
   InputGroupText,
 } from "@/components/ui/input-group";
-import { initials, usd } from "@/features/dashboard/utils/format";
+import { initials, usd } from "../utils/format";
 import { financeAccounts, financeRecipients } from "@/mocks/dashboard-finance.mock";
 
 import { transferAmountError } from "../utils/finance";

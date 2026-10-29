@@ -1,7 +1,7 @@
 "use client";
 
 import { ChartCard } from "@/components/chart/chart-card";
-import { FlowChart } from "@/features/chart/sankey/components/sankey-flow-chart";
+import { SankeyFlowChart } from "@/features/chart/sankey/components/sankey-flow-chart";
 import { regionPlans } from "@/mocks/chart-sankey.mock";
 
 export function SankeyCompactCard() {
@@ -11,7 +11,7 @@ export function SankeyCompactCard() {
       description="Compact — names only, thin nodes, short height"
       footer="Values live in the tooltip to keep the chart small."
     >
-      <FlowChart
+      <SankeyFlowChart
         data={regionPlans}
         showValues={false}
         className="h-48 min-w-[24rem]"

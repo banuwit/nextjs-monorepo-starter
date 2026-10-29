@@ -17,7 +17,6 @@ import * as React from "react"
 import { cn } from "@/lib/utils"
 
 import { FacetedFilter } from "@/components/filter/faceted-filter"
-import { SelectBox } from "@/components/filter/select-box"
 import {
   Table,
   TableBody,
@@ -39,6 +38,10 @@ import { DataGridPaginationAdvance } from "./data-grid-pagination-advance"
 import { DataGridPaginationSimple } from "./data-grid-pagination-simple"
 import { getPinnedCellProps, useColumnPinOffsets } from "./data-grid-pinning"
 import { DataGridSearchInput } from "./data-grid-search-input"
+import {
+  DataGridToolbarFilters,
+  getToolbarFilterKeys,
+} from "./data-grid-toolbar-filters"
 import { getDataGridBodyState } from "./data-grid-state"
 import { DataGridRowDnd, DataGridSortableRow } from "./data-grid-row-dnd"
 import { reorderDataGridItems } from "./data-grid-reordering"
@@ -97,6 +100,8 @@ interface DataGridClientBaseProps<TData extends RowData> {
   striped?: boolean
   /** Draw separators between columns. Default: false. */
   columnLines?: boolean
+  /** Draw the table's own rounded border. Turn off when the grid sits flush inside a framed card. Default: true. */
+  bordered?: boolean
   /** Keep the header visible in a scroll viewport. Defaults to true for virtual scroll, false otherwise. */
   stickyHeader?: boolean
   /**
@@ -163,7 +168,6 @@ export type DataGridClientProps<TData extends RowData> =
     )
 
 const EMPTY_FACETS: NonNullable<ToolbarConfig["facets"]> = []
-const EMPTY_SELECTS: NonNullable<ToolbarConfig["selects"]> = []
 
 export function DataGridClient<TData extends RowData>({
   columns,
@@ -185,6 +189,7 @@ export function DataGridClient<TData extends RowData>({
   compact = true,
   striped = false,
   columnLines = false,
+  bordered = true,
   stickyHeader,
   showHeaderVisibilityToggle = true,
   enableColumnPinning = false,
@@ -205,18 +210,21 @@ export function DataGridClient<TData extends RowData>({
   onRowReorder,
 }: DataGridClientProps<TData>) {
   const facets = toolbar?.facets ?? EMPTY_FACETS
-  const selects = toolbar?.selects ?? EMPTY_SELECTS
   const searchConfigs = toolbar?.searches ?? []
+  const toolbarFilterKeys = getToolbarFilterKeys(toolbar).join("\n")
   const paginate = pagination !== "none"
   const scrollRef = React.useRef<HTMLDivElement>(null)
   const useVirtualRows = !!virtualScroll && !paginate && !rowGrouping && !renderRowDetails && !onRowReorder && !columnDrag
   const useStickyHeader = stickyHeader ?? useVirtualRows
 
-  // Facets/selects carry arrays; TanStack's automatic string filter does not
+  // Facets carry arrays; TanStack's automatic string filter does not
   // interpret those as a set of allowed values.
   const filterColumns = React.useMemo(() => {
     const multiValueKeys = new Set(
-      [...facets, ...selects].map((filter) => filter.key),
+      [
+        ...facets.map((filter) => filter.key),
+        ...(toolbarFilterKeys ? toolbarFilterKeys.split("\n") : []),
+      ],
     )
     const configure = (
       column: ColumnDef<DataGridFeatures, TData>,
@@ -232,7 +240,7 @@ export function DataGridClient<TData extends RowData>({
         : column
     }
     return columns.map(configure)
-  }, [columns, facets, selects])
+  }, [columns, facets, toolbarFilterKeys])
 
   const [sorting, setSorting] = React.useState<SortingState>(defaultSorting)
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
@@ -403,19 +411,11 @@ export function DataGridClient<TData extends RowData>({
                 onClear={() => applyFacet(facet.key, [])}
               />
             ))}
-            {selects.map((select) => (
-              <SelectBox
-                key={select.key}
-                className="w-auto"
-                options={select.options}
-                placeholder={select.placeholder}
-                clearable={select.clearable}
-                value={getFacetValues(select.key)[0] ?? null}
-                onValueChange={(value) =>
-                  applyFacet(select.key, value ? [value] : [])
-                }
-              />
-            ))}
+            <DataGridToolbarFilters
+              toolbar={toolbar}
+              getValues={getFacetValues}
+              onChange={applyFacet}
+            />
           </div>
           <div className="flex shrink-0 items-center gap-2">
             {showVisibilityToggle && (
@@ -429,7 +429,7 @@ export function DataGridClient<TData extends RowData>({
         </div>
       )}
 
-      <div className="overflow-hidden rounded-md border">
+      <div className={cn("overflow-hidden", bordered && "rounded-md border")}>
         <Table {...tableProps} className={cn(columnLines && "[&_th:not(:last-child)]:border-r [&_td:not(:last-child)]:border-r", tableProps?.className)} aria-rowcount={useVirtualRows ? virtualScroll!.totalCount + 1 : tableProps?.["aria-rowcount"]}
           renderContainer={useVirtualRows || useStickyHeader ? (children) => (
             <DataGridScrollArea

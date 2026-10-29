@@ -17,12 +17,12 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
-import { StatusBadge } from "@/features/dashboard/components/status-badge";
-import { usdWhole } from "@/features/dashboard/utils/format";
+import { StatusBadge } from "./status-badge";
+import { usdWhole } from "../utils/format";
 import type { CrmOpportunity } from "@/mocks/dashboard-crm.mock";
 
 import { CrmOpportunityEditor } from "./crm-opportunity-editor";
-import { healthStyles, priorityLabels } from "./crm-status";
+import { healthStyles, priorityLabels } from "../utils/crm-status";
 
 // Row actions come from context so the column definitions stay stable.
 const EditContext = createContext<(opportunity: CrmOpportunity) => void>(() => {});

@@ -41,22 +41,34 @@ export interface SearchConfig {
   placeholder: string
 }
 
-/**
- * A single-pick filter rendered as a `SelectBox` instead of a `FacetedFilter`
- * — the choice applies immediately, no Apply step. Server-side query values
- * use repeated keys, like faceted filters.
- */
-export interface SelectConfig {
+/** A short single-pick list rendered as a `SelectFilter` (no search). */
+export interface DropdownConfig {
   key: string
-  placeholder?: string
+  placeholder: string
+  /** Options with a `group` render under that heading; long lists scroll. */
   options: SelectOption[]
-  clearable?: boolean
+  /** Label of the entry that clears the filter. Default: "All". */
+  allLabel?: string
+}
+
+/** A long list rendered as a searchable `ComboboxFilter`. */
+export interface ComboboxConfig {
+  key: string
+  placeholder: string
+  options: SelectOption[]
+  emptyMessage?: string
+  /** Allow several picks (chips, or a count badge with `trigger="popup"`). */
+  multiple?: boolean
+  /** `"popup"` opens the search box from a button. Default: `"input"`. */
+  trigger?: "input" | "popup"
+  searchPlaceholder?: string
 }
 
 export interface ToolbarConfig {
   searches?: SearchConfig[]
   facets?: FacetConfig[]
-  selects?: SelectConfig[]
+  dropdowns?: DropdownConfig[]
+  comboboxes?: ComboboxConfig[]
 }
 
 export function getSorted(

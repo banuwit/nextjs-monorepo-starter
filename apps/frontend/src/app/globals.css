@@ -1,25 +1,6 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
-/* React Flow stays scoped to the dashboard theme. */
-.flow-structure {
-  --xy-background-color: transparent;
-  --xy-node-color: var(--foreground);
-  --xy-edge-stroke: var(--border);
-  --xy-handle-background-color: var(--foreground);
-  --xy-handle-border-color: var(--background);
-  --xy-attribution-background-color: var(--background);
-}
-.flow-structure .react-flow__handle { width: 4px; height: 4px; min-width: 4px; min-height: 4px; }
-.flow-structure .flow-edge-add { opacity: 0; }
-.flow-structure .react-flow__edgelabel-renderer > div:hover .flow-edge-add,
-.flow-structure .flow-edge-add:focus-visible { opacity: 1; }
-@media (hover: none) { .flow-structure .flow-edge-add { opacity: 1; } }
-.flow-app-icon[data-app="Stripe"] { color: #635bff; }
-.flow-app-icon[data-app="Neon"] { color: #0d9f76; }
-.flow-app-icon[data-app="Claude"] { color: #c26a4a; }
-.flow-app-icon[data-app="ClickUp"] { color: #b84fe8; }
-.flow-app-icon[data-app="Slack"] { color: #1697ad; }
 
 @custom-variant dark (&:is(.dark *));
 

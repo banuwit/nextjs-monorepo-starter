@@ -1,6 +1,6 @@
 # Panduan Data Grid
 
-Panduan ini berlaku saat memakai atau mengubah komponen global di [data-grid](../../../apps/frontend/src/components/data-grid/) dan kontrol filternya di [filter](../../../apps/frontend/src/components/filter/). Ikuti juga [PRD Tahap 1](../../../apps/frontend/prd.md) dan [Panduan Preferences](./preferences.md). Jangan menyalin implementasi grid ke setiap fitur.
+Panduan ini berlaku saat memakai atau mengubah komponen global di [data-grid](../../../apps/frontend/src/components/data-grid/) dan kontrol filternya di [filter](../../../apps/frontend/src/components/filter/) (detail opsi filter ada di [Panduan komponen Filter](./filter.md)). Ikuti juga [PRD Tahap 1](../../../apps/frontend/prd.md) dan [Panduan Preferences](./preferences.md). Jangan menyalin implementasi grid ke setiap fitur.
 
 ## Pilih mode yang tepat
 
@@ -55,7 +55,9 @@ export function ItemsGrid({ items }: { items: Item[] }) {
 }
 ```
 
-Mode client mendukung `pagination="advance" | "simple" | "none"` (bawaan `advance`), `defaultSorting`, `defaultColumnOrder`, `loading`, teks empty state, dan `actions`. `loading={true}` menampilkan skeleton serta menyembunyikan pagination selama pemuatan. `toolbar` opsional; visibility toggle tetap tersedia tanpa toolbar selama `showVisibilityToggle` tidak `false`. `facets` memakai pilihan multi/single dengan tombol Apply, sedangkan `selects` (komponen [SelectBox](../../../apps/frontend/src/components/filter/select-box.tsx)) menerapkan satu pilihan segera. Pada mode client, grid mengaitkan facet/select ke filter `multiValue` untuk kolom yang id-nya cocok. Search client bersifat **per kolom**, bukan global lintas kolom.
+Mode client mendukung `pagination="advance" | "simple" | "none"` (bawaan `advance`), `defaultSorting`, `defaultColumnOrder`, `loading`, teks empty state, dan `actions`. `loading={true}` menampilkan skeleton serta menyembunyikan pagination selama pemuatan. `toolbar` opsional; visibility toggle tetap tersedia tanpa toolbar selama `showVisibilityToggle` tidak `false`. `facets` memakai pilihan multi/single dengan tombol Apply. Pada mode client, grid mengaitkan facet dan filter toolbar lain ke filter `multiValue` untuk kolom yang id-nya cocok. Search client bersifat **per kolom**, bukan global lintas kolom.
+
+`toolbar` juga menerima `dropdowns` (`SelectFilter`) dan `comboboxes` (`ComboboxFilter`, opsi `multiple` dan `trigger: "popup"`); keduanya memakai bentuk nilai yang sama dengan facet. Opsi tiap komponen filter, filter chip ReUI (`/filter/advance`), dan builder grup AND/OR (`/filter/group`) dijelaskan di [Panduan komponen Filter](./filter.md).
 
 Jika pemuatan data client gagal, teruskan pesan aman untuk pengguna melalui `error` bersama callback `onRetry`; `data` tetap boleh berupa array kosong. Saat `error` ada, grid menampilkan pesan dan tombol “Try again” sebagai pengganti baris serta menyembunyikan pagination. Callback dimiliki fitur, misalnya memanggil ulang fungsi pemuatan data:
 
@@ -103,12 +105,11 @@ Teruskan `data` dan `meta` dari envelope daftar REST yang dikunci di PRD. `filte
   getRowId={(row) => row.id}
   toolbar={{
     searches: [{ key: "search", placeholder: "Search..." }],
-    selects: [
+    dropdowns: [
       {
         key: "status",
         placeholder: "Status",
         options: [{ label: "Active", value: "active" }],
-        clearable: true,
       },
     ],
   }}
@@ -155,7 +156,7 @@ Pin statis tanpa kontrol unpin:
 
 Gunakan `enableColumnPinning` hanya bila pengguna boleh mengubah pin dari menu [DataGridHeaderDropdown](../../../apps/frontend/src/components/data-grid/data-grid-header-dropdown.tsx). Dengan mode dinamis, menu pin/unpin dan ikon unpin pada header yang terpin memang muncul. `enableColumnOrdering` mengaktifkan move. `defaultColumnPinning` dan `defaultColumnOrder` hanya nilai awal, bukan state terkendali. Id pin harus sama dengan id kolom. Pinned column diukur dari lebar header yang dirender; pastikan header tetap ditampilkan. Posisi start/end memakai CSS logical inset untuk RTL.
 
-`showVisibilityToggle` mengontrol tombol “View” di toolbar; `showHeaderVisibilityToggle` mengontrol submenu di header. `actions` menaruh tombol tambahan di sisi kanan toolbar. Komponen [FacetedFilter](../../../apps/frontend/src/components/filter/faceted-filter.tsx) dan [SelectBox](../../../apps/frontend/src/components/filter/select-box.tsx) boleh dipakai terpisah dari grid, tetapi folder `filters` bukan salinan komponen grid.
+`showVisibilityToggle` mengontrol tombol “View” di toolbar; `showHeaderVisibilityToggle` mengontrol submenu di header. `actions` menaruh tombol tambahan di sisi kanan toolbar. Komponen [FacetedFilter](../../../apps/frontend/src/components/filter/faceted-filter.tsx) boleh dipakai terpisah dari grid, tetapi folder `filter` bukan salinan komponen grid.
 
 ## Edit per baris
 

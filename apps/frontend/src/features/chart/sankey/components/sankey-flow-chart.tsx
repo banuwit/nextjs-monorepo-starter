@@ -36,7 +36,7 @@ type FlowChartProps = {
 };
 
 /** Sankey with a legend that hides source nodes and their flows. */
-export function FlowChart({
+export function SankeyFlowChart({
   data,
   className,
   showValues = true,

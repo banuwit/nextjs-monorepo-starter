@@ -1,3 +1,12 @@
 import type { Metadata } from "next";
-export const metadata: Metadata = { title: "Login 1 | WIT. Studio" };
-export { LoginPage as default } from "@/features/authentication/auth-1/components/login-page";
+import { LoginPage } from "@/features/authentication/auth-1/components/login-page";
+
+export const metadata: Metadata = {
+  title: "Login 1 | WIT. Studio",
+  description:
+    "Sign in to your workspace with email, password, or a social account.",
+};
+
+export default function Page() {
+  return <LoginPage />;
+}

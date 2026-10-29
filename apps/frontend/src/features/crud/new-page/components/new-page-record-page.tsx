@@ -31,12 +31,12 @@ import {
 } from "@/components/ui/empty";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useCrudExamples } from "@/mocks/use-crud-examples";
-import { ExampleForm } from "./example-form";
-import { exampleColumns } from "./example-page";
+import { newPageColumns } from "./new-page-columns";
+import { NewPageForm } from "./new-page-form";
 
 const basePath = "/crud/new-page";
 
-export function ExampleRecordPage({
+export function NewPageRecordPage({
   mode,
   id,
 }: {
@@ -118,7 +118,7 @@ export function ExampleRecordPage({
             {mode === "view" && record ? (
               <div className="flex flex-col gap-6">
                 <dl className="grid gap-5 sm:grid-cols-2">
-                  {exampleColumns.map((column) => (
+                  {newPageColumns.map((column) => (
                     <div key={column.key}>
                       <dt className="mb-1 text-xs text-muted-foreground">
                         {column.label}
@@ -157,7 +157,7 @@ export function ExampleRecordPage({
                 </Button>
               </div>
             ) : (
-              <ExampleForm
+              <NewPageForm
                 key={id ?? "new"}
                 record={mode === "edit" ? record : undefined}
                 error={error}

@@ -27,7 +27,7 @@ import {
   agentPickableFiles,
   aiChatModels,
 } from "@/mocks/ai-chat.mock";
-import { ChatComposer } from "./chat-composer";
+import { ChatComposer } from "@/features/ai-chat/components/chat-composer";
 import { ChatMessageItem } from "./chat-message";
 import { ChatThread, ChatThreadItem } from "./chat-thread";
 import type { AgentTask } from "../hooks/use-agent-task";

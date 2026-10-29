@@ -8,12 +8,12 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { StatusBadge } from "@/features/dashboard/components/status-badge";
-import { usdWhole } from "@/features/dashboard/utils/format";
+import { StatusBadge } from "./status-badge";
+import { usdWhole } from "../utils/format";
 import type { DashboardCustomer } from "@/mocks/dashboard-main.mock";
 
 import { summarizeBilling } from "../utils/customers";
-import { billingStyles } from "./customer-status";
+import { billingStyles } from "../utils/customer-status";
 
 export function CustomerAttention({
   customers,

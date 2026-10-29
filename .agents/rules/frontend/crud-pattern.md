@@ -1,6 +1,6 @@
 # Pola halaman CRUD
 
-Rules ini berlaku saat membuat atau mengubah halaman CRUD di frontend. Acuannya contoh [crud-examples](../../../apps/frontend/src/features/crud-examples/) yang memakai komponen global [components/crud](../../../apps/frontend/src/components/crud/), serta [PRD Tahap 1 §5.2](../../../apps/frontend/prd.md). Ikuti juga [Struktur folder](./structure-folder.md), [Panduan Data Grid](./data-grid.md), dan [Panduan Preferences](./preferences.md).
+Rules ini berlaku saat membuat atau mengubah halaman CRUD di frontend. Acuannya contoh [crud](../../../apps/frontend/src/features/crud/) yang memakai komponen global [components/crud](../../../apps/frontend/src/components/crud/), serta [PRD Tahap 1 §5.2](../../../apps/frontend/prd.md). Ikuti juga [Struktur folder](./structure-folder.md), [Panduan Data Grid](./data-grid.md), dan [Panduan Preferences](./preferences.md).
 
 ## Empat pilihan pola
 
@@ -55,22 +55,28 @@ Komponen di `components/crud/` tidak boleh mengimpor `@/features/*`, `@/mocks/*`
 ```text
 src/app/(backoffice)/crud/
 ├── page.tsx                        # redirect ke /crud/new-page
-├── modal/page.tsx                  # <ExamplePage variant="modal" />
-├── sheet/page.tsx                  # <ExamplePage variant="sheet" />
-├── panel-inline/page.tsx           # <ExamplePage variant="panel-inline" />
+├── modal/page.tsx                  # <ModalPage />
+├── sheet/page.tsx                  # <SheetPage />
+├── panel-inline/page.tsx           # <PanelInlinePage />
 └── new-page/
-    ├── page.tsx                    # <ExamplePage variant="new-page" />  (daftar)
-    ├── new/page.tsx                # <ExampleRecordPage mode="create" />
+    ├── page.tsx                    # <NewPageListPage />  (daftar)
+    ├── new/page.tsx                # <NewPageRecordPage mode="create" />
     └── [id]/
-        ├── page.tsx                # <ExampleRecordPage mode="view" id={id} />
-        └── edit/page.tsx           # <ExampleRecordPage mode="edit" id={id} />
+        ├── page.tsx                # <NewPageRecordPage mode="view" id={id} />
+        └── edit/page.tsx           # <NewPageRecordPage mode="edit" id={id} />
 
-src/features/crud-examples/
-├── components/
-│   ├── example-page.tsx            # kolom + peta varian → CrudResource
-│   ├── example-form.tsx            # fields + schema → CrudForm
-│   └── example-record-page.tsx     # halaman create/view/edit untuk pola page
-├── hooks/  schemas/  types/  utils/
+src/features/crud/                  # induk kelompok; lima folder standar, saat ini kosong
+├── new-page/
+│   ├── components/
+│   │   ├── new-page-list-page.tsx   # daftar (pattern="page") → CrudResource
+│   │   ├── new-page-record-page.tsx # halaman create/view/edit
+│   │   ├── new-page-form.tsx        # fields + schema → CrudForm
+│   │   └── new-page-columns.tsx     # kolom daftar
+│   └── types/new-page-example.ts
+├── modal/        # modal-page.tsx, modal-form.tsx, modal-columns.tsx, types/modal-example.ts
+├── sheet/        # sheet-page.tsx, sheet-form.tsx, sheet-columns.tsx, types/sheet-example.ts
+└── panel-inline/ # panel-inline-page.tsx, panel-inline-form.tsx, panel-inline-columns.tsx, types/panel-inline-example.ts
+    # setiap varian memiliki lima folder standar (components, hooks, schemas, types, utils)
 
 src/mocks/
 ├── crud-model.ts                   # crudSchemas (Zod) + MockEntity<T>
@@ -79,7 +85,7 @@ src/mocks/
 └── use-crud-examples.ts            # hook localStorage: data, ready, error, reload, commit
 ```
 
-Keempat route memakai satu fitur `crud-examples` dan satu sumber data, sehingga perubahan di satu pola terlihat di pola lain.
+Keempat route memakai satu kelompok fitur `crud` (satu subfitur per pola, masing-masing berisi form, kolom, dan tipe sendiri) dan satu sumber data di `src/mocks/`, sehingga perubahan di satu pola terlihat di pola lain.
 
 ## Langkah membuat halaman CRUD baru
 
@@ -89,7 +95,7 @@ Keempat route memakai satu fitur `crud-examples` dan satu sumber data, sehingga 
 4. **Sumber data (hook).** Kontrak hook: `{ data, ready, error, reload, commit }`. Saat ini contoh memakai hook mock di `src/mocks/`; saat API tersedia, buat `features/<resource>/hooks/use-<resource>.ts` berbasis TanStack Query yang memanggil `lib/api/endpoints/<resource>.ts`, lalu ganti sumber data tanpa mengubah komponen.
 5. **Form.** `components/<resource>-form.tsx`: definisikan `fields` dan bungkus `CrudForm` dengan `schema` dan `defaults`.
 6. **Daftar.** `components/<resource>-page.tsx` (`"use client"`): definisikan `columns` dan render `CrudResource` dengan pola terpilih. Kolom dengan `render` JSX tetap di `components/`; helper murni (format, mapper) di `utils/`.
-7. **Pola page saja.** Buat `components/<resource>-record-page.tsx` dengan `CrudPage` untuk mode `create`/`view`/`edit`, mengikuti `ExampleRecordPage`: guard `beforeunload` saat dirty, konfirmasi buang perubahan, state loading (`Skeleton`), data tidak ditemukan (`Empty`), error + tombol muat ulang, lalu `router.push` ke detail setelah simpan.
+7. **Pola page saja.** Buat `components/<resource>-record-page.tsx` dengan `CrudPage` untuk mode `create`/`view`/`edit`, mengikuti `NewPageRecordPage`: guard `beforeunload` saat dirty, konfirmasi buang perubahan, state loading (`Skeleton`), data tidak ditemukan (`Empty`), error + tombol muat ulang, lalu `router.push` ke detail setelah simpan.
 8. **Route.** `page.tsx` tipis dengan `metadata`; untuk `[id]`, `await params` lalu render dengan `key={id}`.
 9. **Navigasi.** Daftarkan di `components/layout/app-navigation.tsx` dan `menu-search-tree.ts`.
 10. **Verifikasi.** `pnpm --filter frontend check-types` dan `pnpm --filter frontend lint`, lalu cek manual: tambah, lihat, edit, hapus, validasi field, konfirmasi buang perubahan, konflik antar-tab, keyboard/fokus, mobile, light/dark.

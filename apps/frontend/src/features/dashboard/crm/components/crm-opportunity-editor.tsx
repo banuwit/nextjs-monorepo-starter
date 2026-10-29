@@ -19,7 +19,7 @@ import {
 import { crmHealth, crmStages, type CrmOpportunity } from "@/mocks/dashboard-crm.mock";
 
 import { opportunityValueError } from "../utils/crm-data";
-import { priorityLabels } from "./crm-status";
+import { priorityLabels } from "../utils/crm-status";
 
 export function CrmOpportunityEditor({
   opportunity,

@@ -4,7 +4,7 @@ import { useState } from "react";
 import type { SankeyLinkProps, SankeyNodeProps } from "recharts";
 
 import { ChartCard } from "@/components/chart/chart-card";
-import { FlowChart } from "@/features/chart/sankey/components/sankey-flow-chart";
+import { SankeyFlowChart } from "@/features/chart/sankey/components/sankey-flow-chart";
 import { SankeyNode } from "@/features/chart/sankey/components/sankey-node";
 import { linkPath } from "@/features/chart/sankey/utils/sankey-link-path";
 import { budgetAllocation } from "@/mocks/chart-sankey.mock";
@@ -55,7 +55,7 @@ export function SankeyBudgetHoverCard() {
       change={5.6}
       footer="Hover a link or node; unrelated flows fade out."
     >
-      <FlowChart
+      <SankeyFlowChart
         data={budgetAllocation}
         className="min-w-[30rem]"
         sankeyProps={{

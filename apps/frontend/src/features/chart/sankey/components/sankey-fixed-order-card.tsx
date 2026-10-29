@@ -1,7 +1,7 @@
 "use client";
 
 import { ChartCard } from "@/components/chart/chart-card";
-import { FlowChart } from "@/features/chart/sankey/components/sankey-flow-chart";
+import { SankeyFlowChart } from "@/features/chart/sankey/components/sankey-flow-chart";
 import { ticketRouting } from "@/mocks/chart-sankey.mock";
 
 export function SankeyFixedOrderCard() {
@@ -13,7 +13,7 @@ export function SankeyFixedOrderCard() {
       change={-4.2}
       footer="Channels and outcomes stay in priority order instead of by size."
     >
-      <FlowChart
+      <SankeyFlowChart
         data={ticketRouting}
         className="min-w-[30rem]"
         sankeyProps={{ sort: false }}

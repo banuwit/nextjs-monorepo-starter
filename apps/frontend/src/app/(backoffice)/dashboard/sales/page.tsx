@@ -1,7 +1,15 @@
+import type { Metadata } from "next";
 import { SalesDashboardPage } from "@/features/dashboard/sales/components/sales-dashboard-page";
-import { workspaceHour, workspaceToday } from "@/features/dashboard/utils/today";
+import {
+  workspaceHour,
+  workspaceToday,
+} from "@/features/dashboard/sales/utils/today";
 
-export const metadata = { title: "Sales monitor | Dashboard" };
+export const metadata: Metadata = {
+  title: "Sales monitor | Dashboard",
+  description:
+    "Live sales pace, channels, leaderboard, and alerts against the daily target.",
+};
 
 export default function Page() {
   const now = new Date();

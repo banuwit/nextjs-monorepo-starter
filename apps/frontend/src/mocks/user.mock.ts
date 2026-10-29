@@ -8,6 +8,30 @@ import type {
 const genders = ["male", "female"] as const;
 const roles = ["admin", "editor", "viewer"] as const;
 const statuses = ["active", "inactive", "pending"] as const;
+export const departments = [
+  "Engineering",
+  "Product",
+  "Design",
+  "Marketing",
+  "Sales",
+  "Finance",
+  "Human Resources",
+  "Operations",
+] as const;
+export const cities = [
+  "Jakarta",
+  "Bandung",
+  "Surabaya",
+  "Yogyakarta",
+  "Semarang",
+  "Medan",
+  "Makassar",
+  "Denpasar",
+  "Balikpapan",
+  "Palembang",
+] as const;
+const emailDomains = ["example.com", "acme.co.id", "nusantara.id"] as const;
+
 const sortColumns = [
   "id",
   "name",
@@ -26,6 +50,9 @@ export type User = {
   role: (typeof roles)[number];
   joinDate: string;
   status: (typeof statuses)[number];
+  /** Always set in the fixture; optional so editable demos can omit it. */
+  department?: (typeof departments)[number];
+  city?: (typeof cities)[number];
   /** Direct supervisor; absent for users at the top of the demo organization. */
   managerId?: string;
 };
@@ -72,13 +99,16 @@ const names = [
 export const users: User[] = names.map((name, index) => ({
   id: `USR-${String(index + 1).padStart(3, "0")}`,
   name,
-  email: `${name.toLowerCase().replaceAll(" ", ".")}@example.com`,
+  email: `${name.toLowerCase().replaceAll(" ", ".")}@${emailDomains[index % emailDomains.length]}`,
   gender: index % 2 === 0 ? "male" : "female",
   role: roles[index % roles.length] ?? "viewer",
   joinDate: new Date(Date.UTC(2024 + (index % 3), index % 12, (index % 28) + 1))
     .toISOString()
     .slice(0, 10),
   status: statuses[Math.floor(index / 3) % statuses.length] ?? "active",
+  // Co-prime strides so department, city, and role do not move in lockstep.
+  department: departments[(index * 3) % departments.length] ?? "Engineering",
+  city: cities[(index * 7) % cities.length] ?? "Jakarta",
   // Roots 001–005; 006 reports to 001; 007–026 to 002–006; 027–036 to 007–011.
   managerId:
     index < 5
@@ -148,12 +178,30 @@ export function getMockUsers(
     gender: genders,
     role: roles,
     status: statuses,
+    department: departments,
+    city: cities,
   })) {
     const value = params[key];
     const selected = (
       Array.isArray(value) ? value : value ? [value] : []
     ).filter((item) => (options as readonly string[]).includes(item));
     if (selected.length) filters[key] = [...new Set(selected)];
+  }
+
+  // Single join month (`YYYY-MM`, scrollable select demo).
+  const joinMonth = Array.isArray(params.joinMonth)
+    ? params.joinMonth[0]
+    : params.joinMonth;
+  if (joinMonth && /^\d{4}-\d{2}$/.test(joinMonth)) {
+    filters.joinMonth = joinMonth;
+  }
+
+  // Single supervisor filter (combobox demo); only ids that manage someone count.
+  const manager = Array.isArray(params.manager)
+    ? params.manager[0]
+    : params.manager;
+  if (manager && users.some((user) => user.managerId === manager)) {
+    filters.manager = manager;
   }
 
   const search = query.search.toLowerCase();
@@ -163,10 +211,15 @@ export function getMockUsers(
         [user.id, user.name, user.email].some((value) =>
           value.toLowerCase().includes(search),
         ) &&
-        (["gender", "role", "status"] as const).every((key) => {
-          const selected = filters[key];
-          return !selected || selected.includes(user[key]);
-        }),
+        (["gender", "role", "status", "department", "city"] as const).every(
+          (key) => {
+            const selected = filters[key];
+            return !selected || selected.includes(user[key] ?? "");
+          },
+        ) &&
+        (!filters.manager || user.managerId === filters.manager) &&
+        (!filters.joinMonth ||
+          user.joinDate.startsWith(String(filters.joinMonth))),
     )
     .sort((left, right) => {
       const comparison = left[query.sortBy].localeCompare(

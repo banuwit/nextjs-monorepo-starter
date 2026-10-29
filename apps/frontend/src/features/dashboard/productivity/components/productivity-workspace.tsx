@@ -2,7 +2,7 @@
 
 import { useState, type ReactNode } from "react";
 
-import { KpiStrip } from "@/features/dashboard/components/kpi-strip";
+import { KpiStrip } from "./kpi-strip";
 import {
   productivityFocusLoggedMinutes,
   productivityGoals,

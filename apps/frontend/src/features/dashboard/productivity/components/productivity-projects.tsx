@@ -10,7 +10,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { daysBetween, formatShortDate } from "@/features/dashboard/utils/format";
+import { daysBetween, formatShortDate } from "../utils/format";
 import { productivityProjects } from "@/mocks/dashboard-productivity.mock";
 
 export function ProductivityProjects({ today }: { today: string }) {

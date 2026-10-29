@@ -1,10 +1,21 @@
-import { ProductivityDashboardPage } from "@/features/dashboard/productivity/components/dashboard-productivity-page";
-import { workspaceHour, workspaceToday } from "@/features/dashboard/utils/today";
+import type { Metadata } from "next";
+import { ProductivityDashboardPage } from "@/features/dashboard/productivity/components/productivity-dashboard-page";
+import {
+  workspaceHour,
+  workspaceToday,
+} from "@/features/dashboard/productivity/utils/today";
 
-export const metadata = { title: "Productivity | Dashboard" };
+export const metadata: Metadata = {
+  title: "Productivity | Dashboard",
+  description:
+    "Tasks, projects, notes, calendar, and focus timer in one workspace.",
+};
 
 export default function Page() {
   return (
-    <ProductivityDashboardPage today={workspaceToday()} hour={workspaceHour()} />
+    <ProductivityDashboardPage
+      today={workspaceToday()}
+      hour={workspaceHour()}
+    />
   );
 }

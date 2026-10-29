@@ -5,8 +5,8 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { TrendDelta } from "@/features/dashboard/components/trend-delta";
-import { usdWhole } from "@/features/dashboard/utils/format";
+import { TrendDelta } from "./trend-delta";
+import { usdWhole } from "../utils/format";
 import { salesChannels } from "@/mocks/dashboard-sales.mock";
 
 export function SalesChannels({ revenue }: { revenue: number }) {

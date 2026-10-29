@@ -43,7 +43,7 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
-import { initialDriveEntries } from "@/mocks/drive.mock";
+import { initialDriveEntries } from "@/mocks/file-manager.mock";
 import type { DriveAction, DriveEntry, DriveLocation } from "../types/drive";
 import {
   ancestors,

@@ -17,7 +17,7 @@ import {
   ChartTooltipContent,
   type ChartConfig,
 } from "@/components/ui/chart";
-import { usdCompact, usdWhole } from "@/features/dashboard/utils/format";
+import { usdCompact, usdWhole } from "../utils/format";
 
 import { cumulativeSales } from "../utils/sales";
 

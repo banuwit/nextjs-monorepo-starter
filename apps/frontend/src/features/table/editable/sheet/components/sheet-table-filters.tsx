@@ -11,7 +11,7 @@ import {
 import type { UserFilter, UserFilterField } from "../types/user-sheet-filters";
 
 /** The filter row lives inside each header, matching the spreadsheet example. */
-export function CellColumnFilter({
+export function SheetColumnFilter({
   field,
   title,
   options,

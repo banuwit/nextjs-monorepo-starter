@@ -5,8 +5,8 @@ import { DownloadIcon, PauseIcon, PlayIcon } from "lucide-react";
 import { AppBody } from "@/components/app-body";
 import { PageHeading } from "@/components/page-heading";
 import { Button } from "@/components/ui/button";
-import { downloadCsv } from "@/features/dashboard/utils/csv";
-import { formatLongDate } from "@/features/dashboard/utils/format";
+import { downloadCsv } from "../utils/csv";
+import { formatLongDate } from "../utils/format";
 import { cn } from "@/lib/utils";
 import {
   salesConversionRate,

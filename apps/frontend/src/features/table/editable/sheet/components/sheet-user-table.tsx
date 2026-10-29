@@ -56,11 +56,11 @@ import type {
   UserFilter,
   UserFilterField,
 } from "../types/user-sheet-filters";
-import { CellColumnFilter } from "./sheet-table-filters";
+import { SheetColumnFilter } from "./sheet-table-filters";
 import {
-  CellUserDelete,
-  CellUserForm,
-  type CellUserEditor,
+  SheetUserDelete,
+  SheetUserForm,
+  type SheetUserEditor,
 } from "./sheet-user-dialogs";
 
 const fields: {
@@ -163,7 +163,7 @@ function UserHeader({
           </Button>
         ) : (
           config && (
-            <CellColumnFilter
+            <SheetColumnFilter
               field={id as UserFilterField}
               title={title}
               options={"options" in config ? config.options : undefined}
@@ -406,7 +406,7 @@ function UserRowMenu({
   );
 }
 
-export function CellUserTable({ users }: { users: User[] }) {
+export function SheetUserTable({ users }: { users: User[] }) {
   const [state, dispatch] = useReducer(userCellHistoryReducer, {
     rows: users,
     past: [],
@@ -416,7 +416,7 @@ export function CellUserTable({ users }: { users: User[] }) {
   const [showFilters, setShowFilters] = useState(false);
   const [search, setSearch] = useState("");
   const [sorting, setSorting] = useState<UserCellSorting>(null);
-  const [editor, setEditor] = useState<CellUserEditor | null>(null);
+  const [editor, setEditor] = useState<SheetUserEditor | null>(null);
   const [deleting, setDeleting] = useState<User>();
   const rows = useMemo(
     () =>
@@ -565,7 +565,7 @@ export function CellUserTable({ users }: { users: User[] }) {
         </DataGridSheetEditing>
       </div>
       {editor && (
-        <CellUserForm
+        <SheetUserForm
           key={editor.mode + editor.draft.id}
           editor={editor}
           rows={state.rows}
@@ -580,7 +580,7 @@ export function CellUserTable({ users }: { users: User[] }) {
           onClose={() => setEditor(null)}
         />
       )}
-      <CellUserDelete
+      <SheetUserDelete
         user={deleting}
         onDelete={(id) =>
           dispatch({
