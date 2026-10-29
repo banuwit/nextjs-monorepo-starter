@@ -337,6 +337,32 @@
   --sidebar-foreground: #fff;
 }
 
+/* Logo WIT.: hitam di permukaan terang, putih di permukaan gelap. Sidebar
+   berteks putih kecuali White pada mode terang; header berteks putih kecuali White. */
+[data-slot="app-logo"][data-variant="white"],
+.dark [data-slot="app-logo"][data-variant="black"] {
+  display: none;
+}
+.dark [data-slot="app-logo"][data-variant="white"] {
+  display: block;
+}
+[data-sidebar-color]:not([data-sidebar-color="white"])
+  :is([data-slot="sidebar"], [data-slot="app-multi-sidebar-rail"])
+  [data-slot="app-logo"][data-variant="black"],
+[data-header-color]:not([data-header-color="white"])
+  [data-slot="app-header"]
+  [data-slot="app-logo"][data-variant="black"] {
+  display: none;
+}
+[data-sidebar-color]:not([data-sidebar-color="white"])
+  :is([data-slot="sidebar"], [data-slot="app-multi-sidebar-rail"])
+  [data-slot="app-logo"][data-variant="white"],
+[data-header-color]:not([data-header-color="white"])
+  [data-slot="app-header"]
+  [data-slot="app-logo"][data-variant="white"] {
+  display: block;
+}
+
 [data-slot="app-body"],
 [data-sidebar-style="floating"] [data-slot="sidebar-container"] {
   background-color: transparent;

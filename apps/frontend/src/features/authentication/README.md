@@ -18,11 +18,12 @@ Login 5 uses a 5/12 testimonial panel and a 7/12 form panel on desktop, with the
 
 Login 4 is based only on the public description of auth-4 (framed card on a noise background, Google/Apple/GitHub row, Privacy/Terms/Status footer); the block source is not publicly available.
 
-Images are local copies of the Unsplash photographs visible in the public references:
+Images:
 
-- Login 2, light: https://images.unsplash.com/photo-1743657166981-8d8e11d03c3e
-- Login 2, dark: https://images.unsplash.com/photo-1651065567117-ac52c1a62e21
-- Login 3: https://images.unsplash.com/photo-1557804506-669a67965ba0
-- Login 5 avatar: https://images.unsplash.com/photo-1500648767791-00dcc994a43e
+- Login 2, light/dark: original abstract renders made for this project (ribbons with the WIT. red dot), 1080×1500.
+- Login 3: local copy of the Unsplash photograph https://images.unsplash.com/photo-1504384308090-c894fdcc538d
+- Login 5 avatar: original clay-style 3D illustration made for this project; not a real person.
+
+The brand mark is the WIT. wordmark (`public/wit-logo-black.png`, `public/wit-logo-white.png`) rendered by `@/components/app-logo`.
 
 The new pages inherit font, theme, scale, radius, and primary-color preferences from the root provider. They intentionally render outside the dashboard shell.

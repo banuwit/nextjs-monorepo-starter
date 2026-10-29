@@ -16,7 +16,9 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
-import { CheckIcon, ChevronsUpDownIcon, GalleryVerticalEndIcon } from "lucide-react";
+import { CheckIcon, ChevronsUpDownIcon } from "lucide-react";
+
+import { AppLogo } from "@/components/app-logo";
 
 const teams = ["Bandung", "Jakarta", "Surabaya"] as const;
 const TeamContext = React.createContext<{
@@ -65,18 +67,10 @@ export function TeamSwitcher({
             }
           >
             {showLogo && (
-              <span
-                className={`flex size-8 items-center justify-center rounded-lg ${
-                  inHeader
-                    ? "bg-primary text-primary-foreground"
-                    : "bg-sidebar-primary text-sidebar-primary-foreground"
-                }`}
-              >
-                <GalleryVerticalEndIcon className="size-4" />
-              </span>
+              <AppLogo className="w-14 group-data-[collapsible=icon]:w-8" />
             )}
             <span className="grid min-w-0 flex-1 text-left text-sm leading-tight group-data-[collapsible=icon]:hidden">
-              <span className="truncate font-medium">WIT. Indonesia</span>
+              <span className="truncate font-medium">{showLogo ? "Indonesia" : "WIT. Indonesia"}</span>
               <span className="truncate text-xs">{activeTeam}</span>
             </span>
             <ChevronsUpDownIcon className="ml-auto group-data-[collapsible=icon]:hidden" />

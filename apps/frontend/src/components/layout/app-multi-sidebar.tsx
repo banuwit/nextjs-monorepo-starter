@@ -3,7 +3,6 @@
 import { useEffect, useSyncExternalStore, type ReactNode } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { GalleryVerticalEndIcon } from "lucide-react";
 
 import {
   type NavigationSection,
@@ -12,6 +11,7 @@ import {
 import { findActiveNavigationSection } from "@/components/layout/navigation-active";
 import { NavMain } from "@/components/layout/nav-main";
 import { NavUser, type NavUserData } from "@/components/layout/nav-user";
+import { AppLogo } from "@/components/app-logo";
 import { TeamSwitcher } from "@/components/layout/team-switcher";
 import { Button } from "@/components/ui/button";
 import {
@@ -97,9 +97,9 @@ export function AppMultiSidebar({
         <Link
           href="/dashboard/main"
           aria-label="WIT. Indonesia"
-          className="flex size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground"
+          className="flex h-8 w-9 items-center justify-center rounded-md outline-none focus-visible:ring-2 focus-visible:ring-sidebar-ring"
         >
-          <GalleryVerticalEndIcon className="size-4" />
+          <AppLogo className="w-full" />
         </Link>
         <nav className="flex flex-col items-center gap-1">
           {navigation.map((section) => {
