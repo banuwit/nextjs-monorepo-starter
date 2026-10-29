@@ -256,6 +256,76 @@ const fields = useMemo(
 | `createReachCounter(rows, reader)`        | Menghitung baris yang cocok per aturan secara terpisah (mengabaikan `negated`). Hanya untuk data client; hapus saat baris datang dari server.                                                                                                                                                                                                                     |
 | `TermReach`, `PatternValue`               | Bagian tampilan yang dipakai `withTermReach`                                                                                                                                                                                                                                                                                                                      |
 
+### Bentuk query (Show query)
+
+Tombol **Show query** di `/filter/group` menampilkan dua bentuk dari query yang sama. Contoh di bawah adalah query awal halaman tersebut. **JSON `FilterQuery`** adalah bentuk yang disimpan atau dikirim ke API:
+
+```json
+{
+  "id": "root",
+  "type": "group",
+  "combinator": "and",
+  "rules": [
+    {
+      "id": "seed-status",
+      "type": "rule",
+      "path": ["status"],
+      "operator": "is_any_of",
+      "value": ["active", "pending"]
+    },
+    {
+      "id": "seed-group",
+      "type": "group",
+      "combinator": "or",
+      "rules": [
+        {
+          "id": "seed-score",
+          "type": "rule",
+          "path": ["score"],
+          "operator": "between",
+          "value": [60, 100]
+        },
+        {
+          "id": "seed-department",
+          "type": "rule",
+          "path": ["organization", "department"],
+          "operator": "is_any_of",
+          "value": ["engineering", "product"]
+        }
+      ]
+    },
+    {
+      "id": "seed-two-factor",
+      "type": "rule",
+      "path": ["account", "twoFactor"],
+      "operator": "is",
+      "value": true
+    }
+  ]
+}
+```
+
+**Ekspresi `FilterExpression`** hanya untuk dibaca manusia:
+
+```text
+status in ('active', 'pending') AND (performance_score between 60 and 100 OR department in ('engineering', 'product')) AND two_factor_enabled = true
+```
+
+Yang perlu diperhatikan saat membaca atau mengirim JSON ini:
+
+- **Struktur.** Akar selalu `type: "group"` dengan `id: "root"`. `rules` berisi `type: "rule"` atau grup lain dengan `combinator` sendiri (`and`/`or`), tanpa batas kedalaman.
+- **`path`.** Berisi id field dari akar skema; field di dalam grup menjadi `["organization", "department"]`. Ekspresi memakai `column` milik field, JSON tetap memakai `path`.
+- **`value`.** Bentuknya mengikuti operator:
+  - Operator daftar (`is_any_of`, `has_*`) memakai array.
+  - `between` memakai pasangan `[min, max]`.
+  - `is` bisa string, boolean, atau array berisi satu nilai.
+  - `empty`/`not_empty` tidak membawa `value`.
+  - Nilai opsi adalah `value` opsi (slug), bukan label.
+- **Tanggal.** Disimpan sebagai token, bukan `Date`. Contoh: `{"relative":{"unit":"day","offset":-29}}` untuk "29 hari lalu" (dihitung ulang setiap dibaca) atau `{"date":"2025-06-01"}` untuk hari tertentu.
+- **Negasi.** Negate menukar operator ke kebalikannya bila ada; bila tidak ada, aturan diberi `"negated": true`. Penerima query wajib membaca `negated`.
+- **Aturan belum selesai.** Aturan dengan `operator` kosong atau `value` kosong bisa ikut terkirim saat pengguna masih mengedit. Abaikan aturan seperti itu, seperti yang dilakukan `isFilterRuleIncomplete`.
+- **Kontrak API.** Saat API tersedia, JSON ini menjadi body request. Schema Zod di `packages/contracts` harus memvalidasi struktur, whitelist `path`/`operator`, dan bentuk `value` sebelum query diterjemahkan ke database. Jangan memakai teks ekspresi sebagai SQL.
+
 ## Kode vendor ReUI
 
 - `src/components/reui/{filters,cascader}` dipasang dengan `pnpm dlx shadcn@latest add @reui/filters` dari `apps/frontend`; registry `@reui` terdaftar di `components.json`.
