@@ -23,6 +23,14 @@
 
 > **Amendemen UI, 23 Oktober 2026 (Toggle tema):** Tombol ikon terang/gelap berada di header, tepat di kiri menu akun, pada semua gaya header. Toggle tema di dalam menu akun dihapus.
 
+> **Amendemen arsitektur, 29 Oktober 2026 (Abstraksi auth server) — DIKUNCI:** Route Handler `/api/v1` dan use case di `packages/core` tidak boleh mengimpor atau mengenal API Better Auth secara langsung. Satu-satunya titik yang mengetahui Better Auth adalah adapter server di `packages/auth` yang mengekspos `getPrincipal(request)` (identitas, role, permission) dan `requirePrincipal(request)`. Tipe `Principal` didefinisikan di `packages/core/shared`, bukan di `packages/auth`. Tujuannya agar penggantian mekanisme auth pada Tahap 2 (token mobile) dan Tahap 3 (backend Go) hanya mengganti adapter, bukan handler dan use case. Lihat §8.1.
+
+> **Amendemen arsitektur, 29 Oktober 2026 (Migrasi SQL bebas Drizzle) — DIKUNCI:** Migrasi di `packages/db/drizzle/` wajib berupa SQL murni yang dapat dijalankan tanpa Drizzle Kit, dan tabel bisnis hanya boleh merujuk tabel Better Auth melalui `user.id`; tidak ada FK ke `session`, `account`, atau `verification`. Pada Tahap 3 kepemilikan migrasi berpindah ke alat migrasi Go dengan baseline dari SQL Drizzle terakhir. Lihat §9.2.
+
+> **Amendemen pengujian, 29 Oktober 2026 (Conformance suite black-box) — DIKUNCI:** API contract test (§16.3) ditulis sebagai pengujian HTTP black-box terhadap `API_BASE_URL`, bukan dengan mengimpor Route Handler Next.js. Suite yang sama harus dapat dijalankan tanpa perubahan terhadap implementasi Next.js (Tahap 1) dan Go (Tahap 3). Kebijakan bisnis di `packages/core` (permission per role, aturan `409`, validasi hierarki menu, proteksi admin terakhir) ditulis sebagai test case table-driven yang berfungsi sebagai spesifikasi portabel. Lihat §16.1 dan §16.3.
+
+> **Amendemen scope, 29 Oktober 2026 (Halaman resource vs `/crud/*`):** Menyelesaikan kontradiksi antara amendemen 21 Oktober dan M4–M5/§18. Keputusan pengguna: halaman resource `/users`, `/countries`, `/provinces`, `/cities`, `/menus`, dan `/parameters` **dibuat ulang pada M4–M5** ketika API dan database tersedia, memakai komponen CRUD global yang sama. `/crud/*` tetap menjadi demo pola dengan data mock dan tidak dihubungkan ke API. Entri navigasi resource ditambahkan kembali saat halamannya tersedia. Peta halaman §5.1 dan §18 kembali berlaku untuk M4–M5.
+
 Roadmap tahap berikutnya: [Tahap 2 (Mobile)](../mobile/prd.md) dan [Tahap 3 (Backend)](../backend/prd.md). Kedua dokumen tersebut belum memberi izin untuk memulai implementasinya.
 
 ---
@@ -689,6 +697,7 @@ GET /api/v1/users?page=1&pageSize=20&search=andi&sortBy=name&sortOrder=asc
 - Minimal seed satu admin menggunakan env/bootstrap yang aman, jangan hardcode password produksi di repo.
 - Cookie `httpOnly`, `secure` di production, `sameSite` disesuaikan origin/deployment; CSRF dan origin policy sesuai Better Auth.
 - `proxy.ts` boleh digunakan untuk redirect awal/UX, tetapi **bukan security boundary utama**. Permission dan session wajib diverifikasi dalam server Route Handlers/use cases.
+- **Abstraksi auth server (amendemen 29 Oktober 2026, DIKUNCI):** Route Handler memperoleh identitas hanya melalui `getPrincipal(request)`/`requirePrincipal(request)` dari `packages/auth`. `Principal` (`id`, `email`, `role`, `permissions`) adalah tipe milik `packages/core/shared`. Handler dan use case tidak mengimpor `better-auth` dan tidak membaca cookie/session secara langsung. Strategi auth Tahap 3 (Go memiliki auth sendiri, atau Next.js tetap menjadi identity provider) diputuskan saat Tahap 3 dimulai; Tahap 1 hanya menjamin satu titik ganti.
 
 ### 8.2 RBAC dan permissions
 
@@ -740,6 +749,7 @@ Konvensi:
 - Seed idempotent: admin awal yang aman, negara/provinsi/kota contoh, menu navigasi, parameter dasar. Jangan menimpa data pengguna pada re-run seed.
 - Isolasi database integration test dari dev/prod, gunakan database disposable.
 - Jangan mengandalkan cascade delete yang berpotensi menghilangkan data relasi tanpa konfirmasi kebijakan.
+- **Portabilitas migrasi (amendemen 29 Oktober 2026, DIKUNCI):** file migrasi adalah SQL murni yang dapat dijalankan oleh alat lain (misalnya `psql`, goose, atlas) tanpa Drizzle Kit; jangan memakai custom migration dalam TypeScript. Tabel bisnis hanya merujuk tabel Better Auth lewat `user.id`; tidak ada FK ke `session`, `account`, atau `verification`. Metadata aplikasi untuk user (role, status) disimpan pada tabel yang dimiliki aplikasi atau kolom tambahan yang terdokumentasi, agar dapat dibawa saat auth berpindah. CI menguji migrasi dari database kosong hanya dengan menjalankan SQL secara berurutan.
 
 ---
 
@@ -913,6 +923,7 @@ Agent harus mengimplementasikan root scripts di package.json yang meneruskan per
 - Pure utilities/formatters dan mappers penting.
 - State/behavior helpers Data Grid dan CRUD bila dapat diuji secara unit.
 - Mock/fake repository, bukan DB sungguhan pada unit tests.
+- **Kebijakan bisnis sebagai spesifikasi portabel (amendemen 29 Oktober 2026):** permission per role, aturan konflik `409`, validasi hierarki menu, dan proteksi admin terakhir/diri sendiri ditulis sebagai test case table-driven (input → hasil yang diharapkan) dalam format yang mudah dibaca, karena test inilah yang dibawa ke implementasi Go pada Tahap 3, bukan kode use case TypeScript.
 
 ### 16.2 Integration tests (wajib)
 
@@ -929,6 +940,7 @@ Agent harus mengimplementasikan root scripts di package.json yang meneruskan per
 - Generated OpenAPI reproducible, semua endpoint terdaftar, tidak terjadi drift.
 - Pastikan `/api/auth/*` dikecualikan dari envelope bisnis dan HTTP 204 tidak memiliki body.
 - Pantau breaking changes yang mengganggu kesiapan Flutter/Go.
+- **Conformance suite black-box (amendemen 29 Oktober 2026, DIKUNCI):** test dijalankan sebagai klien HTTP terhadap `API_BASE_URL` (default server Next.js lokal) dengan login lewat endpoint auth, bukan dengan mengimpor Route Handler. Suite tidak boleh bergantung pada modul internal Next.js, Drizzle, atau Better Auth; seed data uji disiapkan melalui API atau skrip SQL. Suite yang sama wajib dapat diarahkan ke backend Go pada Tahap 3 tanpa perubahan selain `API_BASE_URL` dan kredensial.
 
 ### 16.4 UI/E2E regression (direkomendasikan)
 
@@ -995,7 +1007,7 @@ Sebuah feature **belum selesai** apabila:
 
 ### M4 — Users (multi-page) + geografi (dialog)
 
-- [ ] Users API/use cases/repository/schema; `/users`, `/users/new`, `/users/[id]`, `/users/[id]/edit`.
+- [ ] Users API/use cases/repository/schema; `/users`, `/users/new`, `/users/[id]`, `/users/[id]/edit`. Halaman resource dibuat ulang sesuai amendemen 29 Oktober 2026; `/crud/*` tetap demo mock.
 - [ ] Countries API + dialog CRUD.
 - [ ] Provinces API + dialog CRUD dan parent country.
 - [ ] Cities API + dialog CRUD dan parent province.

@@ -1,184 +1,128 @@
 "use client";
 
-import { useState } from "react";
-import {
-  DollarSignIcon,
-  PackageCheckIcon,
-  ReceiptTextIcon,
-  RotateCcwIcon,
-  ShoppingBagIcon,
-  UsersIcon,
-} from "lucide-react";
+import { DownloadIcon, PauseIcon, PlayIcon } from "lucide-react";
 
 import { AppBody } from "@/components/app-body";
+import { PageHeading } from "@/components/page-heading";
+import { Button } from "@/components/ui/button";
+import { downloadCsv } from "@/features/dashboard/utils/csv";
+import { formatLongDate } from "@/features/dashboard/utils/format";
+import { cn } from "@/lib/utils";
 import {
-  Card,
-  CardAction,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import {
-  NativeSelect,
-  NativeSelectOption,
-} from "@/components/ui/native-select";
-import { salesMetrics } from "@/mocks/dashboard-sales.mock";
+  salesConversionRate,
+  salesDailyTarget,
+  salesVisitorsLastHour,
+} from "@/mocks/dashboard-sales.mock";
 
-import { SalesOrders } from "./sales-orders";
-import type { SalesChannel, SalesPeriod } from "../types/sales";
-import {
-  Inventory,
-  Reviews,
-  SalesOverview,
-  StoreTraffic,
-  TopProducts,
-  TrafficSources,
-} from "./sales-widgets";
+import { useSalesLive } from "../hooks/use-sales-live";
+import { expectedByNow, ordersCsvHeader, salesTotalsAt } from "../utils/sales";
+import { SalesAlerts } from "./sales-alerts";
+import { SalesChannels } from "./sales-channels";
+import { SalesLeaderboard } from "./sales-leaderboard";
+import { SalesLiveFeed } from "./sales-live-feed";
+import { SalesPaceChart } from "./sales-pace-chart";
+import { SalesTarget } from "./sales-target";
 
-const metricIcons = {
-  sales: DollarSignIcon,
-  orders: ShoppingBagIcon,
-  customers: UsersIcon,
-  average: ReceiptTextIcon,
-  returns: RotateCcwIcon,
-  stock: PackageCheckIcon,
-};
+const clockFormat = new Intl.DateTimeFormat("en-GB", {
+  hour: "2-digit",
+  minute: "2-digit",
+  timeZone: "Asia/Jakarta",
+});
 
-const periods: { value: SalesPeriod; label: string }[] = [
-  { value: "this-month", label: "This Month" },
-  { value: "last-month", label: "Last Month" },
-  { value: "last-30-days", label: "Last 30 Days" },
-  { value: "year-to-date", label: "Year to Date" },
-];
-
-const channels: { value: SalesChannel; label: string }[] = [
-  { value: "all", label: "All Channels" },
-  { value: "Online Store", label: "Online Store" },
-  { value: "Marketplace", label: "Marketplace" },
-  { value: "Social", label: "Social" },
-  { value: "Retail", label: "Retail" },
-];
-
-export function SalesDashboardPage({ today }: { today: string }) {
-  const [period, setPeriod] = useState<SalesPeriod>("this-month");
-  const [channel, setChannel] = useState<SalesChannel>("all");
-  const formattedDate = new Intl.DateTimeFormat("en-US", {
-    weekday: "long",
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-    timeZone: "UTC",
-  }).format(new Date(today));
+export function SalesDashboardPage({
+  today,
+  hour,
+  now,
+}: {
+  today: string;
+  hour: number;
+  now: number;
+}) {
+  const live = useSalesLive(now);
+  const base = salesTotalsAt(hour);
+  const revenue = base.revenue + live.extraRevenue;
+  const orders = base.orders + live.extraOrders;
 
   return (
     <AppBody>
-      <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-        <div className="flex flex-col gap-1">
-          <h1 className="text-3xl leading-none tracking-tight">
-            Store Overview
-          </h1>
-          <p className="text-sm text-muted-foreground">{formattedDate}</p>
+      <PageHeading
+        title="Sales monitor"
+        currentPage="Sales"
+        description={
+          <span className="flex flex-wrap items-center gap-x-2">
+            {formatLongDate(today)}
+            <span className="inline-flex items-center gap-1.5">
+              <span
+                aria-hidden="true"
+                className={cn(
+                  "size-2 rounded-full",
+                  live.paused ? "bg-muted-foreground" : "bg-emerald-500 motion-safe:animate-pulse",
+                )}
+              />
+              <span role="status">
+                {live.paused ? "Paused" : "Live"}, updated {clockFormat.format(live.clock)}
+              </span>
+            </span>
+          </span>
+        }
+      >
+        <Button
+          variant="outline"
+          size="sm"
+          aria-pressed={live.paused}
+          onClick={() => live.setPaused(!live.paused)}
+        >
+          {live.paused ? <PlayIcon data-icon="inline-start" /> : <PauseIcon data-icon="inline-start" />}
+          {live.paused ? "Resume updates" : "Pause updates"}
+        </Button>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() =>
+            downloadCsv(
+              "orders-today.csv",
+              ordersCsvHeader,
+              live.feed.map((order) => [
+                order.id,
+                order.customer,
+                order.product,
+                order.items,
+                order.channel,
+                order.payment,
+                order.total.toFixed(2),
+              ]),
+            )
+          }
+        >
+          <DownloadIcon data-icon="inline-start" />
+          Export
+        </Button>
+      </PageHeading>
+
+      <SalesTarget
+        revenue={revenue}
+        orders={orders}
+        yesterdayRevenue={base.yesterdayRevenue}
+        yesterdayOrders={base.yesterdayOrders}
+        target={salesDailyTarget}
+        expected={expectedByNow(hour, salesDailyTarget)}
+        visitors={salesVisitorsLastHour}
+        conversion={salesConversionRate}
+      />
+
+      <div className="grid min-w-0 gap-4 xl:grid-cols-5">
+        <div className="min-w-0 xl:col-span-3">
+          <SalesPaceChart hour={hour} liveExtra={live.extraRevenue} target={salesDailyTarget} />
         </div>
-        <div className="flex flex-wrap gap-2">
-          <NativeSelect
-            aria-label="Order period"
-            size="sm"
-            className="w-36"
-            value={period}
-            onChange={(event) => setPeriod(event.target.value as SalesPeriod)}
-          >
-            {periods.map((item) => (
-              <NativeSelectOption key={item.value} value={item.value}>
-                {item.label}
-              </NativeSelectOption>
-            ))}
-          </NativeSelect>
-          <NativeSelect
-            aria-label="Order channel"
-            size="sm"
-            className="w-40"
-            value={channel}
-            onChange={(event) => setChannel(event.target.value as SalesChannel)}
-          >
-            {channels.map((item) => (
-              <NativeSelectOption key={item.value} value={item.value}>
-                {item.label}
-              </NativeSelectOption>
-            ))}
-          </NativeSelect>
+        <div className="min-w-0 xl:col-span-2">
+          <SalesLiveFeed orders={live.feed} clock={live.clock} latestId={live.latestId} />
         </div>
       </div>
 
-      <div className="grid min-w-0 grid-cols-1 gap-4 xl:grid-cols-12">
-        <section
-          aria-label="Sales metrics and overview"
-          className="overflow-hidden rounded-xl bg-card ring-1 ring-foreground/10 xl:col-span-12"
-        >
-          <div className="grid xl:grid-cols-12">
-            <div className="grid sm:grid-cols-2 xl:col-span-5 xl:border-r">
-              {salesMetrics.map((metric) => {
-                const Icon = metricIcons[metric.icon];
-                return (
-                  <Card
-                    key={metric.label}
-                    className="rounded-none border-b border-border shadow-none ring-0 sm:odd:border-r"
-                  >
-                    <CardHeader>
-                      <CardTitle className="text-sm font-normal">
-                        {metric.label}
-                      </CardTitle>
-                      <CardDescription className="text-3xl leading-none tracking-tight tabular-nums text-foreground">
-                        {metric.value}
-                      </CardDescription>
-                      <CardAction className="grid size-6 place-items-center rounded-sm bg-muted">
-                        <Icon className="size-3" aria-hidden="true" />
-                      </CardAction>
-                    </CardHeader>
-                    <CardContent className="text-sm">
-                      <span
-                        className={
-                          metric.change.startsWith("-") ||
-                          metric.label === "Return Requests"
-                            ? "text-destructive"
-                            : "text-primary-text"
-                        }
-                      >
-                        {metric.change}
-                      </span>
-                      <span className="text-muted-foreground">
-                        {" "}
-                        {metric.comparison}
-                      </span>
-                    </CardContent>
-                  </Card>
-                );
-              })}
-            </div>
-            <div className="min-w-0 xl:col-span-7">
-              <SalesOverview today={today} />
-            </div>
-          </div>
-        </section>
-
-        <div className="min-w-0 xl:col-span-5">
-          <StoreTraffic />
-        </div>
-        <div className="min-w-0 xl:col-span-7">
-          <TrafficSources />
-        </div>
-        <div className="min-w-0 xl:col-span-4">
-          <TopProducts />
-        </div>
-        <div className="min-w-0 xl:col-span-4">
-          <Inventory />
-        </div>
-        <div className="min-w-0 xl:col-span-4">
-          <Reviews />
-        </div>
-        <div className="min-w-0 xl:col-span-12">
-          <SalesOrders today={today} period={period} channel={channel} />
-        </div>
+      <div className="grid min-w-0 gap-4 lg:grid-cols-2 xl:grid-cols-3">
+        <SalesChannels revenue={revenue} />
+        <SalesLeaderboard />
+        <SalesAlerts />
       </div>
     </AppBody>
   );

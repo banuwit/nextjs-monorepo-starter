@@ -1,1 +1,1 @@
-export { MainDashboardPage as default } from "@/features/dashboard/main/components/dashboard-main-page";
+export { default, metadata } from "./main/page";

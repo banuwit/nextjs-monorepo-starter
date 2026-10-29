@@ -1,130 +1,88 @@
-// Presentational sample data; no accounts or transfers are connected.
+// Data contoh untuk dashboard Finance; tidak ada rekening atau transfer yang terhubung.
+import type { KpiItem } from "@/features/dashboard/types/dashboard";
+
+/** Month-end net worth in USD, oldest first; the last value is this month. */
+export const financeNetWorthHistory = [
+  96_200, 98_900, 101_400, 100_100, 104_800, 108_300,
+  110_900, 109_600, 114_200, 117_000, 118_600, 128_400,
+];
+
+export const financeAccounts = [
+  { name: "Everyday checking", institution: "Revolut", last4: "4182", balance: 12_840, color: "var(--chart-1)" },
+  { name: "High-yield savings", institution: "HSBC", last4: "1004", balance: 48_320, color: "var(--chart-2)" },
+  { name: "Index investments", institution: "Vanguard", last4: "7731", balance: 42_780, color: "var(--chart-3)" },
+  { name: "Emergency reserve", institution: "Barclays", last4: "9912", balance: 24_460, color: "var(--chart-4)" },
+] as const;
+
 export const financeMetrics = [
   {
-    label: "Net worth",
-    value: "$128.4K",
-    detail: "+$9.8K vs last month",
-    change: "+8.4%",
-    tone: "positive",
-  },
-  {
     label: "Available cash",
-    value: "$12.8K",
-    detail: "$410 above your 30-day average",
-    change: "+3.2%",
-    tone: "positive",
+    value: "$12,840",
+    delta: { value: "+3.2%", direction: "up", sentiment: "good" },
+    context: "$410 above your 30-day average",
   },
   {
-    label: "Monthly spend",
+    label: "Spent this month",
     value: "$2,140",
-    detail: "$124 more than last month",
-    change: "+6.1%",
-    tone: "negative",
+    delta: { value: "+6.1%", direction: "up", sentiment: "bad" },
+    context: "$124 more than September",
   },
   {
     label: "Savings rate",
     value: "28%",
-    detail: "Up from 25.6% last month",
-    change: "+2.4%",
-    tone: "positive",
+    delta: { value: "+2.4 pts", direction: "up", sentiment: "good" },
+    context: "up from 25.6%",
   },
-] as const;
+] as const satisfies readonly KpiItem[];
+
+export const financeSpentThisMonth = 2_140;
 
 export const financeIncome = [
-  { label: "Primary salary", share: 68, amount: "$4,560.00" },
-  { label: "Freelance projects", share: 21, amount: "$1,412.00" },
-  { label: "Dividends and interest", share: 11, amount: "$765.00" },
+  { label: "Salary", amount: 4_560, color: "var(--chart-1)" },
+  { label: "Freelance projects", amount: 1_412, color: "var(--chart-2)" },
+  { label: "Dividends and interest", amount: 765, color: "var(--chart-3)" },
 ] as const;
 
 export const financeSpending = [
-  { day: "Monday", weekly: 165, monthly: 310 },
-  { day: "Tuesday", weekly: 290, monthly: 460 },
-  { day: "Wednesday", weekly: 220, monthly: 390 },
-  { day: "Thursday", weekly: 390, monthly: 530 },
-  { day: "Friday", weekly: 315, monthly: 420 },
-  { day: "Saturday", weekly: 445, monthly: 620 },
-  { day: "Sunday", weekly: 280, monthly: 350 },
-] as const;
-
-export const financeAllocation = [
-  {
-    label: "Main Wallet",
-    amount: 122540,
-    share: "52.2%",
-    fill: "var(--chart-1)",
-  },
-  {
-    label: "Savings Account",
-    amount: 48320,
-    share: "20.6%",
-    fill: "var(--chart-2)",
-  },
-  {
-    label: "Investment Account",
-    amount: 36780,
-    share: "15.7%",
-    fill: "var(--chart-3)",
-  },
-  {
-    label: "Reserve Account",
-    amount: 27256,
-    share: "11.5%",
-    fill: "var(--chart-4)",
-  },
-] as const;
-
-export const financeWallet = [
-  {
-    name: "Revolut Premium",
-    detail: "•••• 4182",
-    value: "$12,450.60",
-    mark: "R",
-  },
-  { name: "HSBC Bank", detail: "•••• 1004", value: "$3,200.11", mark: "H" },
-  { name: "Barclays Bank", detail: "•••• 9912", value: "$1,450.00", mark: "B" },
-  {
-    name: "Bitcoin",
-    detail: "Binance",
-    value: "0.42 BTC · $24,150.00",
-    mark: "₿",
-  },
-  {
-    name: "Ethereum",
-    detail: "MetaMask",
-    value: "4.85 ETH · $12,420.10",
-    mark: "Ξ",
-  },
+  { day: "Mon", thisWeek: 165, lastWeek: 210 },
+  { day: "Tue", thisWeek: 290, lastWeek: 240 },
+  { day: "Wed", thisWeek: 220, lastWeek: 260 },
+  { day: "Thu", thisWeek: 390, lastWeek: 310 },
+  { day: "Fri", thisWeek: 315, lastWeek: 330 },
+  { day: "Sat", thisWeek: 445, lastWeek: 380 },
+  { day: "Sun", thisWeek: 280, lastWeek: 300 },
 ] as const;
 
 export const financeBills = [
-  { name: "Claude Pro Subscription", date: "October 24, 2026", mark: "C" },
-  { name: "Resend Pro Team", date: "October 26, 2026", mark: "R" },
-  { name: "Linear Plus Plan", date: "November 01, 2026", mark: "L" },
+  { name: "Claude Pro", category: "Software", amount: 20, due: "2026-10-30", autopay: true },
+  { name: "Electricity", category: "Utilities", amount: 145, due: "2026-11-01", autopay: true },
+  { name: "Resend Pro Team", category: "Software", amount: 80, due: "2026-11-03", autopay: false },
+  { name: "Apartment rent", category: "Housing", amount: 1_000, due: "2026-11-05", autopay: false },
+  { name: "Linear Plus", category: "Software", amount: 14, due: "2026-11-08", autopay: true },
 ] as const;
 
-export const financeTransactions = [
-  {
-    name: "Primary salary",
-    date: "October 21, 2026",
-    amount: 4560,
-    type: "Income",
-  },
-  {
-    name: "Groceries",
-    date: "October 20, 2026",
-    amount: -86.5,
-    type: "Expense",
-  },
-  {
-    name: "Freelance projects",
-    date: "October 18, 2026",
-    amount: 1412,
-    type: "Income",
-  },
-  {
-    name: "Utilities",
-    date: "October 16, 2026",
-    amount: -145,
-    type: "Expense",
-  },
+export type FinanceTransaction = {
+  id: string;
+  name: string;
+  category: string;
+  date: string;
+  amount: number;
+};
+
+export const financeTransactions: FinanceTransaction[] = [
+  { id: "t8", name: "Salary", category: "Income", date: "2026-10-28", amount: 4_560 },
+  { id: "t7", name: "Whole Foods", category: "Groceries", date: "2026-10-27", amount: -86.5 },
+  { id: "t6", name: "Northwind Studio", category: "Freelance", date: "2026-10-25", amount: 1_412 },
+  { id: "t5", name: "City Utilities", category: "Utilities", date: "2026-10-24", amount: -145 },
+  { id: "t4", name: "Blue Bottle Coffee", category: "Dining", date: "2026-10-23", amount: -12.4 },
+  { id: "t3", name: "Uber", category: "Transport", date: "2026-10-22", amount: -23.8 },
+  { id: "t2", name: "Vanguard dividend", category: "Investments", date: "2026-10-20", amount: 765 },
+  { id: "t1", name: "Uniqlo", category: "Shopping", date: "2026-10-19", amount: -64.9 },
+];
+
+export const financeRecipients = [
+  { id: "ar", name: "Aisha Rahman" },
+  { id: "sc", name: "Sam Carter" },
+  { id: "mj", name: "Maya Jensen" },
+  { id: "ed", name: "Elliot Diaz" },
 ] as const;

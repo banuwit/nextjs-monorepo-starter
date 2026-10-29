@@ -13,7 +13,7 @@ Setiap resource memilih **satu** pola. Pola diatur lewat prop `pattern` pada `Cr
 | `sheet`          | `/crud/sheet`        | Panel overlay dari kanan (`CrudSheet`, maks. `sm:max-w-xl`)       | Form sedang/lebih tinggi dari modal, daftar tidak perlu tetap terlihat               |
 | `inline`         | `/crud/panel-inline` | Panel tertanam di kanan daftar (`CrudInlinePanel`), tanpa overlay | Mengedit sambil membandingkan baris di daftar; pada mobile panel menggantikan daftar |
 
-Pemetaan PRD: Users → `page`; Countries/Provinces/Cities → `dialog`; Menus → `sheet`; Parameters → `inline`. Halaman tersebut saat ini dihapus dari frontend (amendemen 21 Oktober 2026), jadi jangan dibuat ulang tanpa permintaan pengguna.
+Pemetaan PRD: Users → `page`; Countries/Provinces/Cities → `dialog`; Menus → `sheet`; Parameters → `inline`. Halaman tersebut saat ini dihapus dari frontend (amendemen 21 Oktober 2026). Sesuai amendemen 29 Oktober 2026, halaman tersebut dibuat ulang pada milestone M4–M5 dengan data dari API dan database nyata, memakai `CrudResource` yang sama; sebelum milestone itu, jangan dibuat ulang. `/crud/*` tetap menjadi demo pola dengan data mock.
 
 ## Komponen global
 

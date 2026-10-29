@@ -1,86 +1,112 @@
-export const salesMetrics = [
-  { label: "Total Sales", value: "$48,560.00", change: "+15.8%", comparison: "vs last week", icon: "sales" },
-  { label: "Total Orders", value: "379", change: "+8.3%", comparison: "vs last week", icon: "orders" },
-  { label: "Customer Growth", value: "820", change: "+12.5%", comparison: "vs last month", icon: "customers" },
-  { label: "Average Order", value: "$128", change: "-$4.20", comparison: "vs last week", icon: "average" },
-  { label: "Return Requests", value: "18", change: "+0.6%", comparison: "vs last month", icon: "returns" },
-  { label: "Stock Accuracy", value: "97%", change: "+2.4 pts", comparison: "vs last audit", icon: "stock" },
-] as const;
+// Data contoh untuk monitor Sales; belum terhubung ke API.
 
-export const revenueHistory = [
-  4820, 5150, 5060, 5520, 5990, 6880, 5140, 5360, 5520, 5860, 6120, 6720,
-  4920, 4680, 5150, 5360, 5720, 6150, 5480, 5920, 5660, 6180, 6340, 6660,
-  5840, 6220, 6480, 6110, 6680, 7230, 6280, 6740, 6960, 7120, 6780, 7240,
-  6820, 7240, 7680, 7410, 7920, 7810, 6040, 6420, 6150, 6860, 7080, 7090,
-  5860, 6120, 6340, 6080, 6620, 6900, 6520, 6840, 7060, 7420, 7160, 8280,
-  6980, 7320, 7640, 7160, 8040, 8620, 6900, 7400, 8100, 8600, 8200, 9360,
+export const salesDailyTarget = 46_000;
+export const salesVisitorsLastHour = 1_284;
+export const salesConversionRate = 3.4;
+
+/** Share of a typical day's revenue earned in each hour, 00:00–23:00. */
+const hourlyShape = [
+  0.8, 0.5, 0.3, 0.2, 0.2, 0.4, 1.1, 2.4, 3.9, 5.2, 6.1, 6.6,
+  7.4, 7.0, 6.4, 6.2, 6.0, 6.3, 6.9, 7.2, 6.4, 4.8, 3.1, 1.9,
+];
+const shapeTotal = hourlyShape.reduce((sum, value) => sum + value, 0);
+
+export const salesYesterdayHourly = hourlyShape.map((value) =>
+  Math.round((value / shapeTotal) * 41_800),
+);
+
+export const salesTodayHourly = hourlyShape.map((value, hour) =>
+  Math.round((value / shapeTotal) * 44_600 * (1 + ((hour % 5) - 2) * 0.05)),
+);
+
+/** Orders per hour today; used with revenue to derive order counts. */
+export const salesTodayOrdersHourly = salesTodayHourly.map((revenue) =>
+  Math.max(0, Math.round(revenue / 132)),
+);
+
+export type SalesChannelName = "Online store" | "Marketplace" | "Social" | "Retail";
+
+export const salesChannels: {
+  name: SalesChannelName;
+  share: number;
+  yesterdayShare: number;
+}[] = [
+  { name: "Online store", share: 0.46, yesterdayShare: 0.43 },
+  { name: "Marketplace", share: 0.27, yesterdayShare: 0.29 },
+  { name: "Social", share: 0.17, yesterdayShare: 0.14 },
+  { name: "Retail", share: 0.1, yesterdayShare: 0.14 },
 ];
 
-export const trafficHistory = [
-  280, 420, 360, 140, 80, 600, 260, 70, 90, 180, 150, 60,
-  430, 110, 260, 120, 90, 40, 75, 0, 15, 35, 60, 95,
-];
-
-export const trafficSources = [
-  { name: "Meta", visits: "5,640", share: 38, change: "+18%" },
-  { name: "Google", visits: "3,740", share: 25, change: "-6%" },
-  { name: "Shopify", visits: "2,960", share: 20, change: "+7%" },
-  { name: "TikTok", visits: "1,340", share: 10, change: "+9%" },
-  { name: "eBay", visits: "1,080", share: 7, change: "-3%" },
+export const salesReps = [
+  { name: "Nadia Putri", closed: 9_840, quota: 10_000 },
+  { name: "Marcus Lee", closed: 8_120, quota: 10_000 },
+  { name: "Sofia Alvarez", closed: 6_930, quota: 9_000 },
+  { name: "Raka Pratama", closed: 4_410, quota: 8_000 },
+  { name: "Hannah Kim", closed: 3_260, quota: 8_000 },
 ] as const;
 
-export const productCategories = [
-  { name: "Apparel", share: 44, color: "var(--chart-3)" },
-  { name: "Accessories", share: 32, color: "var(--chart-2)" },
-  { name: "Home", share: 24, color: "var(--chart-1)" },
-] as const;
+export type SalesAlert = {
+  id: string;
+  severity: "danger" | "warning" | "info";
+  title: string;
+  detail: string;
+};
 
-export const topProducts = [
-  { name: "Linen Overshirt", category: "Apparel", share: "31%", sales: "$14,820" },
-  { name: "Everyday Tote", category: "Accessories", share: "24%", sales: "$11,460" },
-  { name: "Ceramic Planter", category: "Home", share: "18%", sales: "$8,930" },
-] as const;
-
-export const customerReviews = [
-  { name: "Melody Macy", review: "The linen overshirt arrived faster than expected and the fit was exactly right." },
-  { name: "Emma Smith", review: "Everything was packed carefully, and checkout was quick and simple." },
-  { name: "Olivia Wild", review: "The everyday tote is sturdy and looks just like the photos." },
+export const salesAlerts: SalesAlert[] = [
+  {
+    id: "stock-tote",
+    severity: "danger",
+    title: "Everyday Tote is out of stock",
+    detail: "14 orders are waiting. Restock or hide the listing.",
+  },
+  {
+    id: "unpaid",
+    severity: "warning",
+    title: "6 orders unpaid for over 24 hours",
+    detail: "Send a payment reminder before they are cancelled.",
+  },
+  {
+    id: "returns",
+    severity: "warning",
+    title: "Returns for Linen Overshirt doubled",
+    detail: "Most cite sizing. Check the size guide.",
+  },
+  {
+    id: "promo",
+    severity: "info",
+    title: "Weekend promo starts tomorrow",
+    detail: "Banner and discount code are scheduled for 00:00.",
+  },
 ];
 
 export type SalesOrder = {
   id: string;
   customer: string;
+  product: string;
   items: number;
-  payment: "Paid" | "Pending" | "Refunded";
-  fulfillment: "Fulfilled" | "Unfulfilled" | "Returned";
   total: number;
-  daysAgo: number;
-  channel: "Online Store" | "Marketplace" | "Social" | "Retail";
+  channel: SalesChannelName;
+  payment: "Paid" | "Pending";
+  /** Minutes before page load that the order arrived. */
+  minutesAgo: number;
 };
 
-const orderSeeds = [
-  ["Emma Smith", 2, "Pending", "Unfulfilled", 248, "Online Store"],
-  ["Melody Macy", 3, "Paid", "Fulfilled", 1200, "Marketplace"],
-  ["Max Smith", 1, "Pending", "Unfulfilled", 79, "Social"],
-  ["Sean Bean", 5, "Paid", "Fulfilled", 5500, "Online Store"],
-  ["Brian Cox", 2, "Refunded", "Returned", 880, "Retail"],
-  ["Mikaela Collins", 4, "Paid", "Fulfilled", 7650, "Marketplace"],
-  ["Francis Mitcham", 2, "Pending", "Unfulfilled", 375, "Social"],
-  ["Olivia Wild", 3, "Paid", "Fulfilled", 38, "Online Store"],
-  ["Neil Owen", 1, "Paid", "Unfulfilled", 76, "Retail"],
-  ["Dan Wilson", 2, "Refunded", "Returned", 204, "Marketplace"],
-] as const;
+export const salesRecentOrders: SalesOrder[] = [
+  { id: "14550", customer: "Emma Smith", product: "Linen Overshirt", items: 2, total: 248, channel: "Online store", payment: "Paid", minutesAgo: 1 },
+  { id: "14549", customer: "Melody Macy", product: "Ceramic Planter", items: 3, total: 186, channel: "Marketplace", payment: "Paid", minutesAgo: 3 },
+  { id: "14548", customer: "Max Smith", product: "Everyday Tote", items: 1, total: 79, channel: "Social", payment: "Pending", minutesAgo: 6 },
+  { id: "14547", customer: "Sean Bean", product: "Linen Overshirt", items: 4, total: 512, channel: "Online store", payment: "Paid", minutesAgo: 9 },
+  { id: "14546", customer: "Brian Cox", product: "Wool Throw", items: 1, total: 140, channel: "Retail", payment: "Paid", minutesAgo: 12 },
+  { id: "14545", customer: "Mikaela Collins", product: "Ceramic Planter", items: 2, total: 124, channel: "Marketplace", payment: "Pending", minutesAgo: 16 },
+  { id: "14544", customer: "Francis Mitcham", product: "Canvas Apron", items: 1, total: 58, channel: "Social", payment: "Paid", minutesAgo: 21 },
+];
 
-export const salesOrders: SalesOrder[] = Array.from({ length: 34 }, (_, index) => {
-  const seed = orderSeeds[index % orderSeeds.length]!;
-  return {
-    id: String(14550 - index * 14),
-    customer: seed[0],
-    items: seed[1],
-    payment: seed[2],
-    fulfillment: seed[3],
-    total: seed[4],
-    daysAgo: index < 24 ? Math.floor(index / 2) : 32 + index - 24,
-    channel: seed[5],
-  };
-});
+/** Orders the monitor appends one by one to simulate live traffic. */
+export const salesIncomingOrders: Omit<SalesOrder, "id" | "minutesAgo">[] = [
+  { customer: "Olivia Wild", product: "Wool Throw", items: 2, total: 280, channel: "Online store", payment: "Paid" },
+  { customer: "Neil Owen", product: "Canvas Apron", items: 1, total: 58, channel: "Retail", payment: "Paid" },
+  { customer: "Dan Wilson", product: "Linen Overshirt", items: 1, total: 124, channel: "Marketplace", payment: "Pending" },
+  { customer: "Ayu Lestari", product: "Ceramic Planter", items: 3, total: 186, channel: "Social", payment: "Paid" },
+  { customer: "Tom Becker", product: "Everyday Tote", items: 2, total: 158, channel: "Online store", payment: "Paid" },
+  { customer: "Lena Hart", product: "Wool Throw", items: 1, total: 140, channel: "Marketplace", payment: "Paid" },
+];

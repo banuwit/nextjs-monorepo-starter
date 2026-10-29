@@ -1,86 +1,166 @@
 "use client";
 
 import { useState } from "react";
-import { CalendarDaysIcon, PlusIcon } from "lucide-react";
+import { PlusIcon } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
 import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { productivityTasks } from "@/mocks/dashboard-productivity.mock";
+  Card,
+  CardAction,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Input } from "@/components/ui/input";
+import { NativeSelect, NativeSelectOption } from "@/components/ui/native-select";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import { cn } from "@/lib/utils";
+import { productivityTaskTags, type ProductivityTask } from "@/mocks/dashboard-productivity.mock";
 
-const taskPeriods = [
-  { value: "today", label: "Today" },
-  { value: "tomorrow", label: "Tomorrow" },
-  { value: "this-week", label: "This Week" },
-];
+import { taskTitleError } from "../utils/productivity";
 
-export function ProductivityTasks() {
-  const [tasks, setTasks] = useState(productivityTasks);
+const views = ["Open", "Done", "All"] as const;
+type View = (typeof views)[number];
+
+export function ProductivityTasks({
+  tasks,
+  onToggle,
+  onAdd,
+}: {
+  tasks: ProductivityTask[];
+  onToggle: (id: string, done: boolean) => void;
+  onAdd: (task: Pick<ProductivityTask, "title" | "tag">) => void;
+}) {
+  const [view, setView] = useState<View>("Open");
+  const [title, setTitle] = useState("");
+  const [tag, setTag] = useState<string>(productivityTaskTags[0]);
+  const [error, setError] = useState<string | null>(null);
+
+  const visible = tasks.filter((task) =>
+    view === "All" ? true : view === "Done" ? task.done : !task.done,
+  );
+  const counts = {
+    Open: tasks.filter((task) => !task.done).length,
+    Done: tasks.filter((task) => task.done).length,
+    All: tasks.length,
+  };
 
   return (
-    <section className="flex flex-col gap-2">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <h2 className="text-xl tracking-tight">Tasks</h2>
-        <div className="flex items-center gap-2">
-          <Select defaultValue="today" items={taskPeriods}>
-            <SelectTrigger className="w-30" aria-label="Task period">
-              <SelectValue placeholder="Today" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectGroup>
-                {taskPeriods.map((period) => (
-                  <SelectItem key={period.value} value={period.value}>{period.label}</SelectItem>
-                ))}
-              </SelectGroup>
-            </SelectContent>
-          </Select>
-          <Button>
-            <PlusIcon data-icon="inline-start" />
-            New Task
-          </Button>
-        </div>
-      </div>
-      <div className="divide-y overflow-hidden rounded-xl border bg-background shadow-xs">
-        {tasks.map((task) => (
-          <div key={task.title} className="flex items-center gap-3 p-4">
-            <Checkbox
-              checked={task.checked}
-              aria-label={task.title}
-              onCheckedChange={(checked) =>
-                setTasks((current) =>
-                  current.map((item) =>
-                    item.title === task.title
-                      ? { ...item, checked: checked === true }
-                      : item,
-                  ),
-                )
-              }
+    <Card className="min-w-0">
+      <CardHeader>
+        <CardTitle>Today&apos;s tasks</CardTitle>
+        <CardDescription>
+          {counts.Done} of {counts.All} done
+        </CardDescription>
+        <CardAction>
+          <ToggleGroup
+            aria-label="Show tasks"
+            variant="outline"
+            size="sm"
+            spacing={0}
+            value={[view]}
+            onValueChange={(values) => {
+              const next = views.find((item) => item === values[0]);
+              if (next) setView(next);
+            }}
+          >
+            {views.map((item) => (
+              <ToggleGroupItem key={item} value={item}>
+                {item}
+                <span className="ml-1 text-muted-foreground tabular-nums">{counts[item]}</span>
+              </ToggleGroupItem>
+            ))}
+          </ToggleGroup>
+        </CardAction>
+      </CardHeader>
+      <CardContent className="flex flex-col gap-3">
+        <form
+          noValidate
+          className="flex flex-col gap-1.5"
+          onSubmit={(event) => {
+            event.preventDefault();
+            const message = taskTitleError(title);
+            setError(message);
+            if (message) return;
+            onAdd({ title: title.trim(), tag });
+            setTitle("");
+            setView((current) => (current === "Done" ? "Open" : current));
+          }}
+        >
+          <div className="flex flex-wrap gap-2">
+            <Input
+              className="basis-full sm:basis-0 sm:flex-1"
+              aria-label="New task"
+              placeholder="Add a task for today"
+              value={title}
+              aria-invalid={error ? true : undefined}
+              aria-describedby={error ? "task-title-error" : undefined}
+              onChange={(event) => {
+                setTitle(event.target.value);
+                setError(null);
+              }}
             />
-            <div className="flex min-w-0 flex-1 flex-col gap-2 lg:flex-row lg:items-center lg:justify-between">
-              <div className="flex min-w-0 flex-wrap items-center gap-2 lg:gap-4">
-                <span className={task.checked ? "truncate text-sm text-muted-foreground line-through" : "truncate text-sm"}>
+            <NativeSelect
+              aria-label="Task tag"
+              className="w-32 flex-1 sm:flex-none"
+              value={tag}
+              onChange={(event) => setTag(event.target.value)}
+            >
+              {productivityTaskTags.map((item) => (
+                <NativeSelectOption key={item} value={item}>
+                  {item}
+                </NativeSelectOption>
+              ))}
+            </NativeSelect>
+            <Button type="submit">
+              <PlusIcon data-icon="inline-start" />
+              Add
+            </Button>
+          </div>
+          {error && (
+            <p id="task-title-error" role="alert" className="text-sm text-destructive">
+              {error}
+            </p>
+          )}
+        </form>
+        {visible.length ? (
+          <ul className="flex flex-col divide-y">
+            {visible.map((task) => (
+              <li key={task.id} className="flex items-center gap-3 py-3 last:pb-0">
+                <Checkbox
+                  id={task.id}
+                  checked={task.done}
+                  onCheckedChange={(checked) => onToggle(task.id, checked === true)}
+                />
+                <label
+                  htmlFor={task.id}
+                  className={cn(
+                    "min-w-0 flex-1 cursor-pointer truncate text-sm",
+                    task.done && "text-muted-foreground line-through",
+                  )}
+                >
                   {task.title}
-                </span>
-                <Badge variant="outline" className="px-3 py-1 font-normal">
+                </label>
+                <Badge variant="outline" className="font-normal">
                   {task.tag}
                 </Badge>
-              </div>
-              <div className="flex shrink-0 items-center gap-3 text-sm text-muted-foreground">
-                <span>{task.time}</span>
-                <CalendarDaysIcon className="size-4" />
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
-    </section>
+                <span className="w-12 text-right text-sm text-muted-foreground tabular-nums">
+                  {task.time || "Today"}
+                </span>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p className="py-6 text-center text-sm text-muted-foreground">
+            {view === "Open"
+              ? "Everything on today's list is done."
+              : "Nothing finished yet. Tick a task when it's done."}
+          </p>
+        )}
+      </CardContent>
+    </Card>
   );
 }

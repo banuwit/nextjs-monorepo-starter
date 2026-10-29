@@ -1,33 +1,32 @@
+// Data contoh untuk dashboard CRM; belum terhubung ke API.
+import type { KpiItem } from "@/features/dashboard/types/dashboard";
+
 export const crmMetrics = [
   {
-    label: "Lead Pipeline Value",
+    label: "Pipeline value",
     value: "$284,500",
-    change: "+12%",
-    previous: "$254,200 last month",
-    positive: true,
+    delta: { value: "+12%", direction: "up", sentiment: "good" },
+    context: "vs $254,200 last month",
   },
   {
-    label: "Qualified Lead Rate",
+    label: "Qualified lead rate",
     value: "28.4%",
-    change: "-2.5%",
-    previous: "30.9% last month",
-    positive: false,
+    delta: { value: "-2.5 pts", direction: "down", sentiment: "bad" },
+    context: "vs 30.9% last month",
   },
   {
-    label: "Open Opportunities",
+    label: "Open opportunities",
     value: "42",
-    change: "+7",
-    previous: "35 last month",
-    positive: true,
+    delta: { value: "+7", direction: "up", sentiment: "good" },
+    context: "vs 35 last month",
   },
   {
-    label: "Lead-to-Deal Rate",
+    label: "Lead-to-deal rate",
     value: "18.1%",
-    change: "+1.6%",
-    previous: "16.5% last month",
-    positive: true,
+    delta: { value: "+1.6 pts", direction: "up", sentiment: "good" },
+    context: "vs 16.5% last month",
   },
-] as const;
+] as const satisfies readonly KpiItem[];
 
 export const crmLeadFlow = [
   { month: "Nov", qualified: 34, booked: 12 },
@@ -45,11 +44,13 @@ export const crmLeadFlow = [
 ];
 
 export const crmMeetings = [
-  { time: "08:45", title: "Sales team check-in", account: "Internal" },
-  { time: "09:00", title: "Discovery call", account: "BlueHaven Systems" },
-  { time: "10:00", title: "Product demo with Tim", account: "Weblabs Studio" },
-  { time: "10:20", title: "Proposal review", account: "Everline Freight" },
-];
+  { time: "09:00", minutes: 15, title: "Sales team check-in", account: "Internal", kind: "internal" },
+  { time: "10:00", minutes: 30, title: "Discovery call", account: "BlueHaven Systems", kind: "call" },
+  { time: "13:30", minutes: 45, title: "Product demo", account: "Weblabs Studio", kind: "video" },
+  { time: "15:00", minutes: 30, title: "Proposal review", account: "Everline Freight", kind: "video" },
+] as const;
+
+export const crmProposalGoal = { sent: 12, target: 18 } as const;
 
 export const crmStages = [
   "Qualified",

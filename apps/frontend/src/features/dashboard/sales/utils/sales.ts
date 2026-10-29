@@ -1,56 +1,56 @@
-import type { SalesOrder } from "@/mocks/dashboard-sales.mock";
-import type {
-  SalesPeriod,
-  SalesChannel,
-  SalesOrderFilter,
-} from "../types/sales";
+import {
+  salesTodayHourly,
+  salesTodayOrdersHourly,
+  salesYesterdayHourly,
+} from "@/mocks/dashboard-sales.mock";
 
-export const orderFilters: SalesOrderFilter[] = [
-  "All",
-  "Needs action",
-  "Unfulfilled",
-  "Unpaid",
-  "Returns",
-];
+import type { SalesMonitorTotals } from "../types/sales";
 
-export function filterSalesOrders(
-  orders: SalesOrder[],
-  period: SalesPeriod,
-  channel: SalesChannel,
-  status: SalesOrderFilter,
-  now: Date,
-) {
-  const today = new Date(
-    Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()),
-  );
-  const thisMonth = new Date(
-    Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), 1),
-  );
-  const lastMonth = new Date(
-    Date.UTC(today.getUTCFullYear(), today.getUTCMonth() - 1, 1),
-  );
-  const thisYear = new Date(Date.UTC(today.getUTCFullYear(), 0, 1));
+const sumUntil = (values: readonly number[], hour: number) =>
+  values.slice(0, hour).reduce((sum, value) => sum + value, 0) + (values[hour] ?? 0) / 2;
 
-  return orders.filter((order) => {
-    const placed = new Date(today.getTime() - order.daysAgo * 86_400_000);
-    const inPeriod =
-      period === "this-month"
-        ? placed >= thisMonth
-        : period === "last-month"
-          ? placed >= lastMonth && placed < thisMonth
-          : period === "last-30-days"
-            ? order.daysAgo < 30
-            : placed >= thisYear;
-    const inStatus =
-      status === "All" ||
-      (status === "Needs action" &&
-        (order.payment === "Pending" || order.fulfillment === "Unfulfilled")) ||
-      (status === "Unfulfilled" && order.fulfillment === "Unfulfilled") ||
-      (status === "Unpaid" && order.payment === "Pending") ||
-      (status === "Returns" && order.fulfillment === "Returned");
+/** Totals so far today and at the same point yesterday (current hour counted as half). */
+export function salesTotalsAt(hour: number): SalesMonitorTotals {
+  return {
+    revenue: Math.round(sumUntil(salesTodayHourly, hour)),
+    orders: Math.round(sumUntil(salesTodayOrdersHourly, hour)),
+    yesterdayRevenue: Math.round(sumUntil(salesYesterdayHourly, hour)),
+    yesterdayOrders: Math.round(sumUntil(salesTodayOrdersHourly, hour) * 0.94),
+  };
+}
 
-    return (
-      inPeriod && (channel === "all" || order.channel === channel) && inStatus
-    );
+/** Running revenue per hour; today stops at the current hour. */
+export function cumulativeSales(hour: number, liveExtra: number) {
+  let today = 0;
+  let yesterday = 0;
+  return salesYesterdayHourly.map((value, index) => {
+    yesterday += value;
+    const label = `${String(index).padStart(2, "0")}:00`;
+    if (index > hour) return { hour: label, yesterday, today: null };
+    today += index === hour ? salesTodayHourly[index]! / 2 + liveExtra : salesTodayHourly[index]!;
+    return { hour: label, yesterday, today: Math.round(today) };
   });
 }
+
+/** Where revenue should be by this hour to hit the target, using yesterday's shape. */
+export function expectedByNow(hour: number, target: number) {
+  const total = salesYesterdayHourly.reduce((sum, value) => sum + value, 0);
+  return (sumUntil(salesYesterdayHourly, hour) / total) * target;
+}
+
+export function minutesAgoLabel(at: number, now: number) {
+  const minutes = Math.max(0, Math.round((now - at) / 60_000));
+  if (minutes < 1) return "Just now";
+  if (minutes < 60) return `${minutes} min ago`;
+  return `${Math.floor(minutes / 60)} h ago`;
+}
+
+export const ordersCsvHeader = [
+  "Order",
+  "Customer",
+  "Product",
+  "Items",
+  "Channel",
+  "Payment",
+  "Total (USD)",
+] as const;

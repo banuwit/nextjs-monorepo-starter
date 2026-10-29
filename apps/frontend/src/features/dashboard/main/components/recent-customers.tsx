@@ -1,191 +1,162 @@
 "use client";
 
-import { useState } from "react";
-import {
-  ChevronLeftIcon,
-  ChevronRightIcon,
-  CircleAlertIcon,
-  CircleCheckIcon,
-  Clock3Icon,
-  DownloadIcon,
-  LoaderIcon,
-  UserRoundIcon,
-} from "lucide-react";
-import { Badge } from "@/components/ui/badge";
+import type { ColumnDef } from "@tanstack/react-table";
+import { DownloadIcon } from "lucide-react";
+
+import { DataGridClient } from "@/components/data-grid/data-grid-client";
+import type { DataGridFeatures } from "@/components/data-grid/data-grid-features";
+import { DataGridHeader } from "@/components/data-grid/data-grid-header";
+import { DataGridHeaderSort } from "@/components/data-grid/data-grid-header-sort";
 import { Button } from "@/components/ui/button";
 import {
   Card,
-  CardAction,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import {
-  dashboardCustomers,
-  type DashboardCustomer,
-} from "@/mocks/dashboard-main.mock";
+import { StatusBadge } from "@/features/dashboard/components/status-badge";
+import { downloadCsv } from "@/features/dashboard/utils/csv";
+import { formatShortDate, initials, usdWhole } from "@/features/dashboard/utils/format";
+import type { DashboardCustomer } from "@/mocks/dashboard-main.mock";
 
-const PAGE_SIZE = 10;
-const billingIcons = {
-  Paid: CircleCheckIcon,
-  Pending: LoaderIcon,
-  Overdue: CircleAlertIcon,
-  Trial: Clock3Icon,
-};
-function exportCustomers(data: DashboardCustomer[]) {
-  const fields = [
-    "id",
-    "name",
-    "email",
-    "status",
-    "billing",
-    "plan",
-    "joined",
-  ] as const;
-  const csv = [
-    fields.join(","),
-    ...data.map((row) =>
-      fields.map((field) => `"${row[field].replaceAll('"', '""')}"`).join(","),
-    ),
-  ].join("\n");
-  const url = URL.createObjectURL(
-    new Blob([csv], { type: "text/csv;charset=utf-8" }),
-  );
-  const link = document.createElement("a");
-  link.href = url;
-  link.download = "customers.csv";
-  link.click();
-  URL.revokeObjectURL(url);
-}
+import { customersCsvHeader, customersCsvRows } from "../utils/customers";
+import { accountStyles, billingStyles } from "./customer-status";
 
-export function RecentCustomers() {
-  const [page, setPage] = useState(0);
-  const pageCount = Math.max(
-    1,
-    Math.ceil(dashboardCustomers.length / PAGE_SIZE),
-  );
-  const currentPage = Math.min(page, pageCount - 1);
-  const rows = dashboardCustomers.slice(
-    currentPage * PAGE_SIZE,
-    (currentPage + 1) * PAGE_SIZE,
-  );
-  return (
-    <Card id="customers">
-      <CardHeader>
-        <CardTitle>18,426 Customers</CardTitle>
-        <CardDescription>
-          Recent customer records with plan, billing, status, and signup
-          activity.
-        </CardDescription>
-        <CardAction>
-          <Button
-            size="sm"
-            variant="outline"
-            onClick={() => exportCustomers(dashboardCustomers)}
-          >
-            <DownloadIcon data-icon="inline-start" />
-            Export
-          </Button>
-        </CardAction>
-      </CardHeader>
-      <CardContent className="flex flex-col gap-4">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Customer</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Billing</TableHead>
-              <TableHead>Plan</TableHead>
-              <TableHead>Joined</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {rows.map((customer) => {
-              const Icon = billingIcons[customer.billing];
-              return (
-                <TableRow key={customer.id}>
-                  <TableCell>
-                    <div className="flex items-center gap-2">
-                      <span className="grid size-8 place-items-center rounded-md border bg-muted text-muted-foreground">
-                        <UserRoundIcon className="size-4" />
-                      </span>
-                      <div className="flex flex-col gap-0.5">
-                        <span className="font-medium">{customer.name}</span>
-                        <span className="text-xs text-muted-foreground">
-                          #{customer.id}
-                        </span>
-                      </div>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <Badge variant="outline">{customer.status}</Badge>
-                  </TableCell>
-                  <TableCell>
-                    <Badge variant="outline">
-                      <Icon />
-                      {customer.billing}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>{customer.plan}</TableCell>
-                  <TableCell>
-                    <div className="flex flex-col gap-0.5">
-                      <span>
-                        {new Date(
-                          `${customer.joined}T00:00:00Z`,
-                        ).toLocaleDateString("en-US", {
-                          day: "numeric",
-                          month: "long",
-                          year: "numeric",
-                          timeZone: "UTC",
-                        })}
-                      </span>
-                      <span className="text-xs text-muted-foreground">
-                        at 10:25 AM
-                      </span>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              );
-            })}
-          </TableBody>
-        </Table>
-        <div className="flex items-center justify-between gap-3 text-sm">
-          <span className="text-muted-foreground">
-            {dashboardCustomers.length} customers
-          </span>
-          <div className="flex items-center gap-2">
-            <span>
-              Page {currentPage + 1} of {pageCount}
-            </span>
-            <Button
-              variant="outline"
-              size="icon-sm"
-              aria-label="Previous page"
-              disabled={currentPage === 0}
-              onClick={() => setPage(currentPage - 1)}
-            >
-              <ChevronLeftIcon />
-            </Button>
-            <Button
-              variant="outline"
-              size="icon-sm"
-              aria-label="Next page"
-              disabled={currentPage === pageCount - 1}
-              onClick={() => setPage(currentPage + 1)}
-            >
-              <ChevronRightIcon />
-            </Button>
-          </div>
+const columns: ColumnDef<DataGridFeatures, DashboardCustomer>[] = [
+  {
+    accessorKey: "name",
+    header: ({ column }) => <DataGridHeaderSort column={column} title="Customer" />,
+    cell: ({ row }) => (
+      <div className="flex min-w-48 items-center gap-2.5">
+        <span
+          aria-hidden="true"
+          className="grid size-8 shrink-0 place-items-center rounded-full bg-muted text-xs font-medium text-muted-foreground"
+        >
+          {initials(row.original.name)}
+        </span>
+        <div className="min-w-0">
+          <p className="truncate font-medium">{row.original.name}</p>
+          <p className="truncate text-xs text-muted-foreground">{row.original.email}</p>
         </div>
+      </div>
+    ),
+  },
+  {
+    accessorKey: "plan",
+    header: ({ column }) => <DataGridHeaderSort column={column} title="Plan" />,
+  },
+  {
+    accessorKey: "mrr",
+    header: ({ column }) => <DataGridHeaderSort column={column} title="MRR" />,
+    cell: ({ row }) => (
+      <span className="tabular-nums">
+        {row.original.mrr ? usdWhole.format(row.original.mrr) : "Free trial"}
+      </span>
+    ),
+  },
+  {
+    accessorKey: "status",
+    header: () => <DataGridHeader title="Account" />,
+    cell: ({ row }) => {
+      const { status } = row.original;
+      const Icon = accountStyles[status].icon;
+      return (
+        <span
+          className={
+            status === "Subscribed"
+              ? "inline-flex items-center gap-1.5"
+              : "inline-flex items-center gap-1.5 text-muted-foreground"
+          }
+        >
+          <Icon className="size-3.5 text-muted-foreground" aria-hidden="true" />
+          {status}
+        </span>
+      );
+    },
+  },
+  {
+    accessorKey: "billing",
+    header: () => <DataGridHeader title="Billing" />,
+    cell: ({ row }) => {
+      const style = billingStyles[row.original.billing];
+      return (
+        <StatusBadge tone={style.tone} icon={style.icon}>
+          {row.original.billing}
+        </StatusBadge>
+      );
+    },
+  },
+  {
+    accessorKey: "joined",
+    header: ({ column }) => <DataGridHeaderSort column={column} title="Joined" />,
+    cell: ({ row }) => (
+      <span className="whitespace-nowrap text-muted-foreground tabular-nums">
+        {formatShortDate(row.original.joined)}
+      </span>
+    ),
+  },
+];
+
+const toOptions = (values: readonly string[]) =>
+  values.map((value) => ({ label: value, value }));
+
+export function RecentCustomers({
+  customers,
+}: {
+  customers: DashboardCustomer[];
+}) {
+  return (
+    <Card id="customers" className="min-w-0">
+      <CardHeader>
+        <CardTitle>Recent customers</CardTitle>
+        <CardDescription>
+          Latest {customers.length} sign-ups with their plan and billing state
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="min-w-0">
+        <DataGridClient
+          columns={columns}
+          data={customers}
+          getRowId={(row) => row.id}
+          defaultSorting={[{ id: "joined", desc: true }]}
+          pagination="simple"
+          defaultPageSize={8}
+          toolbar={{
+            searches: [{ key: "name", placeholder: "Search customers..." }],
+            facets: [
+              {
+                key: "billing",
+                title: "Billing",
+                options: toOptions(["Paid", "Pending", "Overdue", "Trial"]),
+              },
+              {
+                key: "plan",
+                title: "Plan",
+                options: toOptions(["Enterprise", "Growth", "Pro", "Starter"]),
+              },
+              {
+                key: "status",
+                title: "Account",
+                options: toOptions(["Subscribed", "Inactive", "Unsubscribed"]),
+              },
+            ],
+          }}
+          actions={
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() =>
+                downloadCsv("customers.csv", customersCsvHeader, customersCsvRows(customers))
+              }
+            >
+              <DownloadIcon data-icon="inline-start" />
+              Export
+            </Button>
+          }
+          emptyFilteredTitle="No customers match these filters"
+          emptyFilteredDescription="Clear a filter or search for another name."
+        />
       </CardContent>
     </Card>
   );

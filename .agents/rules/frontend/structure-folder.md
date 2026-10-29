@@ -194,14 +194,14 @@ export function ScrollTablePage() {
 
 ## Perbedaan kode saat ini dengan PRD
 
-| PRD §6 (target)                                                             | Kode saat ini                                 | Pegangan agent                                           |
-| --------------------------------------------------------------------------- | --------------------------------------------- | -------------------------------------------------------- |
-| Route group `(dashboard)`                                                   | `(backoffice)`                                | Pakai `(backoffice)`                                     |
-| `components/layouts/`                                                       | `components/layout/`                          | Pakai `components/layout/`                               |
-| `/login`, `/change-password`                                                | `/login-1` … `/login-5` (pratinjau)           | Ikuti kode; auth nyata menunggu milestone autentikasi    |
-| `/users`, `/countries`, `/menus`, dll.                                      | Dihapus; diganti `/crud/*` (amendemen 21 Okt) | Jangan membuat ulang halaman tersebut tanpa permintaan   |
-| `lib/api/`, `providers/query-provider.tsx`, `config/`, `tests/`, `app/api/` | Belum ada                                     | Buat saat milestone terkait dikerjakan, bukan lebih awal |
-| Folder fitur hanya jika diperlukan                                          | Lima folder selalu ada                        | Ikuti keputusan pengguna 24 Oktober 2026                 |
+| PRD §6 (target)                                                             | Kode saat ini                                 | Pegangan agent                                                |
+| --------------------------------------------------------------------------- | --------------------------------------------- | ------------------------------------------------------------- |
+| Route group `(dashboard)`                                                   | `(backoffice)`                                | Pakai `(backoffice)`                                          |
+| `components/layouts/`                                                       | `components/layout/`                          | Pakai `components/layout/`                                    |
+| `/login`, `/change-password`                                                | `/login-1` … `/login-5` (pratinjau)           | Ikuti kode; auth nyata menunggu milestone autentikasi         |
+| `/users`, `/countries`, `/menus`, dll.                                      | Dihapus; diganti `/crud/*` (amendemen 21 Okt) | Dibuat ulang pada M4–M5 (amendemen 29 Okt); jangan lebih awal |
+| `lib/api/`, `providers/query-provider.tsx`, `config/`, `tests/`, `app/api/` | Belum ada                                     | Buat saat milestone terkait dikerjakan, bukan lebih awal      |
+| Folder fitur hanya jika diperlukan                                          | Lima folder selalu ada                        | Ikuti keputusan pengguna 24 Oktober 2026                      |
 
 ## Langkah saat menambah atau merapikan fitur
 

@@ -1,9 +1,12 @@
 import type { SalesOrder } from "@/mocks/dashboard-sales.mock";
 
-export type SalesPeriod =
-  "this-month" | "last-month" | "last-30-days" | "year-to-date";
+/** An order shown in the live feed, with its arrival time as epoch ms. */
+export type SalesFeedOrder = Omit<SalesOrder, "minutesAgo"> & { at: number };
 
-export type SalesChannel = "all" | SalesOrder["channel"];
-
-export type SalesOrderFilter =
-  "All" | "Needs action" | "Unfulfilled" | "Unpaid" | "Returns";
+export type SalesMonitorTotals = {
+  revenue: number;
+  orders: number;
+  /** Revenue by the same time yesterday. */
+  yesterdayRevenue: number;
+  yesterdayOrders: number;
+};

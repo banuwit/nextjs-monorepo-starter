@@ -1,21 +1,15 @@
 import { SalesDashboardPage } from "@/features/dashboard/sales/components/sales-dashboard-page";
+import { workspaceHour, workspaceToday } from "@/features/dashboard/utils/today";
 
-export const metadata = { title: "Sales | Dashboard" };
+export const metadata = { title: "Sales monitor | Dashboard" };
 
 export default function Page() {
-  const parts = Object.fromEntries(
-    new Intl.DateTimeFormat("en-US", {
-      timeZone: "Asia/Jakarta",
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit",
-    })
-      .formatToParts(new Date())
-      .map(({ type, value }) => [type, value]),
-  );
+  const now = new Date();
   return (
     <SalesDashboardPage
-      today={`${parts.year}-${parts.month}-${parts.day}T12:00:00Z`}
+      today={workspaceToday(now)}
+      hour={workspaceHour(now)}
+      now={now.getTime()}
     />
   );
 }
