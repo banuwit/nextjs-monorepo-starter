@@ -1,6 +1,6 @@
 "use client";
 
-import { ChartExamplePage } from "@/features/chart/components/chart-example-page";
+import { ChartExamplePage } from "./chart-example-page";
 import { ScatterBubbleCard } from "@/features/chart/scatter/components/scatter-bubble-card";
 import { ScatterTrendLineCard } from "@/features/chart/scatter/components/scatter-trend-line-card";
 import { ScatterMultiGroupCard } from "@/features/chart/scatter/components/scatter-multi-group-card";

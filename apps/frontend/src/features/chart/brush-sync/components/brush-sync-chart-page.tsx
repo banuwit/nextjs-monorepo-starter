@@ -1,4 +1,4 @@
-import { ChartExamplePage } from "@/features/chart/components/chart-example-page";
+import { ChartExamplePage } from "./chart-example-page";
 import { BrushSyncAreaCard } from "@/features/chart/brush-sync/components/brush-sync-area-card";
 import { BrushSyncAreaSyncCard } from "@/features/chart/brush-sync/components/brush-sync-area-sync-card";
 import { BrushSyncBarCard } from "@/features/chart/brush-sync/components/brush-sync-bar-card";

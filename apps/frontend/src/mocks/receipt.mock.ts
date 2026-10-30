@@ -4,7 +4,7 @@ export const receipt: Receipt = {
   id: "RCT-2026-018042",
   orderId: "HLD-2026-18042",
   date: "May 18, 2026",
-  shop: { name: "ReUI", website: "reui.io", supportEmail: "support@reui.io" },
+  shop: { name: "WIT", supportEmail: "support@example.com" },
   customerEmail: "jordan@example.com",
   items: [
     {

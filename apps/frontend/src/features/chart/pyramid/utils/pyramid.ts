@@ -1,4 +1,4 @@
-import { formatCompact } from "@/features/chart/utils/format";
+import { formatCompact } from "./format";
 import type { PyramidRow } from "@/features/chart/pyramid/types/pyramid";
 
 /**

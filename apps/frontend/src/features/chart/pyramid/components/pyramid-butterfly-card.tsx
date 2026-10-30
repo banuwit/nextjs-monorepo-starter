@@ -26,7 +26,7 @@ import {
   mirrorRows,
   symmetricScale,
 } from "@/features/chart/pyramid/utils/pyramid";
-import { sumBy } from "@/features/chart/utils/format";
+import { sumBy } from "../utils/format";
 import { ticketsByTeam } from "@/mocks/chart-pyramid.mock";
 
 const ticketsConfig = {

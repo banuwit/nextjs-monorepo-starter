@@ -12,7 +12,7 @@ const party = z.object({
   taxId: z.string().max(80),
 });
 
-const invoiceBaseSchema = z.object({
+const draftPreviewBaseSchema = z.object({
   reference: requiredText.max(60),
   issuedDate: z.iso.date("Enter a valid issue date."),
   dueDate: z.iso.date("Enter a valid due date."),
@@ -47,10 +47,10 @@ const invoiceBaseSchema = z.object({
 });
 
 function validateDates(
-  invoice: { issuedDate: string; dueDate: string },
+  draftPreview: { issuedDate: string; dueDate: string },
   ctx: z.RefinementCtx,
 ) {
-  if (invoice.dueDate < invoice.issuedDate)
+  if (draftPreview.dueDate < draftPreview.issuedDate)
     ctx.addIssue({
       code: "custom",
       path: ["dueDate"],
@@ -58,10 +58,13 @@ function validateDates(
     });
 }
 function validateDiscount(
-  invoice: { discountType: "fixed" | "percent"; discountValue: number },
+  draftPreview: { discountType: "fixed" | "percent"; discountValue: number },
   ctx: z.RefinementCtx,
 ) {
-  if (invoice.discountType === "percent" && invoice.discountValue > 100)
+  if (
+    draftPreview.discountType === "percent" &&
+    draftPreview.discountValue > 100
+  )
     ctx.addIssue({
       code: "custom",
       path: ["discountValue"],
@@ -69,17 +72,19 @@ function validateDiscount(
     });
 }
 
-export const invoiceSchema = invoiceBaseSchema.superRefine((invoice, ctx) => {
-  validateDates(invoice, ctx);
-  validateDiscount(invoice, ctx);
-});
+export const draftPreviewSchema = draftPreviewBaseSchema.superRefine(
+  (draftPreview, ctx) => {
+    validateDates(draftPreview, ctx);
+    validateDiscount(draftPreview, ctx);
+  },
+);
 
-const invoiceStepSchemas = [
-  invoiceBaseSchema
+const draftPreviewStepSchemas = [
+  draftPreviewBaseSchema
     .pick({ reference: true, issuedDate: true, dueDate: true, currency: true })
     .superRefine(validateDates),
-  invoiceBaseSchema.pick({ from: true, to: true }),
-  invoiceBaseSchema
+  draftPreviewBaseSchema.pick({ from: true, to: true }),
+  draftPreviewBaseSchema
     .pick({
       items: true,
       discountType: true,
@@ -87,7 +92,7 @@ const invoiceStepSchemas = [
       taxRate: true,
     })
     .superRefine(validateDiscount),
-  invoiceBaseSchema.pick({
+  draftPreviewBaseSchema.pick({
     bank: true,
     accountName: true,
     accountNumber: true,
@@ -102,7 +107,7 @@ const stepFields = [
   ["bank", "accountName", "accountNumber", "notes"],
 ] as const;
 
-export function invoiceStepForPath(path: string) {
+export function draftPreviewStepForPath(path: string) {
   const field = path.split(".")[0];
   return Math.max(
     0,
@@ -112,11 +117,11 @@ export function invoiceStepForPath(path: string) {
   );
 }
 
-export function validateInvoiceStep(
+export function validateDraftPreviewStep(
   step: number,
-  draft: z.input<typeof invoiceSchema>,
+  draft: z.input<typeof draftPreviewSchema>,
 ): Record<string, string> {
-  const schema = invoiceStepSchemas[step];
+  const schema = draftPreviewStepSchemas[step];
   if (!schema) return {};
   const result = schema.safeParse(draft);
   if (result.success) return {};

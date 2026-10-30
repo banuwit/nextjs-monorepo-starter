@@ -20,7 +20,7 @@ import {
   type ChartConfig,
 } from "@/components/ui/chart";
 import { formatHour } from "@/features/chart/brush-sync/utils/brush-sync";
-import { formatCompact, sumBy } from "@/features/chart/utils/format";
+import { formatCompact, sumBy } from "../utils/format";
 import { hourlyServiceMetrics } from "@/mocks/chart-brush-sync.mock";
 
 const metricsConfig = {

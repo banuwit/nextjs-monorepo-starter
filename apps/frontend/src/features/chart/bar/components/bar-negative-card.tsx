@@ -18,7 +18,7 @@ import {
   ChartTooltipContent,
   type ChartConfig,
 } from "@/components/ui/chart";
-import { formatCurrency, sumBy } from "@/features/chart/utils/format";
+import { formatCurrency, sumBy } from "../utils/format";
 import { monthlyNetIncome } from "@/mocks/chart-bar.mock";
 
 const netConfig = {

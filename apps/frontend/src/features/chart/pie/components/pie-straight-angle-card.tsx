@@ -14,7 +14,7 @@ import {
   ChartTooltipContent,
   type ChartConfig,
 } from "@/components/ui/chart";
-import { formatCurrency, sumBy } from "@/features/chart/utils/format";
+import { formatCurrency, sumBy } from "../utils/format";
 import { departmentBudget } from "@/mocks/chart-pie.mock";
 
 const budgetConfig = {

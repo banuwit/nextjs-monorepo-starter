@@ -16,24 +16,24 @@ import {
   NativeSelect,
   NativeSelectOption,
 } from "@/components/ui/native-select";
-import { invoiceExample } from "@/mocks/invoice.mock";
+import { draftPreviewExample } from "@/mocks/draft-preview.mock";
 import {
-  invoiceSchema,
-  invoiceStepForPath,
-  validateInvoiceStep,
-} from "../schemas/invoice.schema";
+  draftPreviewSchema,
+  draftPreviewStepForPath,
+  validateDraftPreviewStep,
+} from "../schemas/draft-preview.schema";
 import { cn } from "@/lib/utils";
-import type { Invoice, InvoiceErrors } from "../types/invoice";
-import { calculateInvoice, formatMoney } from "../utils/invoice";
-import { InvoiceField, PartyFields } from "./invoice-fields";
-import { InvoiceItems } from "./invoice-items";
-import { InvoicePreview } from "./invoice-preview";
-import { useInvoiceExport } from "../hooks/use-invoice-export";
+import type { DraftPreview, DraftPreviewErrors } from "../types/draft-preview";
+import { calculateDraftPreview, formatMoney } from "../utils/draft-preview";
+import { DraftPreviewField, PartyFields } from "./draft-preview-fields";
+import { DraftPreviewItems } from "./draft-preview-items";
+import { DraftPreviewPreview } from "./draft-preview-preview";
+import { useDraftPreviewExport } from "../hooks/use-draft-preview-export";
 
 const steps = [
   {
     title: "Details",
-    caption: "Invoice",
+    caption: "Draft Preview",
     description: "Set the reference and payment timeline.",
   },
   {
@@ -49,40 +49,42 @@ const steps = [
   {
     title: "Payment",
     caption: "Review",
-    description: "Add payment details and review your invoice.",
+    description: "Add payment details and review your draft preview.",
   },
 ] as const;
 
-export function InvoicePage() {
-  const [invoice, setInvoice] = useState<Invoice>(invoiceExample);
+export function DraftPreviewPage() {
+  const [draftPreview, setDraftPreview] =
+    useState<DraftPreview>(draftPreviewExample);
   const [step, setStep] = useState(0);
   const [validatedSteps, setValidatedSteps] = useState<number[]>([]);
   const stepHeading = useRef<HTMLHeadingElement>(null);
   const errorSummary = useRef<HTMLDivElement>(null);
-  const output = useInvoiceExport(invoice);
-  const validation = invoiceSchema.safeParse(invoice);
-  const errors: InvoiceErrors = {};
+  const output = useDraftPreviewExport(draftPreview);
+  const validation = draftPreviewSchema.safeParse(draftPreview);
+  const errors: DraftPreviewErrors = {};
   for (const index of validatedSteps)
-    Object.assign(errors, validateInvoiceStep(index, invoice));
-  const totals = calculateInvoice(invoice);
-  const money = (value: number) => formatMoney(value, invoice.currency);
-  const update = (patch: Partial<Invoice>) =>
-    setInvoice((current) => ({ ...current, ...patch }));
+    Object.assign(errors, validateDraftPreviewStep(index, draftPreview));
+  const totals = calculateDraftPreview(draftPreview);
+  const money = (value: number) => formatMoney(value, draftPreview.currency);
+  const update = (patch: Partial<DraftPreview>) =>
+    setDraftPreview((current) => ({ ...current, ...patch }));
   const checks = [
-    "Invoice details",
+    "Draft Preview details",
     "Business & client",
     "Items & adjustments",
     "Payment details",
   ].map((label, index) => ({
     label,
-    complete: Object.keys(validateInvoiceStep(index, invoice)).length === 0,
+    complete:
+      Object.keys(validateDraftPreviewStep(index, draftPreview)).length === 0,
   }));
 
   function navigate(target: number) {
     if (target < 0 || target >= steps.length) return;
     if (target > step) {
       for (let index = 0; index < target; index++) {
-        const invalid = validateInvoiceStep(index, invoice);
+        const invalid = validateDraftPreviewStep(index, draftPreview);
         if (Object.keys(invalid).length) {
           setValidatedSteps((current) =>
             current.includes(index) ? current : [...current, index],
@@ -99,7 +101,7 @@ export function InvoicePage() {
     requestAnimationFrame(() => stepHeading.current?.focus());
   }
 
-  function exportInvoice() {
+  function exportDraftPreview() {
     if (!validation.success) {
       setValidatedSteps([0, 1, 2, 3]);
       requestAnimationFrame(() => errorSummary.current?.focus());
@@ -114,13 +116,15 @@ export function InvoicePage() {
         <header className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <div className="mb-2 flex items-center gap-3">
-              <h1 className="text-2xl font-semibold tracking-tight">Invoice</h1>
+              <h1 className="text-2xl font-semibold tracking-tight">
+                Draft Preview
+              </h1>
               <span className="rounded-md border border-border bg-card px-2 py-0.5 text-xs text-muted-foreground">
                 Draft
               </span>
             </div>
             <p className="text-sm text-muted-foreground">
-              Good work deserves a well-crafted invoice.
+              Good work deserves a well-crafted draft preview.
             </p>
           </div>
           <div className="flex flex-wrap gap-2">
@@ -128,7 +132,7 @@ export function InvoicePage() {
               type="button"
               size="lg"
               disabled={output.busy}
-              onClick={() => exportInvoice()}
+              onClick={() => exportDraftPreview()}
             >
               {output.busy ? (
                 <LoaderCircleIcon className="animate-spin" />
@@ -170,7 +174,7 @@ export function InvoicePage() {
                     className="underline underline-offset-2"
                     onClick={(e) => {
                       e.preventDefault();
-                      setStep(invoiceStepForPath(path));
+                      setStep(draftPreviewStepForPath(path));
                       requestAnimationFrame(() =>
                         document.getElementById(path)?.focus(),
                       );
@@ -192,13 +196,13 @@ export function InvoicePage() {
               noValidate
               onSubmit={(e) => {
                 e.preventDefault();
-                if (step === steps.length - 1) exportInvoice();
+                if (step === steps.length - 1) exportDraftPreview();
                 else navigate(step + 1);
               }}
               className="min-w-0 rounded-xl border border-border bg-card text-card-foreground"
             >
               <nav
-                aria-label="Invoice progress"
+                aria-label="Draft Preview progress"
                 className="px-4 pt-6 pb-5 sm:px-6"
               >
                 <ol className="flex">
@@ -259,30 +263,30 @@ export function InvoicePage() {
                 {step === 0 && (
                   <section
                     className="px-5 py-6 sm:px-7"
-                    aria-label="Invoice details"
+                    aria-label="Draft Preview details"
                   >
                     <div className="grid gap-4 sm:grid-cols-2">
-                      <InvoiceField
+                      <DraftPreviewField
                         id="reference"
-                        label="Invoice number"
+                        label="Draft Preview number"
                         maxLength={60}
-                        value={invoice.reference}
+                        value={draftPreview.reference}
                         error={errors.reference}
                         onChange={(e) => update({ reference: e.target.value })}
                       />
-                      <InvoiceField
+                      <DraftPreviewField
                         id="issuedDate"
                         label="Issue date"
                         type="date"
-                        value={invoice.issuedDate}
+                        value={draftPreview.issuedDate}
                         error={errors.issuedDate}
                         onChange={(e) => update({ issuedDate: e.target.value })}
                       />
-                      <InvoiceField
+                      <DraftPreviewField
                         id="dueDate"
                         label="Due date"
                         type="date"
-                        value={invoice.dueDate}
+                        value={draftPreview.dueDate}
                         error={errors.dueDate}
                         onChange={(e) => update({ dueDate: e.target.value })}
                       />
@@ -296,10 +300,11 @@ export function InvoicePage() {
                         <NativeSelect
                           id="currency"
                           className="w-full [&_select]:h-10"
-                          value={invoice.currency}
+                          value={draftPreview.currency}
                           onChange={(e) =>
                             update({
-                              currency: e.target.value as Invoice["currency"],
+                              currency: e.target
+                                .value as DraftPreview["currency"],
                             })
                           }
                         >
@@ -324,21 +329,21 @@ export function InvoicePage() {
                   >
                     <PartyFields
                       kind="from"
-                      value={invoice.from}
+                      value={draftPreview.from}
                       errors={errors}
                       onChange={(from) => update({ from })}
                     />
                     <PartyFields
                       kind="to"
-                      value={invoice.to}
+                      value={draftPreview.to}
                       errors={errors}
                       onChange={(to) => update({ to })}
                     />
                   </section>
                 )}
                 {step === 2 && (
-                  <InvoiceItems
-                    invoice={invoice}
+                  <DraftPreviewItems
+                    draftPreview={draftPreview}
                     errors={errors}
                     onChange={(items) => update({ items })}
                   />
@@ -352,28 +357,28 @@ export function InvoicePage() {
                       Payment & notes
                     </h2>
                     <div className="grid gap-4 sm:grid-cols-2">
-                      <InvoiceField
+                      <DraftPreviewField
                         id="bank"
                         label="Bank name"
-                        value={invoice.bank}
+                        value={draftPreview.bank}
                         maxLength={160}
                         error={errors.bank}
                         onChange={(e) => update({ bank: e.target.value })}
                       />
-                      <InvoiceField
+                      <DraftPreviewField
                         id="accountName"
                         label="Account holder"
-                        value={invoice.accountName}
+                        value={draftPreview.accountName}
                         maxLength={160}
                         error={errors.accountName}
                         onChange={(e) =>
                           update({ accountName: e.target.value })
                         }
                       />
-                      <InvoiceField
+                      <DraftPreviewField
                         id="accountNumber"
                         label="Account number"
-                        value={invoice.accountNumber}
+                        value={draftPreview.accountNumber}
                         maxLength={160}
                         error={errors.accountNumber}
                         onChange={(e) =>
@@ -382,12 +387,12 @@ export function InvoicePage() {
                       />
                     </div>
                     <div className="mt-5">
-                      <InvoiceField
+                      <DraftPreviewField
                         id="notes"
                         label="Notes to your client (optional)"
                         multiline
                         maxLength={1500}
-                        value={invoice.notes}
+                        value={draftPreview.notes}
                         error={errors.notes}
                         onChange={(e) => update({ notes: e.target.value })}
                       />
@@ -397,11 +402,14 @@ export function InvoicePage() {
                 {step === 2 && (
                   <section
                     className="border-t border-border px-5 py-6 sm:px-7"
-                    aria-labelledby="invoice-summary-heading"
+                    aria-labelledby="draft-preview-summary-heading"
                   >
                     <div>
-                      <h2 id="invoice-summary-heading" className="font-medium">
-                        Invoice summary
+                      <h2
+                        id="draft-preview-summary-heading"
+                        className="font-medium"
+                      >
+                        Draft Preview summary
                       </h2>
                       <p className="mt-1 text-xs text-muted-foreground">
                         Every detail, accounted for.
@@ -425,11 +433,11 @@ export function InvoicePage() {
                           <NativeSelect
                             id="discountType"
                             className="w-full [&_select]:h-10"
-                            value={invoice.discountType}
+                            value={draftPreview.discountType}
                             onChange={(e) =>
                               update({
                                 discountType: e.target
-                                  .value as Invoice["discountType"],
+                                  .value as DraftPreview["discountType"],
                               })
                             }
                           >
@@ -441,19 +449,19 @@ export function InvoicePage() {
                             </NativeSelectOption>
                           </NativeSelect>
                         </Field>
-                        <InvoiceField
+                        <DraftPreviewField
                           id="discountValue"
                           label={
-                            invoice.discountType === "percent"
+                            draftPreview.discountType === "percent"
                               ? "Discount (%)"
-                              : `Discount (${invoice.currency})`
+                              : `Discount (${draftPreview.currency})`
                           }
                           type="number"
                           min={0}
                           step="any"
                           value={
-                            Number.isFinite(invoice.discountValue)
-                              ? invoice.discountValue
+                            Number.isFinite(draftPreview.discountValue)
+                              ? draftPreview.discountValue
                               : ""
                           }
                           error={errors.discountValue}
@@ -462,7 +470,7 @@ export function InvoicePage() {
                           }
                         />
                       </div>
-                      <InvoiceField
+                      <DraftPreviewField
                         id="taxRate"
                         label="Tax rate (%)"
                         type="number"
@@ -470,8 +478,8 @@ export function InvoicePage() {
                         max={100}
                         step="any"
                         value={
-                          Number.isFinite(invoice.taxRate)
-                            ? invoice.taxRate
+                          Number.isFinite(draftPreview.taxRate)
+                            ? draftPreview.taxRate
                             : ""
                         }
                         error={errors.taxRate}
@@ -495,7 +503,7 @@ export function InvoicePage() {
                         <p className="text-xs text-muted-foreground">
                           Total due{" "}
                           <span className="float-right">
-                            {invoice.currency}
+                            {draftPreview.currency}
                           </span>
                         </p>
                         <p className="mt-2 break-words text-3xl font-semibold tracking-tight tabular-nums">
@@ -511,10 +519,10 @@ export function InvoicePage() {
                 {step === 3 && (
                   <section
                     className="border-t border-border px-5 py-6 sm:px-7"
-                    aria-labelledby="invoice-readiness-heading"
+                    aria-labelledby="draft-preview-readiness-heading"
                   >
                     <h2
-                      id="invoice-readiness-heading"
+                      id="draft-preview-readiness-heading"
                       className="mb-4 text-sm font-medium"
                     >
                       Ready to share?
@@ -564,14 +572,14 @@ export function InvoicePage() {
               </div>
             </form>
             <p className="px-1 text-xs leading-relaxed text-muted-foreground">
-              Example invoice. Changes stay on this page until you leave or
-              reload. Download a PDF to keep a copy.
+              Example draft preview. Changes stay on this page until you leave
+              or reload. Download a PDF to keep a copy.
             </p>
           </div>
-          <InvoicePreview
+          <DraftPreviewPreview
             key={output.file?.url ?? "loading"}
             output={output}
-            onValidate={exportInvoice}
+            onValidate={exportDraftPreview}
           />
         </div>
       </div>

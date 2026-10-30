@@ -8,7 +8,7 @@ import {
   isDarkShade,
   shadeIndex,
 } from "@/features/chart/treemap/utils/treemap-scale";
-import { sumBy } from "@/features/chart/utils/format";
+import { sumBy } from "../utils/format";
 import { bundleByPackage } from "@/mocks/chart-treemap.mock";
 
 const bundleSizes = bundleByPackage.map((item) => item.size);

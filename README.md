@@ -53,7 +53,7 @@ Untuk frontend saja: `pnpm --filter frontend <dev|build|lint|check-types>`. Test
 ### Struktur
 
 - `src/app/` — route, layout, dan Route Handler. `page.tsx` tipis dan merender komponen dari `src/features/`.
-- `src/features/<fitur>/` — UI dan logika khusus fitur, masing-masing dengan lima folder standar `components/`, `hooks/`, `schemas/`, `types/`, `utils/`.
+- `src/features/<fitur>/` — UI dan logika khusus fitur, masing-masing folder halaman dengan lima folder standar `components/`, `hooks/`, `schemas/`, `types/`, `utils/`; folder induk kelompok tidak.
 - `src/components/` — komponen lintas fitur: `ui/` (primitive shadcn), `layout/`, `crud/`, `data-grid/`, `filter/`, `chart/`, `gantt/`.
 - `src/mocks/` — data contoh bertipe (`*.mock.ts`) dan hook mock CRUD berbasis localStorage.
 
@@ -61,14 +61,14 @@ Aturan lengkap: [Struktur folder](.agents/rules/frontend/structure-folder.md). T
 
 ### Halaman yang tersedia
 
-| Grup       | Route                                                                                                                                                                                                             |
-| ---------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Login      | `/login-1` … `/login-5` (pratinjau UI, belum ada autentikasi)                                                                                                                                                     |
-| Dashboard  | `/dashboard/{main,sales,crm,finance,productivity}`, serta aplikasi contoh: AI chat (`float`, `page`, `panel`), calendar, file manager, flow process/structure, invoice, profile, project, receipt, task, timeline |
-| Chart      | `/chart/*` — 21 jenis chart (area, bar, line, pie, sankey, treemap, waterfall, dll.)                                                                                                                              |
-| Table      | `/table/base`, `column`, `scroll`, `drag-and-drop/{row,column}`, `editable/{inline,row,sheet}`, `group/{expansion,section,tree}`                                                                                  |
-| CRUD       | `/crud/{new-page,modal,sheet,panel-inline}` — empat pola CRUD dengan satu sumber data                                                                                                                             |
-| Playground | `/playground/{scenes-3d,invoice,notes,rich-text-editor,wizard}`, `/whiteboard`                                                                                                                                    |
+| Grup       | Route                                                                                                                                                                                                                   |
+| ---------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Login      | `/login-1` … `/login-5` (pratinjau UI, belum ada autentikasi)                                                                                                                                                           |
+| Dashboard  | `/dashboard/{main,sales,crm,finance,productivity}`, serta aplikasi contoh: AI chat (`float`, `page`, `panel`), calendar, file manager, flow process/structure, draft preview, profile, project, receipt, task, timeline |
+| Chart      | `/chart/*` — 21 jenis chart (area, bar, line, pie, sankey, treemap, waterfall, dll.)                                                                                                                                    |
+| Table      | `/table/base`, `column`, `scroll`, `drag-and-drop/{row,column}`, `editable/{inline,row,sheet}`, `group/{expansion,section,tree}`                                                                                        |
+| CRUD       | `/crud/{new-page,modal,sheet,panel-inline}` — empat pola CRUD dengan satu sumber data                                                                                                                                   |
+| Playground | `/playground/{scenes-3d,draft-preview,notes,rich-text-editor,wizard}`, `/whiteboard`                                                                                                                                    |
 
 Menu navigasi didefinisikan di [app-navigation.tsx](apps/frontend/src/components/layout/app-navigation.tsx) dan pencarian menu di [menu-search-tree.ts](apps/frontend/src/components/layout/menu-search-tree.ts).
 

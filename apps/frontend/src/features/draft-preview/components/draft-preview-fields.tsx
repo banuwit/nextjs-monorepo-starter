@@ -2,19 +2,19 @@ import type { ComponentProps } from "react";
 import { Field, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import type { Invoice, InvoiceErrors } from "../types/invoice";
+import type { DraftPreview, DraftPreviewErrors } from "../types/draft-preview";
 
-type InvoiceFieldProps = { label: string; id: string; error?: string } & (
+type DraftPreviewFieldProps = { label: string; id: string; error?: string } & (
   | ({ multiline: true } & ComponentProps<"textarea">)
   | ({ multiline?: false } & ComponentProps<"input">)
 );
 
-export function InvoiceField({
+export function DraftPreviewField({
   label,
   id,
   error,
   ...props
-}: InvoiceFieldProps) {
+}: DraftPreviewFieldProps) {
   const accessibility = {
     id,
     "aria-invalid": !!error,
@@ -57,9 +57,9 @@ export function PartyFields({
   onChange,
 }: {
   kind: "from" | "to";
-  value: Invoice["from"];
-  errors: InvoiceErrors;
-  onChange: (party: Invoice["from"]) => void;
+  value: DraftPreview["from"];
+  errors: DraftPreviewErrors;
+  onChange: (party: DraftPreview["from"]) => void;
 }) {
   return (
     <div className="flex min-w-0 flex-col gap-4">
@@ -72,7 +72,7 @@ export function PartyFields({
           {kind === "from" ? "Your business" : "Your client"}
         </span>
       </div>
-      <InvoiceField
+      <DraftPreviewField
         id={`${kind}.name`}
         label={kind === "from" ? "Business name" : "Client name"}
         value={value.name}
@@ -80,7 +80,7 @@ export function PartyFields({
         error={errors[`${kind}.name`]}
         onChange={(e) => onChange({ ...value, name: e.target.value })}
       />
-      <InvoiceField
+      <DraftPreviewField
         id={`${kind}.email`}
         label="Email address"
         type="email"
@@ -88,7 +88,7 @@ export function PartyFields({
         error={errors[`${kind}.email`]}
         onChange={(e) => onChange({ ...value, email: e.target.value })}
       />
-      <InvoiceField
+      <DraftPreviewField
         id={`${kind}.address`}
         label="Address"
         multiline
@@ -97,7 +97,7 @@ export function PartyFields({
         error={errors[`${kind}.address`]}
         onChange={(e) => onChange({ ...value, address: e.target.value })}
       />
-      <InvoiceField
+      <DraftPreviewField
         id={`${kind}.taxId`}
         label="Tax ID (optional)"
         value={value.taxId}

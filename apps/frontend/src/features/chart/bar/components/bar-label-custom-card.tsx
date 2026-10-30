@@ -16,7 +16,7 @@ import {
   ChartTooltipContent,
   type ChartConfig,
 } from "@/components/ui/chart";
-import { sumBy } from "@/features/chart/utils/format";
+import { sumBy } from "../utils/format";
 import { productRevenue } from "@/mocks/chart-bar.mock";
 
 /** Locale-independent "$48.2K" so server and client render the same text. */

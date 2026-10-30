@@ -1,5 +1,5 @@
 import type { z } from "zod";
-import type { invoiceSchema } from "../schemas/invoice.schema";
+import type { draftPreviewSchema } from "../schemas/draft-preview.schema";
 
-export type Invoice = z.infer<typeof invoiceSchema>;
-export type InvoiceErrors = Record<string, string>;
+export type DraftPreview = z.infer<typeof draftPreviewSchema>;
+export type DraftPreviewErrors = Record<string, string>;

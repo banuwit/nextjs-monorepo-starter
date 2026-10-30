@@ -1,5 +1,5 @@
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { ChartExamplePage } from "@/features/chart/components/chart-example-page";
+import { ChartExamplePage } from "./chart-example-page";
 import { StatusTrackerPipelineCard } from "@/features/chart/status-tracker/components/status-tracker-pipeline-card";
 import { StatusTrackerRunHistoryCard } from "@/features/chart/status-tracker/components/status-tracker-run-history-card";
 import { StatusTrackerServicesCard } from "@/features/chart/status-tracker/components/status-tracker-services-card";

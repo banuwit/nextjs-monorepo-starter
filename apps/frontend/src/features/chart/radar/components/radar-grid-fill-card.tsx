@@ -15,7 +15,7 @@ import {
   ChartTooltipContent,
   type ChartConfig,
 } from "@/components/ui/chart";
-import { sumBy } from "@/features/chart/utils/format";
+import { sumBy } from "../utils/format";
 import { supportSatisfaction } from "@/mocks/chart-radar.mock";
 
 const satisfactionConfig = {

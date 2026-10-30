@@ -1,6 +1,6 @@
-import type { Invoice } from "../features/invoice/types/invoice";
+import type { DraftPreview } from "../features/draft-preview/types/draft-preview";
 
-export const invoiceExample: Invoice = {
+export const draftPreviewExample: DraftPreview = {
   reference: "INV-2026-024",
   issuedDate: "2026-10-28",
   dueDate: "2026-11-11",
@@ -47,5 +47,5 @@ export const invoiceExample: Invoice = {
   accountName: "Forma Studio",
   accountNumber: "123 456 7890",
   notes:
-    "Thank you for creating with us. Please include the invoice number in your payment reference.",
+    "Thank you for creating with us. Please include the draft preview number in your payment reference.",
 };

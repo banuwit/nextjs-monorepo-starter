@@ -48,8 +48,8 @@ import {
   applyUserCellChanges,
   createUserCellDraft,
   userCellHistoryReducer,
-} from "../../utils/user-editing";
-import type { EditableUserField } from "../../types/user-editing";
+} from "../utils/user-editing";
+import type { EditableUserField } from "../types/user-editing";
 import { filterUserCells, sortUserCells } from "../utils/user-sheet-filters";
 import type {
   UserCellSorting,

@@ -52,8 +52,8 @@ export function NewPageRecordPage({
     mode === "create"
       ? "Add New"
       : mode === "edit"
-        ? "Edit parameter contoh"
-        : "Detail parameter contoh";
+        ? "Edit data"
+        : "Detail data";
   const back = mode === "edit" ? `${basePath}/${id}` : basePath;
 
   useEffect(() => {
@@ -93,7 +93,7 @@ export function NewPageRecordPage({
       ) : mode !== "create" && !record && !dirty ? (
         <Empty>
           <EmptyHeader>
-            <EmptyTitle>Parameter contoh tidak ditemukan</EmptyTitle>
+            <EmptyTitle>Data tidak ditemukan</EmptyTitle>
             <EmptyDescription>
               Data mungkin sudah dihapus dari browser ini.
             </EmptyDescription>

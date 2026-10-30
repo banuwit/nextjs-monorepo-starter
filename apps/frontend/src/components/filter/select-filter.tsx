@@ -89,7 +89,11 @@ export function SelectFilter({
     >
       <SelectTrigger
         aria-label={placeholder}
-        className={cn("min-w-32", className)}
+        className={cn(
+          // Same resting look as the outline button behind FacetedFilter.
+          "min-w-32 border-border bg-background text-foreground hover:bg-muted aria-expanded:bg-muted data-placeholder:text-foreground dark:border-input dark:bg-input/30 dark:hover:bg-input/50 dark:aria-expanded:bg-input/50 [&_svg]:text-foreground",
+          className,
+        )}
       >
         <SelectValue placeholder={placeholder} />
       </SelectTrigger>

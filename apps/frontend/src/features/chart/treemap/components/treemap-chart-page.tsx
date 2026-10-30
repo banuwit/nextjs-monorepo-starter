@@ -1,6 +1,6 @@
 "use client";
 
-import { ChartExamplePage } from "@/features/chart/components/chart-example-page";
+import { ChartExamplePage } from "./chart-example-page";
 import { TreemapStorageCard } from "@/features/chart/treemap/components/treemap-storage-card";
 import { TreemapBudgetCard } from "@/features/chart/treemap/components/treemap-budget-card";
 import { TreemapValueScaleCard } from "@/features/chart/treemap/components/treemap-value-scale-card";

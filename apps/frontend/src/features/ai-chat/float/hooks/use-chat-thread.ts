@@ -3,8 +3,8 @@
 import { useCallback, useState } from "react";
 
 import type { ChatMessage } from "../types/chat";
-import { createId } from "@/features/ai-chat/utils/stream-text";
-import { useTimers } from "@/features/ai-chat/hooks/use-timers";
+import { createId } from "../utils/stream-text";
+import { useTimers } from "./use-timers";
 
 type ReplyOptions<TMeta> = {
   meta?: TMeta;

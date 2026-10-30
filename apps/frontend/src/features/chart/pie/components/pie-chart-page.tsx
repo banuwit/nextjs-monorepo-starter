@@ -1,4 +1,4 @@
-import { ChartExamplePage } from "@/features/chart/components/chart-example-page";
+import { ChartExamplePage } from "./chart-example-page";
 import { PieDonutLegendCard } from "@/features/chart/pie/components/pie-donut-legend-card";
 import { PiePaddingAngleCard } from "@/features/chart/pie/components/pie-padding-angle-card";
 import { PieLabelCard } from "@/features/chart/pie/components/pie-label-card";

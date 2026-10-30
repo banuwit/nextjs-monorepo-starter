@@ -3,7 +3,7 @@
 import type { TreemapNode } from "recharts";
 
 import { tileColor } from "@/features/chart/treemap/utils/treemap-colors";
-import { formatCompact } from "@/features/chart/utils/format";
+import { formatCompact } from "../utils/format";
 
 /** Tile renderer: colored rectangle with name and value when it fits. */
 export function TreemapTile({

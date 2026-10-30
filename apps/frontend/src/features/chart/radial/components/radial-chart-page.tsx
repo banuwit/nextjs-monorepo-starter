@@ -1,4 +1,4 @@
-import { ChartExamplePage } from "@/features/chart/components/chart-example-page";
+import { ChartExamplePage } from "./chart-example-page";
 import { RadialGaugeCard } from "@/features/chart/radial/components/radial-gauge-card";
 import { RadialRingsCard } from "@/features/chart/radial/components/radial-rings-card";
 import { RadialSimpleCard } from "@/features/chart/radial/components/radial-simple-card";

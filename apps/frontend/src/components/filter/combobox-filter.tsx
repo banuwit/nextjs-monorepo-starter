@@ -273,7 +273,11 @@ export function ComboboxFilter(props: ComboboxFilterProps) {
             aria-label={placeholder}
             showClear={!!selected}
             disabled={disabled}
-            className={cn("w-56", className)}
+            className={cn(
+              // Same resting look as the outline button behind FacetedFilter.
+              "w-56 border-border bg-background hover:bg-muted dark:border-input dark:bg-input/30 dark:hover:bg-input/50 [&_input::placeholder]:text-foreground [&_svg]:text-foreground",
+              className,
+            )}
           />
           <ComboboxContent>
             <OptionList emptyMessage={emptyMessage} />

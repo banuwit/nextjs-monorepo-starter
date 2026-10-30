@@ -1,4 +1,4 @@
-import { ChartExamplePage } from "@/features/chart/components/chart-example-page";
+import { ChartExamplePage } from "./chart-example-page";
 import { TimelineGanttCard } from "@/features/chart/timeline/components/timeline-gantt-card";
 import { TimelineMilestonesCard } from "@/features/chart/timeline/components/timeline-milestones-card";
 import { TimelineShiftCard } from "@/features/chart/timeline/components/timeline-shift-card";

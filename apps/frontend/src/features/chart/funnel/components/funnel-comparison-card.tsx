@@ -14,7 +14,7 @@ import {
   ChartTooltipContent,
   type ChartConfig,
 } from "@/components/ui/chart";
-import { formatCompact } from "@/features/chart/utils/format";
+import { formatCompact } from "../utils/format";
 import { funnelComparison } from "@/mocks/chart-funnel.mock";
 
 const comparisonConfig = {

@@ -21,7 +21,7 @@ import {
   ChartTooltipContent,
   type ChartConfig,
 } from "@/components/ui/chart";
-import { sumBy } from "@/features/chart/utils/format";
+import { sumBy } from "../utils/format";
 import { productGrowth } from "@/mocks/chart-line.mock";
 
 const growthConfig = {

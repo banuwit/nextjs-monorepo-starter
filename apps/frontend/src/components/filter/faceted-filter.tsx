@@ -221,7 +221,7 @@ export function FacetedFilter({
             id={id}
             variant="outline"
             disabled={disabled}
-            className={className}
+            className={cn("font-normal", className)}
           />
         }
       >

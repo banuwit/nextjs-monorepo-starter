@@ -1,4 +1,4 @@
-import { ChartExamplePage } from "@/features/chart/components/chart-example-page";
+import { ChartExamplePage } from "./chart-example-page";
 import { AreaAxesIconsCard } from "@/features/chart/area/components/area-axes-icons-card";
 import { AreaComparisonCard } from "@/features/chart/area/components/area-comparison-card";
 import { AreaConnectNullsCard } from "@/features/chart/area/components/area-connect-nulls-card";

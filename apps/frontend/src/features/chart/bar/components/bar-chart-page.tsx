@@ -1,4 +1,4 @@
-import { ChartExamplePage } from "@/features/chart/components/chart-example-page";
+import { ChartExamplePage } from "./chart-example-page";
 import { BarActiveCard } from "@/features/chart/bar/components/bar-active-card";
 import { BarGroupedStackedCard } from "@/features/chart/bar/components/bar-grouped-stacked-card";
 import { BarHorizontalCard } from "@/features/chart/bar/components/bar-horizontal-card";

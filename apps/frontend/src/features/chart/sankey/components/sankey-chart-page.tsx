@@ -1,6 +1,6 @@
 "use client";
 
-import { ChartExamplePage } from "@/features/chart/components/chart-example-page";
+import { ChartExamplePage } from "./chart-example-page";
 import { SankeyIncomeStatementCard } from "@/features/chart/sankey/components/sankey-income-statement-card";
 import { SankeyTrialJourneyCard } from "@/features/chart/sankey/components/sankey-trial-journey-card";
 import { SankeyLeadSourceCard } from "@/features/chart/sankey/components/sankey-lead-source-card";

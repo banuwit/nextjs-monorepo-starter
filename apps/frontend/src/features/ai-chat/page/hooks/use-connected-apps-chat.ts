@@ -7,8 +7,8 @@ import {
   chatModes,
   connectedAtStart,
 } from "@/mocks/ai-chat.mock";
-import { useTimers } from "@/features/ai-chat/hooks/use-timers";
-import { createId } from "@/features/ai-chat/utils/stream-text";
+import { useTimers } from "./use-timers";
+import { createId } from "../utils/stream-text";
 import type { ComposerFile, ConnectedRun } from "../types/connected-apps";
 import {
   createReceipts,

@@ -1,4 +1,4 @@
-import { ChartExamplePage } from "@/features/chart/components/chart-example-page";
+import { ChartExamplePage } from "./chart-example-page";
 import { GaugeNeedleCard } from "@/features/chart/gauge/components/gauge-needle-card";
 import { GaugeProgressCard } from "@/features/chart/gauge/components/gauge-progress-card";
 import { GaugeResourcesCard } from "@/features/chart/gauge/components/gauge-resources-card";

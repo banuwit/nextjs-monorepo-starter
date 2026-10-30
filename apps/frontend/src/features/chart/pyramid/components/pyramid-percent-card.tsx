@@ -21,7 +21,7 @@ import {
   symmetricScale,
   toSideShare,
 } from "@/features/chart/pyramid/utils/pyramid";
-import { sumBy } from "@/features/chart/utils/format";
+import { sumBy } from "../utils/format";
 import { employeesByTenure } from "@/mocks/chart-pyramid.mock";
 
 const tenureConfig = {

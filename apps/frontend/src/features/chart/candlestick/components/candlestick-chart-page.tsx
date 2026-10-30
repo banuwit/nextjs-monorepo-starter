@@ -3,7 +3,7 @@ import { CandlestickHollowCard } from "@/features/chart/candlestick/components/c
 import { CandlestickMovingAverageCard } from "@/features/chart/candlestick/components/candlestick-moving-average-card";
 import { CandlestickRangeCard } from "@/features/chart/candlestick/components/candlestick-range-card";
 import { CandlestickVolumeCard } from "@/features/chart/candlestick/components/candlestick-volume-card";
-import { ChartExamplePage } from "@/features/chart/components/chart-example-page";
+import { ChartExamplePage } from "./chart-example-page";
 
 export function CandlestickChartPage() {
   return (

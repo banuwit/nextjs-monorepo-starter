@@ -19,7 +19,7 @@ import {
   mirrorRows,
   symmetricScale,
 } from "@/features/chart/pyramid/utils/pyramid";
-import { formatCompact, sumBy } from "@/features/chart/utils/format";
+import { formatCompact, sumBy } from "../utils/format";
 import { populationByAge } from "@/mocks/chart-pyramid.mock";
 
 const populationConfig = {

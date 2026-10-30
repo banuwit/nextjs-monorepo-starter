@@ -17,22 +17,22 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import type { Invoice, InvoiceErrors } from "../types/invoice";
-import { calculateInvoice, formatMoney } from "../utils/invoice";
+import type { DraftPreview, DraftPreviewErrors } from "../types/draft-preview";
+import { calculateDraftPreview, formatMoney } from "../utils/draft-preview";
 
-export function InvoiceItems({
-  invoice,
+export function DraftPreviewItems({
+  draftPreview,
   errors,
   onChange,
 }: {
-  invoice: Invoice;
-  errors: InvoiceErrors;
-  onChange: (items: Invoice["items"]) => void;
+  draftPreview: DraftPreview;
+  errors: DraftPreviewErrors;
+  onChange: (items: DraftPreview["items"]) => void;
 }) {
-  const totals = calculateInvoice(invoice);
-  function update(id: string, patch: Partial<Invoice["items"][number]>) {
+  const totals = calculateDraftPreview(draftPreview);
+  function update(id: string, patch: Partial<DraftPreview["items"][number]>) {
     onChange(
-      invoice.items.map((item) =>
+      draftPreview.items.map((item) =>
         item.id === id ? { ...item, ...patch } : item,
       ),
     );
@@ -52,15 +52,15 @@ export function InvoiceItems({
           </p>
         </div>
         <span className="shrink-0 rounded-md bg-muted px-2 py-1 text-xs text-muted-foreground">
-          {invoice.items.length} items
+          {draftPreview.items.length} items
         </span>
       </div>
       <DataGridRowDnd
-        items={invoice.items.map((item) => item.id)}
+        items={draftPreview.items.map((item) => item.id)}
         onReorder={(activeId, overId) =>
           onChange(
             reorderDataGridItems(
-              invoice.items,
+              draftPreview.items,
               activeId,
               overId,
               (item) => item.id,
@@ -69,18 +69,18 @@ export function InvoiceItems({
         }
       >
         <Table
-          aria-label="Invoice items"
+          aria-label="Draft Preview items"
           className="min-w-[36rem] table-fixed"
           containerProps={{
             className: "rounded-lg border",
             tabIndex: 0,
             role: "region",
-            "aria-label": "Scrollable invoice items",
+            "aria-label": "Scrollable draft preview items",
           }}
         >
           <TableCaption className="sr-only">
-            Invoice items. Drag a row handle to reorder, or press Space, use the
-            arrow keys, and press Space to drop.
+            Draft Preview items. Drag a row handle to reorder, or press Space,
+            use the arrow keys, and press Space to drop.
           </TableCaption>
           <TableHeader className="bg-muted/50 [&_th]:h-8 [&_th]:px-1.5 [&_th]:text-xs">
             <TableRow>
@@ -98,7 +98,7 @@ export function InvoiceItems({
             </TableRow>
           </TableHeader>
           <TableBody>
-            {invoice.items.map((item, index) => (
+            {draftPreview.items.map((item, index) => (
               <DataGridSortableRow key={item.id} id={item.id}>
                 <TableCell className="p-1.5 align-top">
                   <DataGridRowDragHandle label={`Reorder item ${index + 1}`} />
@@ -173,7 +173,10 @@ export function InvoiceItems({
                 )}
                 <TableCell className="px-1.5 py-3 text-right align-top text-xs font-medium tabular-nums">
                   {Number.isFinite(item.quantity) && Number.isFinite(item.rate)
-                    ? formatMoney(totals.lines[index] ?? 0, invoice.currency)
+                    ? formatMoney(
+                        totals.lines[index] ?? 0,
+                        draftPreview.currency,
+                      )
                     : "—"}
                 </TableCell>
                 <TableCell className="p-1.5 align-top">
@@ -185,7 +188,9 @@ export function InvoiceItems({
                     aria-label={`Remove item ${index + 1}`}
                     onClick={() =>
                       onChange(
-                        invoice.items.filter((entry) => entry.id !== item.id),
+                        draftPreview.items.filter(
+                          (entry) => entry.id !== item.id,
+                        ),
                       )
                     }
                   >
@@ -201,9 +206,9 @@ export function InvoiceItems({
         Drag the handle to reorder items. Use Space and the arrow keys with a
         keyboard.
       </p>
-      {!invoice.items.length && (
+      {!draftPreview.items.length && (
         <p className="py-6 text-sm text-muted-foreground">
-          Add your first item to start this invoice.
+          Add your first item to start this draft preview.
         </p>
       )}
       <Button
@@ -211,10 +216,10 @@ export function InvoiceItems({
         type="button"
         variant="outline"
         className="mt-2 h-10 border-dashed"
-        disabled={invoice.items.length >= 100}
+        disabled={draftPreview.items.length >= 100}
         onClick={() =>
           onChange([
-            ...invoice.items,
+            ...draftPreview.items,
             {
               id: crypto.randomUUID(),
               description: "",

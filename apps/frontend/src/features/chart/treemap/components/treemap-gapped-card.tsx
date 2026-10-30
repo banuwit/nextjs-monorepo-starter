@@ -4,7 +4,7 @@ import { ChartCard } from "@/components/chart/chart-card";
 import { TileTreemap } from "@/features/chart/treemap/components/tile-treemap";
 import type { Tile } from "@/features/chart/treemap/types/treemap";
 import { tileColor } from "@/features/chart/treemap/utils/treemap-colors";
-import { sumBy } from "@/features/chart/utils/format";
+import { sumBy } from "../utils/format";
 import { issuesByLabel } from "@/mocks/chart-treemap.mock";
 
 const issueTiles: Tile[] = issuesByLabel.map((item, index) => ({

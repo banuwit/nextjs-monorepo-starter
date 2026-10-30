@@ -16,7 +16,7 @@ import { createLabeledTile } from "@/features/chart/treemap/components/treemap-l
 import { tileColor } from "@/features/chart/treemap/utils/treemap-colors";
 import { treemapConfig } from "@/features/chart/treemap/utils/treemap-config";
 import { withShare } from "@/features/chart/treemap/utils/treemap-scale";
-import { sumBy } from "@/features/chart/utils/format";
+import { sumBy } from "../utils/format";
 import { cloudSpend } from "@/mocks/chart-treemap.mock";
 
 export function TreemapPercentCard() {

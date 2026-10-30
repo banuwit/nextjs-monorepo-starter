@@ -10,9 +10,8 @@ export function NewPageListPage() {
   const { data, ready, error, reload, commit } = useCrudExamples();
   return (
     <CrudResource<NewPageExample>
-      title="Parameter contoh"
+      title="Data"
       heading="New Page"
-      description="Pola New Page. Semua submenu CRUD memakai data contoh yang sama dan tersimpan di browser ini."
       pattern="page"
       basePath="/crud/new-page"
       rows={data}

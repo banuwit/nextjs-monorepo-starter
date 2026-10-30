@@ -21,7 +21,7 @@ import {
   ChartTooltipContent,
   type ChartConfig,
 } from "@/components/ui/chart";
-import { formatCompact } from "@/features/chart/utils/format";
+import { formatCompact } from "../utils/format";
 import { trafficChannels } from "@/mocks/chart.mock";
 
 const channelConfig = {

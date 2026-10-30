@@ -10,9 +10,8 @@ export function ModalPage() {
   const { data, ready, error, reload, commit } = useCrudExamples();
   return (
     <CrudResource<ModalExample>
-      title="Parameter contoh"
+      title="Data"
       heading="Modal"
-      description="Pola Modal. Semua submenu CRUD memakai data contoh yang sama dan tersimpan di browser ini."
       pattern="dialog"
       rows={data}
       ready={ready}

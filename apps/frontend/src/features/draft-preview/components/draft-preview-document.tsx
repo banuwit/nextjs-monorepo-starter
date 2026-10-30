@@ -7,8 +7,8 @@ import {
   Font,
   pdf,
 } from "@react-pdf/renderer";
-import type { Invoice } from "../types/invoice";
-import { calculateInvoice, formatMoney } from "../utils/invoice";
+import type { DraftPreview } from "../types/draft-preview";
+import { calculateDraftPreview, formatMoney } from "../utils/draft-preview";
 
 // Keep long references and addresses inside their columns without arbitrary truncation.
 Font.registerHyphenationCallback((word) =>
@@ -102,9 +102,13 @@ const styles = StyleSheet.create({
   },
 });
 
-export function InvoiceDocument({ invoice }: { invoice: Invoice }) {
-  const totals = calculateInvoice(invoice);
-  const money = (amount: number) => formatMoney(amount, invoice.currency);
+export function DraftPreviewDocument({
+  draftPreview,
+}: {
+  draftPreview: DraftPreview;
+}) {
+  const totals = calculateDraftPreview(draftPreview);
+  const money = (amount: number) => formatMoney(amount, draftPreview.currency);
   const date = (value: string) =>
     new Intl.DateTimeFormat("en-GB", {
       day: "2-digit",
@@ -114,39 +118,43 @@ export function InvoiceDocument({ invoice }: { invoice: Invoice }) {
     }).format(new Date(`${value}T12:00:00Z`));
   return (
     <Document
-      title={`Invoice ${invoice.reference}`}
-      author={invoice.from.name}
-      subject={`Invoice for ${invoice.to.name}`}
+      title={`Draft Preview ${draftPreview.reference}`}
+      author={draftPreview.from.name}
+      subject={`Draft Preview for ${draftPreview.to.name}`}
     >
       <Page size="A4" style={styles.page}>
         <View style={styles.header} wrap={false}>
           <View style={styles.brand}>
-            <Text style={styles.company}>{invoice.from.name}</Text>
-            <Text style={styles.muted}>{invoice.from.email}</Text>
+            <Text style={styles.company}>{draftPreview.from.name}</Text>
+            <Text style={styles.muted}>{draftPreview.from.email}</Text>
           </View>
           <View style={styles.metadata}>
-            <Text style={styles.heading}>Invoice</Text>
-            <Text>{invoice.reference}</Text>
+            <Text style={styles.heading}>Draft Preview</Text>
+            <Text>{draftPreview.reference}</Text>
           </View>
         </View>
         <View style={styles.parties}>
           <View style={styles.party}>
             <Text style={styles.label}>Billed to</Text>
-            <Text style={styles.bold}>{invoice.to.name}</Text>
-            <Text>{invoice.to.address}</Text>
-            <Text>{invoice.to.email}</Text>
-            {invoice.to.taxId && <Text>Tax ID: {invoice.to.taxId}</Text>}
+            <Text style={styles.bold}>{draftPreview.to.name}</Text>
+            <Text>{draftPreview.to.address}</Text>
+            <Text>{draftPreview.to.email}</Text>
+            {draftPreview.to.taxId && (
+              <Text>Tax ID: {draftPreview.to.taxId}</Text>
+            )}
           </View>
           <View style={styles.party}>
-            <Text style={styles.label}>Invoice information</Text>
-            <Text>Issued: {date(invoice.issuedDate)}</Text>
-            <Text>Due: {date(invoice.dueDate)}</Text>
-            <Text>Currency: {invoice.currency}</Text>
+            <Text style={styles.label}>Draft Preview information</Text>
+            <Text>Issued: {date(draftPreview.issuedDate)}</Text>
+            <Text>Due: {date(draftPreview.dueDate)}</Text>
+            <Text>Currency: {draftPreview.currency}</Text>
             <Text style={[styles.small, { marginTop: 10 }]}>
-              {invoice.from.address}
+              {draftPreview.from.address}
             </Text>
-            {invoice.from.taxId && (
-              <Text style={styles.small}>Tax ID: {invoice.from.taxId}</Text>
+            {draftPreview.from.taxId && (
+              <Text style={styles.small}>
+                Tax ID: {draftPreview.from.taxId}
+              </Text>
             )}
           </View>
         </View>
@@ -156,14 +164,14 @@ export function InvoiceDocument({ invoice }: { invoice: Invoice }) {
           <Text style={styles.price}>Unit price</Text>
           <Text style={styles.price}>Amount</Text>
         </View>
-        {invoice.items.map((item, index) => (
+        {draftPreview.items.map((item, index) => (
           <View key={item.id} style={styles.item}>
             <Text style={styles.description}>{item.description}</Text>
             <Text style={styles.quantity}>
               {item.quantity} {item.unit}
             </Text>
             <Text style={styles.price}>
-              {formatMoney(item.rate, invoice.currency, 20)}
+              {formatMoney(item.rate, draftPreview.currency, 20)}
             </Text>
             <Text style={[styles.price, styles.bold]}>
               {money(totals.lines[index] ?? 0)}
@@ -173,11 +181,11 @@ export function InvoiceDocument({ invoice }: { invoice: Invoice }) {
         <View style={styles.bottom} wrap={false}>
           <View style={styles.payment}>
             <Text style={styles.label}>Payment details</Text>
-            <Text style={styles.bold}>{invoice.bank}</Text>
-            <Text>{invoice.accountName}</Text>
-            <Text>{invoice.accountNumber}</Text>
+            <Text style={styles.bold}>{draftPreview.bank}</Text>
+            <Text>{draftPreview.accountName}</Text>
+            <Text>{draftPreview.accountNumber}</Text>
             <Text style={[styles.small, { marginTop: 12 }]}>
-              Payment reference: {invoice.reference}
+              Payment reference: {draftPreview.reference}
             </Text>
           </View>
           <View style={styles.totals}>
@@ -188,32 +196,32 @@ export function InvoiceDocument({ invoice }: { invoice: Invoice }) {
             <View style={styles.totalRow}>
               <Text>
                 Discount
-                {invoice.discountType === "percent"
-                  ? ` (${invoice.discountValue}%)`
+                {draftPreview.discountType === "percent"
+                  ? ` (${draftPreview.discountValue}%)`
                   : ""}
               </Text>
               <Text>-{money(totals.discount)}</Text>
             </View>
             <View style={styles.totalRow}>
-              <Text>Tax ({invoice.taxRate}%)</Text>
+              <Text>Tax ({draftPreview.taxRate}%)</Text>
               <Text>{money(totals.tax)}</Text>
             </View>
             <View style={styles.total}>
-              <Text>Total due · {invoice.currency}</Text>
+              <Text>Total due · {draftPreview.currency}</Text>
               <Text style={styles.amount}>{money(totals.total)}</Text>
             </View>
           </View>
         </View>
-        {invoice.notes && (
+        {draftPreview.notes && (
           <View style={styles.notes}>
             <Text style={styles.label} minPresenceAhead={20}>
               A note for you
             </Text>
-            <Text>{invoice.notes}</Text>
+            <Text>{draftPreview.notes}</Text>
           </View>
         )}
         <View style={styles.footer} fixed>
-          <Text>Invoice · {invoice.reference}</Text>
+          <Text>Draft Preview · {draftPreview.reference}</Text>
           <Text
             render={({ pageNumber, totalPages }) =>
               `${pageNumber} / ${totalPages}`
@@ -225,6 +233,6 @@ export function InvoiceDocument({ invoice }: { invoice: Invoice }) {
   );
 }
 
-export async function createInvoicePdf(invoice: Invoice) {
-  return pdf(<InvoiceDocument invoice={invoice} />).toBlob();
+export async function createDraftPreviewPdf(draftPreview: DraftPreview) {
+  return pdf(<DraftPreviewDocument draftPreview={draftPreview} />).toBlob();
 }

@@ -1,4 +1,4 @@
-import { ChartExamplePage } from "@/features/chart/components/chart-example-page";
+import { ChartExamplePage } from "./chart-example-page";
 import { PyramidButterflyCard } from "@/features/chart/pyramid/components/pyramid-butterfly-card";
 import { PyramidPercentCard } from "@/features/chart/pyramid/components/pyramid-percent-card";
 import { PyramidPopulationCard } from "@/features/chart/pyramid/components/pyramid-population-card";

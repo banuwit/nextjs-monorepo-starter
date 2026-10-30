@@ -20,7 +20,7 @@ import {
   candlestickConfig,
   formatPriceTick,
 } from "@/features/chart/candlestick/utils/candlestick-config";
-import { sumBy } from "@/features/chart/utils/format";
+import { sumBy } from "../utils/format";
 import { dailyCandles } from "@/mocks/chart-candlestick.mock";
 
 const candles = dailyCandles.slice(-60);

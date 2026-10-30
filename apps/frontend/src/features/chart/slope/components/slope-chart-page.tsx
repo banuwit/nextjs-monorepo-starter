@@ -1,6 +1,6 @@
 "use client";
 
-import { ChartExamplePage } from "@/features/chart/components/chart-example-page";
+import { ChartExamplePage } from "./chart-example-page";
 import { SlopeRetentionCard } from "@/features/chart/slope/components/slope-retention-card";
 import { SlopeServiceRankCard } from "@/features/chart/slope/components/slope-service-rank-card";
 import { SlopeHighlightCard } from "@/features/chart/slope/components/slope-highlight-card";

@@ -30,7 +30,7 @@ import {
   lastRange,
   sliceRange,
 } from "@/features/chart/brush-sync/utils/brush-sync";
-import { sumBy } from "@/features/chart/utils/format";
+import { sumBy } from "../utils/format";
 import { dailyStockMoves } from "@/mocks/chart-brush-sync.mock";
 
 const stockConfig = {

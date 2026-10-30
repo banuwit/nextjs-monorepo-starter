@@ -2,7 +2,7 @@
 
 Rules ini menjadi acuan agent saat membuat file, folder, dan kode di `apps/frontend/src/`. Isinya menggabungkan struktur target [PRD Tahap 1 §6, §10, §11, §13](../../../apps/frontend/prd.md) dengan kondisi kode yang benar-benar ada. Ikuti juga [panduan repositori](../../../AGENTS.md), [Panduan Preferences](./preferences.md), [Panduan Data Grid](./data-grid.md), dan [Pola halaman CRUD](./crud-pattern.md).
 
-**Keputusan pengguna, 24 Oktober 2026:** setiap fitur memiliki lima folder standar, meskipun masih kosong. Keputusan ini menggantikan ketentuan PRD (§0 butir 4 dan tabel §2 "hanya jika diperlukan") khusus untuk folder fitur. Folder global di luar `features/` tetap dibuat hanya ketika ada file nyata.
+**Keputusan pengguna, 24 Oktober 2026, diubah 30 Oktober 2026:** setiap fitur yang merupakan halaman (daun, memiliki route sendiri) memiliki lima folder standar, meskipun masih kosong. Folder induk kelompok fitur tidak boleh memiliki folder standar sama sekali; kode yang dipakai beberapa halaman anak disalin ke setiap halaman anak. Keputusan ini menggantikan ketentuan PRD (§0 butir 4 dan tabel §2 "hanya jika diperlukan") khusus untuk folder halaman fitur. Folder global di luar `features/` tetap dibuat hanya ketika ada file nyata.
 
 Jika kode dan PRD berbeda, ikuti kode yang ada untuk nama folder/route saat ini (lihat [Perbedaan dengan PRD](#perbedaan-kode-saat-ini-dengan-prd)) dan ikuti PRD untuk batas arsitektur yang ditandai **DIKUNCI**.
 
@@ -18,7 +18,7 @@ src/
 │   ├── layout.tsx          # Root HTML, font, boot script tema, PreferencesProvider
 │   ├── page.tsx            # Redirect root
 │   └── globals.css         # Tailwind v4 + token tema
-├── features/<fitur>/       # UI dan logika khusus fitur (lima folder standar)
+├── features/<fitur>/       # UI dan logika khusus fitur (lima folder standar di folder halaman)
 ├── components/             # Komponen lintas fitur
 │   ├── ui/                 # Primitive shadcn (Base UI)
 │   ├── layout/             # Sidebar, header, menubar, multi-sidebar, nav, Preferences
@@ -69,9 +69,9 @@ apps/frontend/src/features/<fitur>/
 └── utils/
 ```
 
-- Kelima folder wajib ada di perangkat lokal, termasuk ketika belum memiliki file. Buat langsung di filesystem (`mkdir -p .../{components,hooks,schemas,types,utils}`).
+- Kelima folder wajib ada di folder halaman (fitur daun), termasuk ketika belum memiliki file. Buat langsung di filesystem (`mkdir -p .../{components,hooks,schemas,types,utils}`).
 - Jangan membuat `.gitkeep`, file placeholder, atau ekspor kosong untuk mempertahankan folder. Checkout Git baru tidak otomatis membentuk folder kosong, dan pembuatan ulangnya belum diotomatisasi.
-- Aturan berlaku untuk fitur utama, subfitur/varian halaman, dan folder induk kelompok fitur. Contoh: `dashboard/`, `dashboard/sales/`, `authentication/`, `authentication/auth-1/`, `table/editable/`, dan `table/editable/sheet/` masing-masing memiliki lima folder tersebut.
+- Aturan berlaku untuk folder terakhir yang menjadi halaman: fitur tingkat atas tanpa subfitur dan setiap subfitur/varian halaman. Contoh: `calendar/`, `dashboard/sales/`, `authentication/auth-1/`, `table/editable/sheet/`, dan `crud/modal/` masing-masing memiliki lima folder tersebut. Folder induk kelompok (`dashboard/`, `authentication/`, `table/`, `table/editable/`, `crud/`, `chart/`, `ai-chat/`) tidak boleh berisi `components/`, `hooks/`, `schemas/`, `types/`, atau `utils/`; isinya hanya folder halaman anak dan dokumen seperti `README.md`.
 - Folder standar tidak perlu memiliki lima subfolder standar lagi. Buat subfolder di dalamnya hanya untuk mengelompokkan file nyata.
 - Jangan menaruh modul kode langsung di root fitur atau root kelompok fitur. Dokumen seperti `README.md` dan `LICENSE` boleh berada di root (contoh: `authentication/README.md`, `calendar/LICENSE`).
 - Kerangka fitur tanpa halaman seperti `user/`, `menus/`, dan `parameters/` tetap memiliki struktur ini. Keberadaan folder tidak berarti halaman atau fungsinya telah diimplementasikan.
@@ -97,7 +97,7 @@ Satu route biasanya dipetakan ke satu fitur atau subfitur. Nama folder fitur men
 ### Subfitur dan kode bersama
 
 - Setiap varian halaman memiliki lima folder standar sendiri (misalnya setiap varian login, chart, dan tabel).
-- Kode yang dipakai beberapa varian dalam satu kelompok ditempatkan di folder standar milik induk kelompok. Contoh: `ai-chat/hooks/use-chat-thread.ts`, `chart/components/chart-example-page.tsx`, serta `table/editable/{schemas,types,utils}/user-editing*`.
+- Kode yang dipakai beberapa varian dalam satu kelompok disalin ke folder standar masing-masing halaman anak dan diimpor secara relatif; induk kelompok tidak menampung kode bersama. Keputusan pengguna, 30 Oktober 2026. Contoh: `chart/<varian>/components/chart-example-page.tsx` dan `chart/<varian>/utils/format.ts`, `ai-chat/{float,page,panel}/{components,hooks,utils}/{chat-composer,use-timers,stream-text}`, serta `table/editable/{inline,row,sheet}/{schemas,types,utils}/user-editing*`. Perubahan pada satu salinan perlu diterapkan ke salinan lain bila perilakunya harus sama. Kode yang dipakai lintas kelompok tetap dipindahkan ke `src/components/`, `src/hooks/`, `src/types/`, atau `src/utils/`.
 - Kode yang dipakai lintas kelompok fitur dipindahkan ke `src/components/`, `src/hooks/`, `src/types/`, atau `src/utils/`; jangan mengimpor modul internal kelompok lain hanya untuk berbagi helper.
 - Empat pola CRUD contoh memakai induk `crud/` dan satu subfitur per route. Keputusan pengguna, 29 Oktober 2026: form, kolom, dan tipe contoh ditulis di masing-masing subfitur, bukan dibagikan lewat induk; sumber data mock tetap satu. Pengecualian ini hanya untuk contoh `/crud/*`.
 - Halaman demo `/filter/{base,advance,group}` juga menyalin skema field, tabel, dan utilitasnya di masing-masing subfitur, bukan di induk `filter/` (keputusan pengguna, 29 Oktober 2026). Komponen filter yang reusable tetap di `src/components/filter/`.
@@ -106,17 +106,17 @@ Satu route biasanya dipetakan ke satu fitur atau subfitur. Nama folder fitur men
 
 ## Penamaan file dan ekspor
 
-| Jenis                  | Pola                                          | Contoh                                      |
-| ---------------------- | --------------------------------------------- | ------------------------------------------- |
-| File/folder            | `kebab-case` (kecuali `[id]`, `(group)`)      | `sheet-user-table.tsx`                      |
-| Komponen halaman fitur | `<nama>-page.tsx` → `export function XPage`   | `scroll-table-page.tsx` → `ScrollTablePage` |
-| Komponen React         | PascalCase, named export                      | `export function InvoicePreview`            |
-| Hook                   | `use-<nama>.ts` → `useNama`                   | `use-invoice-export.ts`                     |
-| Schema Zod             | `<nama>.schema.ts`, konstanta suffix `Schema` | `invoice.schema.ts` → `invoiceSchema`       |
-| Tipe                   | `types/<nama>.ts`, PascalCase                 | `types/invoice.ts` → `Invoice`              |
-| Utilitas               | `utils/<nama>.ts`                             | `utils/invoice.ts`                          |
-| CSS khusus fitur       | `components/<nama>.css` atau `*.module.css`   | `auth-2/components/login-page.module.css`   |
-| Mock                   | `src/mocks/<fitur>[-<varian>].mock.ts`        | `dashboard-sales.mock.ts`                   |
+| Jenis                  | Pola                                          | Contoh                                           |
+| ---------------------- | --------------------------------------------- | ------------------------------------------------ |
+| File/folder            | `kebab-case` (kecuali `[id]`, `(group)`)      | `sheet-user-table.tsx`                           |
+| Komponen halaman fitur | `<nama>-page.tsx` → `export function XPage`   | `scroll-table-page.tsx` → `ScrollTablePage`      |
+| Komponen React         | PascalCase, named export                      | `export function DraftPreviewPreview`            |
+| Hook                   | `use-<nama>.ts` → `useNama`                   | `use-draft-preview-export.ts`                    |
+| Schema Zod             | `<nama>.schema.ts`, konstanta suffix `Schema` | `draft-preview.schema.ts` → `draftPreviewSchema` |
+| Tipe                   | `types/<nama>.ts`, PascalCase                 | `types/draft-preview.ts` → `DraftPreview`        |
+| Utilitas               | `utils/<nama>.ts`                             | `utils/draft-preview.ts`                         |
+| CSS khusus fitur       | `components/<nama>.css` atau `*.module.css`   | `auth-2/components/login-page.module.css`        |
+| Mock                   | `src/mocks/<fitur>[-<varian>].mock.ts`        | `dashboard-sales.mock.ts`                        |
 
 - Gunakan `.ts`/`.tsx` untuk file baru, TypeScript strict, tanpa `any` dan non-null assertion tanpa alasan.
 - Hanya `page.tsx`, `layout.tsx`, dan file khusus Next.js lain yang memakai `export default`.
@@ -125,8 +125,8 @@ Satu route biasanya dipetakan ke satu fitur atau subfitur. Nama folder fitur men
 
 ## Impor dan batas dependensi
 
-- Di dalam satu fitur/subfitur, gunakan impor relatif (`./invoice-items`, `../utils/invoice`, `../types/invoice`).
-- Ke luar fitur atau ke induk kelompok, gunakan alias `@/` (`@/components/...`, `@/features/table/editable/utils/user-editing`, `@/mocks/...`, `@/lib/utils`).
+- Di dalam satu fitur/subfitur, gunakan impor relatif (`./draft-preview-items`, `../utils/draft-preview`, `../types/draft-preview`).
+- Ke luar fitur, gunakan alias `@/` (`@/components/...`, `@/mocks/...`, `@/lib/utils`). Jangan mengimpor modul internal halaman lain.
 - Impor modul secara langsung; jangan membuat barrel `index.ts` hanya untuk meringkas atau mempertahankan lokasi lama.
 - Dependensi tipe memakai `import type`; jaga agar dependensi runtime tidak melingkar.
 - Arah yang diizinkan:
@@ -207,12 +207,12 @@ export function ScrollTablePage() {
 | `/login`, `/change-password`                                                | `/login-1` … `/login-5` (pratinjau)           | Ikuti kode; auth nyata menunggu milestone autentikasi         |
 | `/users`, `/countries`, `/menus`, dll.                                      | Dihapus; diganti `/crud/*` (amendemen 21 Okt) | Dibuat ulang pada M4–M5 (amendemen 29 Okt); jangan lebih awal |
 | `lib/api/`, `providers/query-provider.tsx`, `config/`, `tests/`, `app/api/` | Belum ada                                     | Buat saat milestone terkait dikerjakan, bukan lebih awal      |
-| Folder fitur hanya jika diperlukan                                          | Lima folder selalu ada                        | Ikuti keputusan pengguna 24 Oktober 2026                      |
+| Folder fitur hanya jika diperlukan                                          | Lima folder selalu ada di folder halaman      | Ikuti keputusan pengguna 24 Oktober 2026 (diubah 30 Oktober)  |
 
 ## Langkah saat menambah atau merapikan fitur
 
 1. Tentukan route di `src/app/` dan nama fitur/subfitur yang sesuai; pastikan tidak ada fitur atau komponen global yang sudah memenuhi kebutuhan.
-2. Buat kelima folder standar untuk fitur baru, setiap subfitur, dan induk kelompoknya.
+2. Buat kelima folder standar untuk fitur halaman baru dan setiap subfitur halaman. Jangan membuatnya di induk kelompok.
 3. Buat `components/<nama>-page.tsx` dengan `AppBody` + `PageHeading`, lalu `page.tsx` tipis yang merendernya.
 4. Tempatkan schema, tipe, hook, dan utilitas di foldernya; data contoh di `src/mocks/`.
 5. Saat memindahkan file, pertahankan nama ekspor, perilaku, validasi, dan batas Server/Client Component; perbarui semua import (route, mock, fitur lain).

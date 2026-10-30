@@ -1,4 +1,4 @@
-import { ChartExamplePage } from "@/features/chart/components/chart-example-page";
+import { ChartExamplePage } from "./chart-example-page";
 import { WaterfallCashBridgeCard } from "@/features/chart/waterfall/components/waterfall-cash-bridge-card";
 import { WaterfallConnectorCard } from "@/features/chart/waterfall/components/waterfall-connector-card";
 import { WaterfallHorizontalCard } from "@/features/chart/waterfall/components/waterfall-horizontal-card";

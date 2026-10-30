@@ -15,7 +15,7 @@ import {
   ChartTooltipContent,
   type ChartConfig,
 } from "@/components/ui/chart";
-import { formatCompact, sumBy } from "@/features/chart/utils/format";
+import { formatCompact, sumBy } from "../utils/format";
 import { dailyVisitors } from "@/mocks/chart-area.mock";
 
 const dailyConfig = {

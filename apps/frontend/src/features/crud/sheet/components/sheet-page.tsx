@@ -10,9 +10,8 @@ export function SheetPage() {
   const { data, ready, error, reload, commit } = useCrudExamples();
   return (
     <CrudResource<SheetExample>
-      title="Parameter contoh"
+      title="Data"
       heading="Sheet"
-      description="Pola Sheet. Semua submenu CRUD memakai data contoh yang sama dan tersimpan di browser ini."
       pattern="sheet"
       rows={data}
       ready={ready}

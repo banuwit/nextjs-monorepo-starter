@@ -20,7 +20,7 @@ Pemetaan PRD: Users → `page`; Countries/Provinces/Cities → `dialog`; Menus �
 | File                                                                                                                                                                                                                                                  | Tanggung jawab                                                                                                                                                                                                                                                            |
 | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | [crud-resource.tsx](../../../apps/frontend/src/components/crud/crud-resource.tsx)                                                                                                                                                                     | Controller: daftar, tombol Tambah, view/edit/delete, konfirmasi hapus, konfirmasi buang perubahan, notice `role="status"`, fokus kembali, render pola.                                                                                                                    |
-| [crud-list.tsx](../../../apps/frontend/src/components/crud/crud-list.tsx)                                                                                                                                                                             | Daftar di atas `DataGridClient` dengan konfigurasi seperti `/table/base`: kolom No, header sort, search kolom pertama, pagination `simple`, kolom Aksi terpin di kanan. Aksi baris lewat context agar kolom stabil. Dengan `basePath`, Detail/Edit menjadi link ke route. |
+| [crud-list.tsx](../../../apps/frontend/src/components/crud/crud-list.tsx)                                                                                                                                                                             | Daftar di atas `DataGridClient`, dibungkus `Card`, dengan konfigurasi seperti `/table/base`: kolom No, header sort, search kolom pertama, pagination `simple`, kolom Aksi di kanan, terpin hanya pada pola `inline` (prop `pinActions`). Pola `page` dan `dialog` memakai dropdown ikon ellipsis-vertical (Detail, Edit, Hapus) lewat prop `actionsMenu`; `sheet` dan `inline` tetap deretan tombol ikon. Aksi baris lewat context agar kolom stabil. Dengan `basePath`, Detail/Edit menjadi link ke route. |
 | [crud-form.tsx](../../../apps/frontend/src/components/crud/crud-form.tsx)                                                                                                                                                                             | Form generik dari `fields` + `schema` Zod: validasi `safeParse`, fokus ke field invalid, `id`/`createdAt`/`updatedAt` otomatis, status pending.                                                                                                                           |
 | [crud-page.tsx](../../../apps/frontend/src/components/crud/crud-page.tsx)                                                                                                                                                                             | Kerangka halaman (`AppBody` + `PageHeading` + `actions`) dan slot `sidePanel` beranimasi untuk pola inline.                                                                                                                                                               |
 | [crud-dialog.tsx](../../../apps/frontend/src/components/crud/crud-dialog.tsx), [crud-sheet.tsx](../../../apps/frontend/src/components/crud/crud-sheet.tsx), [crud-inline-panel.tsx](../../../apps/frontend/src/components/crud/crud-inline-panel.tsx) | Wadah form untuk masing-masing pola. Boleh dipakai terpisah oleh fitur non-CRUD (contoh: `calendar`, `project`, `ai-chat`).                                                                                                                                               |
@@ -33,7 +33,6 @@ Komponen di `components/crud/` tidak boleh mengimpor `@/features/*`, `@/mocks/*`
 <CrudResource<T extends { id; createdAt; updatedAt }>
   title="Parameter contoh"          // nama resource; dipakai di tombol, judul panel, notice
   heading="Modal"                   // opsional, <h1> halaman (default: title)
-  description="..."                 // opsional, teks di bawah heading
   pattern="page" | "dialog" | "sheet" | "inline"
   basePath="/crud/new-page"         // wajib untuk pattern="page" saja
   rows={data} ready={ready} error={error} reload={reload}
@@ -65,7 +64,7 @@ src/app/(backoffice)/crud/
         ├── page.tsx                # <NewPageRecordPage mode="view" id={id} />
         └── edit/page.tsx           # <NewPageRecordPage mode="edit" id={id} />
 
-src/features/crud/                  # induk kelompok; lima folder standar, saat ini kosong
+src/features/crud/                  # induk kelompok; tanpa folder standar
 ├── new-page/
 │   ├── components/
 │   │   ├── new-page-list-page.tsx   # daftar (pattern="page") → CrudResource
@@ -103,7 +102,7 @@ Keempat route memakai satu kelompok fitur `crud` (satu subfitur per pola, masing
 ## Perilaku yang tidak boleh hilang
 
 - Validasi Zod di form dan lagi saat commit; pesan error per field dan fokus ke field invalid pertama.
-- Konfirmasi sebelum hapus; konfirmasi sebelum menutup form yang dirty. Tombol Tambah dinonaktifkan saat data belum siap atau panel terbuka.
+- Konfirmasi sebelum hapus; konfirmasi sebelum menutup form yang dirty. Tombol "Add New" tidak bergantung pada status `ready` (tidak berkedip nonaktif saat load pertama); ia hanya dinonaktifkan saat panel terbuka pada pola `dialog`/`sheet`. Pada pola `inline` tombol tetap aktif saat panel terbuka dan mengganti isi panel dengan form tambah (dengan konfirmasi buang perubahan bila form dirty).
 - Hapus tidak optimistis tanpa feedback; kegagalan ditampilkan lewat `error` dengan tombol "Coba muat ulang".
 - Fokus dikembalikan ke pemicu setelah dialog/sheet/panel ditutup; aksi baris memiliki `aria-label` berisi `label(row)`.
 - Pola inline: panel `md:w-[min(28rem,45cqw)]` di kanan, menggantikan daftar di mobile, dan animasi menghormati reduced motion.

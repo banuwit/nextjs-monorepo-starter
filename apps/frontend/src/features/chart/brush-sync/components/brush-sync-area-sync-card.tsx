@@ -15,7 +15,7 @@ import {
   type ChartConfig,
 } from "@/components/ui/chart";
 import { formatDay } from "@/features/chart/brush-sync/utils/brush-sync";
-import { formatCompact, sumBy } from "@/features/chart/utils/format";
+import { formatCompact, sumBy } from "../utils/format";
 import {
   dailyPlatformVisitors,
   weekdayOrders,

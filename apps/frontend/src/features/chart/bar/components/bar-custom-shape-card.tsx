@@ -18,7 +18,7 @@ import {
   type ChartConfig,
 } from "@/components/ui/chart";
 import { BarTriangleShape } from "@/features/chart/bar/components/bar-triangle-shape";
-import { formatCompact, sumBy } from "@/features/chart/utils/format";
+import { formatCompact, sumBy } from "../utils/format";
 import { featureAdoption } from "@/mocks/chart-bar.mock";
 
 const adoptionConfig = {

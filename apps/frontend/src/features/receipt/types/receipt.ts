@@ -2,7 +2,7 @@ export type Receipt = {
   id: string;
   orderId: string;
   date: string;
-  shop: { name: string; website: string; supportEmail: string };
+  shop: { name: string; supportEmail: string };
   customerEmail: string;
   items: {
     id: string;

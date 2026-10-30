@@ -17,7 +17,7 @@ import {
   lastRange,
   sliceRange,
 } from "@/features/chart/brush-sync/utils/brush-sync";
-import { formatCompact, sumBy } from "@/features/chart/utils/format";
+import { formatCompact, sumBy } from "../utils/format";
 import { dailySessions } from "@/mocks/chart-brush-sync.mock";
 
 const sessionsConfig = {

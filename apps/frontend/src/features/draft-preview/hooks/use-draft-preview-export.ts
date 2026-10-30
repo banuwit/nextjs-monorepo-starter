@@ -1,27 +1,27 @@
 import { useEffect, useRef, useState } from "react";
-import type { Invoice } from "../types/invoice";
-import type { renderInvoicePdf } from "../utils/render-invoice-pdf";
-import { invoiceSchema } from "../schemas/invoice.schema";
-import { invoiceFilename } from "../utils/invoice";
+import type { DraftPreview } from "../types/draft-preview";
+import type { renderDraftPreviewPdf } from "../utils/render-draft-preview-pdf";
+import { draftPreviewSchema } from "../schemas/draft-preview.schema";
+import { draftPreviewFilename } from "../utils/draft-preview";
 
-type InvoiceFile = {
+type DraftPreviewFile = {
   url: string;
   name: string;
-  source: Invoice;
-  pages: Awaited<ReturnType<typeof renderInvoicePdf>>;
+  source: DraftPreview;
+  pages: Awaited<ReturnType<typeof renderDraftPreviewPdf>>;
 };
 
-export function useInvoiceExport(invoice: Invoice) {
-  const [file, setFile] = useState<InvoiceFile | null>(null);
+export function useDraftPreviewExport(draftPreview: DraftPreview) {
+  const [file, setFile] = useState<DraftPreviewFile | null>(null);
   const [failure, setFailure] = useState<{
-    source: Invoice;
+    source: DraftPreview;
     message: string;
   } | null>(null);
   const [message, setMessage] = useState("");
   const [retry, setRetry] = useState(0);
   const currentUrl = useRef<string | null>(null);
   const queue = useRef(Promise.resolve());
-  const valid = invoiceSchema.safeParse(invoice).success;
+  const valid = draftPreviewSchema.safeParse(draftPreview).success;
 
   useEffect(
     () => () => {
@@ -31,7 +31,7 @@ export function useInvoiceExport(invoice: Invoice) {
   );
 
   useEffect(() => {
-    const parsed = invoiceSchema.safeParse(invoice);
+    const parsed = draftPreviewSchema.safeParse(draftPreview);
     if (!parsed.success) return;
     let cancelled = false;
     const timer = setTimeout(() => {
@@ -40,29 +40,29 @@ export function useInvoiceExport(invoice: Invoice) {
         if (cancelled) return;
         setFailure(null);
         try {
-          const [{ createInvoicePdf }, { renderInvoicePdf }] =
+          const [{ createDraftPreviewPdf }, { renderDraftPreviewPdf }] =
             await Promise.all([
-              import("../components/invoice-document"),
-              import("../utils/render-invoice-pdf"),
+              import("../components/draft-preview-document"),
+              import("../utils/render-draft-preview-pdf"),
             ]);
           if (cancelled) return;
-          const blob = await createInvoicePdf(parsed.data);
+          const blob = await createDraftPreviewPdf(parsed.data);
           if (cancelled) return;
-          const pages = await renderInvoicePdf(blob);
+          const pages = await renderDraftPreviewPdf(blob);
           if (cancelled) return;
           if (currentUrl.current) URL.revokeObjectURL(currentUrl.current);
           const url = URL.createObjectURL(blob);
           currentUrl.current = url;
           setFile({
             url,
-            name: invoiceFilename(parsed.data.reference),
-            source: invoice,
+            name: draftPreviewFilename(parsed.data.reference),
+            source: draftPreview,
             pages,
           });
         } catch {
           if (!cancelled)
             setFailure({
-              source: invoice,
+              source: draftPreview,
               message:
                 "The preview could not be created. Your changes are still here. Please try again.",
             });
@@ -73,10 +73,10 @@ export function useInvoiceExport(invoice: Invoice) {
       cancelled = true;
       clearTimeout(timer);
     };
-  }, [invoice, retry]);
+  }, [draftPreview, retry]);
 
-  const ready = file?.source === invoice;
-  const error = failure?.source === invoice ? failure.message : "";
+  const ready = file?.source === draftPreview;
+  const error = failure?.source === draftPreview ? failure.message : "";
   const busy = valid && !ready && !error;
 
   function download() {

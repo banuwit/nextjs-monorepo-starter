@@ -25,7 +25,7 @@ import {
   formatPercent,
   withConversion,
 } from "@/features/chart/funnel/utils/funnel";
-import { formatCompact } from "@/features/chart/utils/format";
+import { formatCompact } from "../utils/format";
 import { checkoutFunnel } from "@/mocks/chart-funnel.mock";
 
 const conversionConfig = {

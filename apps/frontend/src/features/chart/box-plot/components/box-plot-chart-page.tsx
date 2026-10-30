@@ -3,7 +3,7 @@ import { BoxPlotGroupedCard } from "@/features/chart/box-plot/components/box-plo
 import { BoxPlotHorizontalCard } from "@/features/chart/box-plot/components/box-plot-horizontal-card";
 import { BoxPlotMeanCard } from "@/features/chart/box-plot/components/box-plot-mean-card";
 import { BoxPlotOutliersCard } from "@/features/chart/box-plot/components/box-plot-outliers-card";
-import { ChartExamplePage } from "@/features/chart/components/chart-example-page";
+import { ChartExamplePage } from "./chart-example-page";
 
 export function BoxPlotChartPage() {
   return (

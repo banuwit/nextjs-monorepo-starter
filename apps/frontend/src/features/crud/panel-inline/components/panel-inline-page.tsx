@@ -10,9 +10,8 @@ export function PanelInlinePage() {
   const { data, ready, error, reload, commit } = useCrudExamples();
   return (
     <CrudResource<PanelInlineExample>
-      title="Parameter contoh"
+      title="Data"
       heading="Panel Inline"
-      description="Pola Panel Inline. Semua submenu CRUD memakai data contoh yang sama dan tersimpan di browser ini."
       pattern="inline"
       rows={data}
       ready={ready}

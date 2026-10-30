@@ -5,7 +5,7 @@ GlobalWorkerOptions.workerSrc = new URL(
   import.meta.url,
 ).toString();
 
-export async function renderInvoicePdf(blob: Blob) {
+export async function renderDraftPreviewPdf(blob: Blob) {
   const task = getDocument({
     data: new Uint8Array(await blob.arrayBuffer()),
     useSystemFonts: true,

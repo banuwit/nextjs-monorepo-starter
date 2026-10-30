@@ -21,7 +21,7 @@ import {
   formatHours,
   rangeTicks,
 } from "@/features/chart/timeline/utils/timeline";
-import { sumBy } from "@/features/chart/utils/format";
+import { sumBy } from "../utils/format";
 import { shiftRoster } from "@/mocks/chart-timeline.mock";
 
 const shiftConfig = {

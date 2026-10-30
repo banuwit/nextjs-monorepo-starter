@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { TileTreemap } from "@/features/chart/treemap/components/tile-treemap";
 import type { Tile } from "@/features/chart/treemap/types/treemap";
 import { tileColor } from "@/features/chart/treemap/utils/treemap-colors";
-import { formatCompact, sumBy } from "@/features/chart/utils/format";
+import { formatCompact, sumBy } from "../utils/format";
 import { headcountByRegion } from "@/mocks/chart-treemap.mock";
 
 function toTiles(items: readonly { name: string; size: number }[]): Tile[] {

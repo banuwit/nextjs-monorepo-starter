@@ -38,13 +38,13 @@ import {
   getUserEditErrors,
   getRowEditRows,
   rowEditReducer,
-} from "../../utils/user-editing";
+} from "../utils/user-editing";
 import type {
   EditableUserField,
   UserDraft,
   RowEditAction,
   RowEditState,
-} from "../../types/user-editing";
+} from "../types/user-editing";
 
 const fields: {
   field: EditableUserField;

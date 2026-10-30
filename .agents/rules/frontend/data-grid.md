@@ -162,7 +162,7 @@ Gunakan `enableColumnPinning` hanya bila pengguna boleh mengubah pin dari menu [
 
 Contoh `/table/editable/row` memakai [RowUserTable](../../../apps/frontend/src/features/table/editable/row/components/row-user-table.tsx), `DataGridClient`, header label, dan kolom Actions yang terpin di kanan. [DataGridEditableActions](../../../apps/frontend/src/components/data-grid/data-grid-editable-actions.tsx) hanya merender tombol Edit, Duplicate, Delete, Save, dan Cancel; state dan validasi tetap di fitur.
 
-Satu baris aktif mengunci aksi baris lain. Duplicate menambahkan draft di sebelah sumber dengan ID baru dan email kosong; Cancel menghapus draft yang belum disimpan. Save memvalidasi data dan keunikan email, sedangkan Delete memerlukan konfirmasi. [Logika user editing](../../../apps/frontend/src/features/table/editable/utils/user-editing.ts) dipakai bersama contoh inline. Perubahan hanya disimpan di state lokal dan kembali ke mock saat reload.
+Satu baris aktif mengunci aksi baris lain. Duplicate menambahkan draft di sebelah sumber dengan ID baru dan email kosong; Cancel menghapus draft yang belum disimpan. Save memvalidasi data dan keunikan email, sedangkan Delete memerlukan konfirmasi. [Logika user editing](../../../apps/frontend/src/features/table/editable/row/utils/user-editing.ts) disalin ke contoh inline dan sheet (`table/editable/{inline,sheet}/utils/`). Perubahan hanya disimpan di state lokal dan kembali ke mock saat reload.
 
 ## Edit per sel
 

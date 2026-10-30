@@ -1,6 +1,6 @@
 "use client";
 
-import { ChartExamplePage } from "@/features/chart/components/chart-example-page";
+import { ChartExamplePage } from "./chart-example-page";
 import { ComposedGoalLineCard } from "@/features/chart/composed/components/composed-goal-line-card";
 import { ComposedCashflowCard } from "@/features/chart/composed/components/composed-cashflow-card";
 import { ComposedLineBarAreaCard } from "@/features/chart/composed/components/composed-line-bar-area-card";

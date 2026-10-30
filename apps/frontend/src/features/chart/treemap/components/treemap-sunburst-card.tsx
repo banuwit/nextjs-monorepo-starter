@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/chart";
 import { tileColor } from "@/features/chart/treemap/utils/treemap-colors";
 import { treemapConfig } from "@/features/chart/treemap/utils/treemap-config";
-import { sumBy } from "@/features/chart/utils/format";
+import { sumBy } from "../utils/format";
 import { budgetByDepartment } from "@/mocks/chart.mock";
 
 export function TreemapSunburstCard() {

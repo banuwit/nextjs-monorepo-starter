@@ -1,5 +1,6 @@
-import { ArrowUpRightIcon, ShoppingBagIcon } from "lucide-react";
+import { ArrowUpRightIcon } from "lucide-react";
 import { AppBody } from "@/components/app-body";
+import { AppLogo } from "@/components/app-logo";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { receipt } from "@/mocks/receipt.mock";
@@ -43,16 +44,12 @@ export function ReceiptPage() {
           className="gap-3 py-6 [--card-spacing:--spacing(6)]"
         >
           <CardHeader className="flex flex-col items-center gap-3 text-center">
-            <div className="flex size-10 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-              <ShoppingBagIcon aria-hidden="true" className="size-5" />
-            </div>
+            <AppLogo className="w-16" />
             <div className="flex flex-col gap-1.5">
               <h2 className="text-sm font-bold tracking-[0.22em] uppercase">
                 Order Receipt
               </h2>
-              <p className="text-xs tracking-[0.18em] text-muted-foreground uppercase">
-                {receipt.shop.name} · {receipt.shop.website}
-              </p>
+              <p className="sr-only">{receipt.shop.name}</p>
             </div>
           </CardHeader>
           <CardContent className="flex flex-col gap-3 tabular-nums">

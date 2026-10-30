@@ -14,7 +14,7 @@ import {
   ChartTooltipContent,
   type ChartConfig,
 } from "@/components/ui/chart";
-import { formatCompact } from "@/features/chart/utils/format";
+import { formatCompact } from "../utils/format";
 import { planSubscribers } from "@/mocks/chart-pie.mock";
 
 const planConfig = {

@@ -1,4 +1,4 @@
-import { ChartExamplePage } from "@/features/chart/components/chart-example-page";
+import { ChartExamplePage } from "./chart-example-page";
 import { RadarMultipleCard } from "@/features/chart/radar/components/radar-multiple-card";
 import { RadarGridCircleDotsCard } from "@/features/chart/radar/components/radar-grid-circle-dots-card";
 import { RadarLinesOnlyCard } from "@/features/chart/radar/components/radar-lines-only-card";

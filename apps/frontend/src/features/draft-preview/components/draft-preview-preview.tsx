@@ -10,13 +10,13 @@ import {
   RefreshCwIcon,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import type { useInvoiceExport } from "../hooks/use-invoice-export";
+import type { useDraftPreviewExport } from "../hooks/use-draft-preview-export";
 
-export function InvoicePreview({
+export function DraftPreviewPreview({
   output,
   onValidate,
 }: {
-  output: ReturnType<typeof useInvoiceExport>;
+  output: ReturnType<typeof useDraftPreviewExport>;
   onValidate: () => void;
 }) {
   const printRoot = useRef<HTMLDivElement>(null);
@@ -50,7 +50,7 @@ export function InvoicePreview({
   return (
     <>
       <section
-        aria-label="Invoice preview"
+        aria-label="Draft Preview"
         className="min-w-0 self-start overflow-hidden rounded-xl border border-border bg-card text-card-foreground @min-[900px]/main:sticky @min-[900px]/main:top-28"
       >
         <header className="flex flex-wrap items-center justify-between gap-3 border-b px-4 py-3">
@@ -82,7 +82,7 @@ export function InvoicePreview({
           </div>
         </header>
         <div
-          data-invoice-preview-stage
+          data-draft-preview-preview-stage
           aria-busy={output.busy}
           className="relative flex h-[clamp(16rem,calc(100dvh-18rem),50rem)] items-center justify-center overflow-hidden bg-muted/60 p-4 sm:p-6"
         >
@@ -93,7 +93,7 @@ export function InvoicePreview({
                 src={page.image}
                 width={page.width}
                 height={page.height}
-                alt={`Invoice page ${selectedIndex + 1} of ${pages.length}`}
+                alt={`Draft Preview page ${selectedIndex + 1} of ${pages.length}`}
                 className="h-auto max-h-full w-auto max-w-full object-contain shadow-sm"
                 loading="eager"
               />
@@ -149,7 +149,7 @@ export function InvoicePreview({
               type="button"
               variant="outline"
               size="icon-sm"
-              aria-label="Previous invoice page"
+              aria-label="Previous draft preview page"
               disabled={selectedIndex === 0 || output.busy}
               onClick={() => setPageIndex(selectedIndex - 1)}
             >
@@ -165,7 +165,7 @@ export function InvoicePreview({
               type="button"
               variant="outline"
               size="icon-sm"
-              aria-label="Next invoice page"
+              aria-label="Next draft preview page"
               disabled={selectedIndex >= pages.length - 1 || output.busy}
               onClick={() => setPageIndex(selectedIndex + 1)}
             >
@@ -184,7 +184,7 @@ export function InvoicePreview({
         createPortal(
           <div
             ref={printRoot}
-            data-playground-invoice-print-root
+            data-playground-draft-preview-print-root
             aria-hidden="true"
           >
             {pages.map((page, index) => (

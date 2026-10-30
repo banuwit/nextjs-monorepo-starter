@@ -32,9 +32,9 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import type { User } from "@/mocks/user.mock";
-import { getUserEditErrors } from "../../utils/user-editing";
-import { userEditsSchema } from "../../schemas/user-editing.schema";
-import type { EditableUserField, UserDraft } from "../../types/user-editing";
+import { getUserEditErrors } from "../utils/user-editing";
+import { userEditsSchema } from "../schemas/user-editing.schema";
+import type { EditableUserField, UserDraft } from "../types/user-editing";
 
 export type SheetUserEditor = {
   mode: "duplicate" | "details";

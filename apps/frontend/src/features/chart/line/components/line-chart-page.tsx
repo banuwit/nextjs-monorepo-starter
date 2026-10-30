@@ -1,4 +1,4 @@
-import { ChartExamplePage } from "@/features/chart/components/chart-example-page";
+import { ChartExamplePage } from "./chart-example-page";
 import { LineConnectNullsCard } from "@/features/chart/line/components/line-connect-nulls-card";
 import { LineDotsCustomCard } from "@/features/chart/line/components/line-dots-custom-card";
 import { LineLabelCard } from "@/features/chart/line/components/line-label-card";

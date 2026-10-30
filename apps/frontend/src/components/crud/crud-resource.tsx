@@ -24,7 +24,6 @@ type Panel<T> = { mode: "create" } | { mode: "view" | "edit"; record: T };
 export function CrudResource<T extends CrudRecord>({
   title,
   heading,
-  description,
   pattern,
   basePath,
   rows,
@@ -39,7 +38,6 @@ export function CrudResource<T extends CrudRecord>({
 }: {
   title: string;
   heading?: string;
-  description?: string;
   pattern: "page" | "dialog" | "sheet" | "inline";
   basePath?: string;
   rows: T[];
@@ -56,6 +54,8 @@ export function CrudResource<T extends CrudRecord>({
   const [pendingDelete, setPendingDelete] = useState<T | null>(null);
   const [dirty, setDirty] = useState(false);
   const [discard, setDiscard] = useState(false);
+  // Panel tujuan bila konfirmasi buang perubahan dipicu tombol Add New (inline).
+  const [nextPanel, setNextPanel] = useState<Panel<T> | null>(null);
   const [notice, setNotice] = useState("");
   const returnFocus = useRef<HTMLElement | null>(null);
   const newButton = useRef<HTMLButtonElement>(null);
@@ -77,6 +77,7 @@ export function CrudResource<T extends CrudRecord>({
     setPanel(null);
   }
   function close() {
+    setNextPanel(null);
     if (dirty) setDiscard(true);
     else dismiss();
   }
@@ -169,23 +170,27 @@ export function CrudResource<T extends CrudRecord>({
             render={<Link href={`${basePath}/new`} />}
           >
             <PlusIcon data-icon="inline-start" />
-            Tambah {title.toLowerCase()}
+            Add New
           </Button>
         ) : (
           <Button
             ref={newButton}
-            disabled={!ready || !!panel}
-            onClick={() => open({ mode: "create" })}
+            disabled={pattern !== "inline" && !!panel}
+            onClick={() => {
+              if (pattern === "inline" && dirty) {
+                setNextPanel({ mode: "create" });
+                setDiscard(true);
+              } else if (panel?.mode !== "create") {
+                open({ mode: "create" });
+              }
+            }}
           >
             <PlusIcon data-icon="inline-start" />
-            Tambah {title.toLowerCase()}
+            Add New
           </Button>
         )
       }
     >
-      {description && (
-        <p className="text-sm text-muted-foreground">{description}</p>
-      )}
       {error && (
         <Alert variant="destructive">
           <AlertDescription className="flex flex-wrap items-center justify-between gap-2">
@@ -209,6 +214,8 @@ export function CrudResource<T extends CrudRecord>({
         loading={!ready && !error}
         label={label}
         basePath={basePath}
+        pinActions={pattern === "inline"}
+        actionsMenu={pattern === "page" || pattern === "dialog"}
         onView={(row) => open({ mode: "view", record: row })}
         onEdit={(row) => open({ mode: "edit", record: row })}
         onDelete={(row) => {
@@ -307,6 +314,10 @@ export function CrudResource<T extends CrudRecord>({
               onClick={() => {
                 setDiscard(false);
                 dismiss();
+                if (nextPanel) {
+                  setPanel(nextPanel);
+                  setNextPanel(null);
+                }
               }}
             >
               Buang perubahan
