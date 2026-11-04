@@ -3,7 +3,8 @@ import { ProcessPage } from "@/features/process/components/process-page";
 
 export const metadata: Metadata = {
   title: "Process | Dashboard",
-  description: "Build and inspect an interactive automation workflow.",
+  description:
+    "Follow an order through every step of the delivery process, from intake to proof of delivery.",
 };
 
 export default function Page() {

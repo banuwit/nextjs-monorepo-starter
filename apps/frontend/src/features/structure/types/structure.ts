@@ -1,18 +1,19 @@
-export type StructureApp =
-  "Stripe" | "Neon" | "Claude" | "ClickUp" | "Resend" | "Custom Code" | "Slack";
+export type Department =
+  | "Executive"
+  | "Engineering"
+  | "Product"
+  | "Design"
+  | "Sales"
+  | "Finance"
+  | "People";
 
-export type RunResult = {
-  status: "Passed" | "Failed" | "Skipped" | "Not run" | "Running";
-  detail: string;
-  metric?: string;
-};
-
-export type StructureStep = {
+export type Employee = {
   id: string;
+  name: string;
   title: string;
-  detail: string;
-  app: StructureApp;
+  department: Department;
+  email: string;
+  location: string;
+  /** Direct manager; the root employee has none. */
   parent?: string;
-  branch?: string;
-  fixture?: RunResult;
 };

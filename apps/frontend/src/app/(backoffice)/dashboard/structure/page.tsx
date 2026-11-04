@@ -4,7 +4,7 @@ import { StructurePage } from "@/features/structure/components/structure-page";
 export const metadata: Metadata = {
   title: "Structure | Dashboard",
   description:
-    "Build and inspect an agent workflow with an interactive flow canvas.",
+    "Explore and edit the organisation chart of managers and their reports on an interactive canvas.",
 };
 
 export default function Page() {

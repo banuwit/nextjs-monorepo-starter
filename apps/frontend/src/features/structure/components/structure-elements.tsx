@@ -13,20 +13,12 @@ import {
   type Edge,
 } from "@xyflow/react";
 import {
-  CheckCircle2Icon,
-  CircleXIcon,
-  CodeIcon,
-  CreditCardIcon,
-  DatabaseIcon,
-  HashIcon,
-  ListChecksIcon,
-  LoaderCircleIcon,
-  MailIcon,
-  MinusIcon,
+  MapPinIcon,
   MoreHorizontalIcon,
   PlusIcon,
-  SparklesIcon,
+  UsersRoundIcon,
 } from "lucide-react";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -36,58 +28,48 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
-import type { StructureApp, StructureStep, RunResult } from "../types/structure";
+import type { Employee } from "../types/structure";
+import { departmentTone, initials } from "../utils/structure";
 
-const icons = {
-  Stripe: CreditCardIcon,
-  Neon: DatabaseIcon,
-  Claude: SparklesIcon,
-  ClickUp: ListChecksIcon,
-  Resend: MailIcon,
-  "Custom Code": CodeIcon,
-  Slack: HashIcon,
-};
-
-export function AppIcon({ app }: { app: StructureApp }) {
-  const Icon = icons[app];
+export function EmployeeAvatar({
+  employee,
+  className,
+}: {
+  employee: Employee;
+  className?: string;
+}) {
   return (
-    <span
-      className="structure-app-icon flex size-9 shrink-0 items-center justify-center rounded-lg border bg-background"
-      data-app={app}
-    >
-      <Icon className="size-5" aria-hidden="true" />
-    </span>
+    <Avatar className={cn("size-9 rounded-lg", className)}>
+      <AvatarFallback
+        className={cn("rounded-lg text-xs font-semibold", departmentTone[employee.department])}
+      >
+        {initials(employee.name) || "?"}
+      </AvatarFallback>
+    </Avatar>
   );
 }
 
-export type StepNode = Node<
+export type EmployeeNode = Node<
   {
-    step: StructureStep;
-    result: RunResult;
+    employee: Employee;
+    /** Direct reports and everyone below them. */
+    reports: { direct: number; total: number };
     leaf: boolean;
-    running: boolean;
     edit: () => void;
     add: () => void;
     remove: () => void;
   },
-  "step"
+  "employee"
 >;
-export const StructureNode = memo(function StructureNode({
+
+export const EmployeeCard = memo(function EmployeeCard({
   data,
   selected,
-}: NodeProps<StepNode>) {
-  const { step, result } = data;
-  const StatusIcon =
-    result.status === "Passed"
-      ? CheckCircle2Icon
-      : result.status === "Failed"
-        ? CircleXIcon
-        : result.status === "Running"
-          ? LoaderCircleIcon
-          : MinusIcon;
+}: NodeProps<EmployeeNode>) {
+  const { employee, reports } = data;
   return (
     <>
-      {step.parent && (
+      {employee.parent && (
         <Handle type="target" position={Position.Top} isConnectable={false} />
       )}
       <div
@@ -97,11 +79,11 @@ export const StructureNode = memo(function StructureNode({
         )}
       >
         <div className="flex items-center gap-2.5 p-2.5">
-          <AppIcon app={step.app} />
+          <EmployeeAvatar employee={employee} />
           <div className="min-w-0 flex-1">
-            <p className="truncate text-sm font-semibold">{step.title}</p>
+            <p className="truncate text-sm font-semibold">{employee.name}</p>
             <p className="truncate text-xs text-muted-foreground">
-              {step.detail}
+              {employee.title}
             </p>
           </div>
           <DropdownMenu>
@@ -111,8 +93,7 @@ export const StructureNode = memo(function StructureNode({
                   className="nodrag"
                   size="icon-xs"
                   variant="ghost"
-                  aria-label={`Actions for ${step.title}`}
-                  disabled={data.running}
+                  aria-label={`Actions for ${employee.name}`}
                 />
               }
             >
@@ -121,41 +102,46 @@ export const StructureNode = memo(function StructureNode({
             <DropdownMenuContent onClick={(event) => event.stopPropagation()}>
               <DropdownMenuGroup>
                 <DropdownMenuItem onClick={data.edit}>
-                  Edit step
+                  Edit employee
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={data.add}>
-                  Add step after
+                  Add direct report
                 </DropdownMenuItem>
                 <DropdownMenuItem
-                  disabled={!step.parent}
+                  disabled={!employee.parent}
                   variant="destructive"
                   onClick={data.remove}
                 >
-                  Delete step
+                  Remove position
                 </DropdownMenuItem>
               </DropdownMenuGroup>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
-        <div
-          className="flex h-8 items-center gap-1.5 rounded-b-lg border-t bg-muted/35 px-2.5 text-[11px] text-muted-foreground"
-          title={result.status}
-        >
-          <StatusIcon
-            aria-label={result.status}
+        <div className="flex h-8 items-center gap-1.5 rounded-b-lg border-t bg-muted/35 px-2.5 text-[11px] text-muted-foreground">
+          <span
             className={cn(
-              "size-3.5 shrink-0",
-              result.status === "Passed" && "text-emerald-600",
-              result.status === "Failed" && "text-destructive",
-              result.status === "Running" && "animate-spin",
+              "rounded-full px-1.5 py-px font-medium",
+              departmentTone[employee.department],
             )}
-          />
-          <span className="truncate">{result.detail}</span>
-          {result.metric && (
-            <>
-              <span aria-hidden="true">·</span>
-              <span className="truncate">{result.metric}</span>
-            </>
+          >
+            {employee.department}
+          </span>
+          <span className="flex items-center gap-1 truncate">
+            <MapPinIcon className="size-3 shrink-0" aria-hidden="true" />
+            {employee.location || "—"}
+          </span>
+          {reports.direct > 0 && (
+            <span
+              className="ml-auto flex shrink-0 items-center gap-1"
+              title={`${reports.direct} direct, ${reports.total} total`}
+            >
+              <UsersRoundIcon className="size-3" aria-hidden="true" />
+              {reports.direct}
+              {reports.total > reports.direct && (
+                <span className="text-muted-foreground/70">/ {reports.total}</span>
+              )}
+            </span>
           )}
         </div>
       </div>
@@ -167,12 +153,11 @@ export const StructureNode = memo(function StructureNode({
             size="icon-xs"
             variant="outline"
             className="nodrag rounded-full"
-            aria-label={`Add a step after ${step.title}`}
+            aria-label={`Add a direct report under ${employee.name}`}
             onClick={(event) => {
               event.stopPropagation();
               data.add();
             }}
-            disabled={data.running}
           >
             <PlusIcon />
           </Button>
@@ -182,8 +167,10 @@ export const StructureNode = memo(function StructureNode({
   );
 });
 
-export type StepEdge = Edge<{ add: () => void; running: boolean }, "step">;
-export function StructureEdge(props: EdgeProps<StepEdge>) {
+export type ReportingEdge = Edge<{ add: () => void }, "reporting">;
+
+/** Manager → report line; the plus inserts a position between the two. */
+export function ReportingLine(props: EdgeProps<ReportingEdge>) {
   const [path, x, y] = getSmoothStepPath({ ...props, borderRadius: 8 });
   return (
     <>
@@ -199,25 +186,15 @@ export function StructureEdge(props: EdgeProps<StepEdge>) {
             transform: `translate(-50%, -50%) translate(${x}px,${y}px)`,
           }}
         >
-          {props.label && (
-            <span className="rounded border bg-background px-1.5 py-0.5 text-[10px]">
-              {props.label}
-            </span>
-          )}
           <Button
             size="icon-xs"
             variant="outline"
             className="structure-edge-add rounded-full"
-            aria-label={
-              props.label
-                ? `Add a step on the ${props.label} path`
-                : "Add a step here"
-            }
+            aria-label="Insert a position between these two"
             onClick={(event) => {
               event.stopPropagation();
               props.data?.add();
             }}
-            disabled={props.data?.running}
           >
             <PlusIcon />
           </Button>

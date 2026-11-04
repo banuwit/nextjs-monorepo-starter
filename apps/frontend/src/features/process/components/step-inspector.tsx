@@ -19,12 +19,14 @@ import {
 } from "@/components/ui/sheet";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { stepOwners } from "@/mocks/process.mock";
-import type { Graph, StepData, StepNode } from "../types/process";
-import { StepStatus, stepIcons } from "./process-step";
+import type { Graph, StepData, StepIcon, StepNode } from "../types/process";
+import { categoryLabels, StepStatus, stepIconLabels, stepIcons } from "./process-step";
 
 type Props = {
   node: StepNode;
   graph: Graph;
+  /** Position of this step in the replay order, 1-based; undefined when unreachable. */
+  order?: number;
   editing: boolean;
   locked: boolean;
   onEdit: () => void;
@@ -48,7 +50,7 @@ export function StepInspector(props: Props) {
         >
           <SheetTitle className="sr-only">Step inspector</SheetTitle>
           <SheetDescription className="sr-only">
-            View and edit the selected workflow step.
+            View and edit the selected process step.
           </SheetDescription>
           <InspectorContent {...props} />
         </SheetContent>
@@ -67,6 +69,7 @@ export function StepInspector(props: Props) {
 function InspectorContent({
   node,
   graph,
+  order,
   editing,
   locked,
   onEdit,
@@ -75,14 +78,16 @@ function InspectorContent({
 }: Props) {
   const [draft, setDraft] = useState(node.data);
   const Icon = stepIcons[node.data.icon];
-  const incoming = graph.edges.filter((edge) => edge.target === node.id).length;
-  const outgoing = graph.edges.filter((edge) => edge.source === node.id).length;
+  const incoming = graph.edges.filter((edge) => edge.target === node.id);
+  const outgoing = graph.edges.filter((edge) => edge.source === node.id);
+  const nameOf = (id: string) =>
+    graph.nodes.find((item) => item.id === id)?.data.title ?? id;
   return (
     <div className="flex flex-col gap-4 p-4">
       <div className="flex items-center gap-2">
         <Icon className="size-4" />
-        <h2 className="flex-1 text-sm font-semibold capitalize">
-          {node.data.category}
+        <h2 className="flex-1 text-sm font-semibold">
+          {categoryLabels[node.data.category]}
         </h2>
         <Button
           variant="ghost"
@@ -104,6 +109,8 @@ function InspectorContent({
                 ...draft,
                 title: draft.title.trim(),
                 detail: draft.detail.trim(),
+                stage: draft.stage.trim() || node.data.stage,
+                duration: draft.duration.trim() || "—",
               });
           }}
         >
@@ -134,6 +141,18 @@ function InspectorContent({
               />
             </Field>
             <Field>
+              <FieldLabel htmlFor="step-stage">Stage</FieldLabel>
+              <Input
+                id="step-stage"
+                maxLength={40}
+                value={draft.stage}
+                disabled={locked}
+                onChange={(event) =>
+                  setDraft({ ...draft, stage: event.target.value })
+                }
+              />
+            </Field>
+            <Field>
               <FieldLabel htmlFor="step-owner">Owner</FieldLabel>
               <NativeSelect
                 id="step-owner"
@@ -151,6 +170,57 @@ function InspectorContent({
                 ))}
               </NativeSelect>
             </Field>
+            <Field>
+              <FieldLabel htmlFor="step-icon">Icon</FieldLabel>
+              <NativeSelect
+                id="step-icon"
+                className="w-full"
+                value={draft.icon}
+                disabled={locked}
+                onChange={(event) =>
+                  setDraft({ ...draft, icon: event.target.value as StepIcon })
+                }
+              >
+                {(Object.keys(stepIconLabels) as StepIcon[]).map((icon) => (
+                  <NativeSelectOption key={icon} value={icon}>
+                    {stepIconLabels[icon]}
+                  </NativeSelectOption>
+                ))}
+              </NativeSelect>
+            </Field>
+            <Field>
+              <FieldLabel htmlFor="step-duration">Recorded duration</FieldLabel>
+              <Input
+                id="step-duration"
+                maxLength={20}
+                placeholder="e.g. 4m 20s"
+                value={draft.duration}
+                disabled={locked}
+                onChange={(event) =>
+                  setDraft({ ...draft, duration: event.target.value })
+                }
+              />
+            </Field>
+            {node.data.category !== "start" && (
+              <Field>
+                <FieldLabel htmlFor="step-outcome">Outcome on replay</FieldLabel>
+                <NativeSelect
+                  id="step-outcome"
+                  className="w-full"
+                  value={draft.outcome ?? "Done"}
+                  disabled={locked}
+                  onChange={(event) =>
+                    setDraft({
+                      ...draft,
+                      outcome: event.target.value === "Failed" ? "Failed" : undefined,
+                    })
+                  }
+                >
+                  <NativeSelectOption value="Done">Completes</NativeSelectOption>
+                  <NativeSelectOption value="Failed">Fails here</NativeSelectOption>
+                </NativeSelect>
+              </Field>
+            )}
           </FieldGroup>
           <Button type="submit" disabled={locked || !draft.title.trim()}>
             Save changes
@@ -166,28 +236,42 @@ function InspectorContent({
               <dd className="break-words text-right">
                 {node.data.detail || "—"}
               </dd>
-              <dt className="text-muted-foreground">Category</dt>
-              <dd className="text-right capitalize">{node.data.category}</dd>
+              <dt className="text-muted-foreground">Stage</dt>
+              <dd className="text-right">{node.data.stage}</dd>
               <dt className="text-muted-foreground">Owner</dt>
               <dd className="text-right">{node.data.owner}</dd>
-              <dt className="text-muted-foreground">Incoming</dt>
-              <dd className="text-right">{incoming}</dd>
-              <dt className="text-muted-foreground">Outgoing</dt>
-              <dd className="text-right">{outgoing}</dd>
+              <dt className="text-muted-foreground">Order</dt>
+              <dd className="text-right">{order ? `#${order} of ${graph.nodes.length}` : "Not reached"}</dd>
+              <dt className="text-muted-foreground">Comes from</dt>
+              <dd className="text-right">
+                {incoming.length
+                  ? incoming.map((edge) => nameOf(edge.source)).join(", ")
+                  : "—"}
+              </dd>
+              <dt className="text-muted-foreground">Goes to</dt>
+              <dd className="text-right">
+                {outgoing.length
+                  ? outgoing
+                      .map((edge) =>
+                        edge.label ? `${nameOf(edge.target)} (${String(edge.label)})` : nameOf(edge.target),
+                      )
+                      .join(", ")
+                  : "—"}
+              </dd>
             </dl>
           </section>
           <Separator />
           <section className="flex flex-col gap-3">
-            <h3 className="text-xs font-semibold">Last Run</h3>
+            <h3 className="text-xs font-semibold">This run</h3>
             <dl className="grid grid-cols-2 items-center gap-3 text-xs">
               <dt className="text-muted-foreground">Status</dt>
               <dd className="justify-self-end">
                 <StepStatus status={node.data.status} />
               </dd>
               <dt className="text-muted-foreground">Duration</dt>
-              <dd className="text-right">{node.data.duration}</dd>
-              <dt className="text-muted-foreground">Run</dt>
-              <dd className="text-right font-mono">run_3f9a1c</dd>
+              <dd className="text-right tabular-nums">{node.data.duration}</dd>
+              <dt className="text-muted-foreground">Order</dt>
+              <dd className="text-right font-mono">#HR-20481</dd>
             </dl>
           </section>
           <Button variant="outline" disabled={locked} onClick={onEdit}>
@@ -196,16 +280,16 @@ function InspectorContent({
           </Button>
         </>
       )}
-      {node.data.category !== "trigger" && incoming === 0 && (
+      {node.data.category !== "start" && incoming.length === 0 && (
         <Alert>
           <AlertTriangleIcon />
           <AlertDescription>
-            This step has no incoming connection and will not run.
+            Nothing leads to this step, so the process never reaches it.
           </AlertDescription>
         </Alert>
       )}
       <p className="text-xs text-muted-foreground">
-        Demo workflow · Last run values are sample data.
+        Demo process · Durations are recorded sample values.
       </p>
     </div>
   );

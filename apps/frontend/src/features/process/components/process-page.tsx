@@ -1,6 +1,13 @@
 "use client";
 
-import { useReducer, useRef, useState, type KeyboardEvent } from "react";
+import {
+  useEffect,
+  useMemo,
+  useReducer,
+  useRef,
+  useState,
+  type KeyboardEvent,
+} from "react";
 import {
   addEdge,
   applyEdgeChanges,
@@ -19,7 +26,6 @@ import {
   type NodeChange,
 } from "@xyflow/react";
 import {
-  CheckIcon,
   ChevronRightIcon,
   HandIcon,
   KeyboardIcon,
@@ -28,8 +34,12 @@ import {
   MinusIcon,
   MoreHorizontalIcon,
   MousePointer2Icon,
+  PauseIcon,
+  PlayIcon,
   PlusIcon,
   Redo2Icon,
+  RotateCcwIcon,
+  SkipForwardIcon,
   Undo2Icon,
   UnlockIcon,
 } from "lucide-react";
@@ -63,14 +73,16 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { toast } from "@/components/ui/toast";
+import { cn } from "@/lib/utils";
 import { initialProcess } from "@/mocks/process.mock";
 import {
   canConnect,
   graphReducer,
   removeStep,
-  serializeGraph,
+  simulateRun,
+  stageOrder,
 } from "../utils/process";
-import type { Graph, StepNode } from "../types/process";
+import type { Graph, RunResult, StepNode } from "../types/process";
 import { ProcessActions, ProcessStep } from "./process-step";
 import { StepInspector } from "./step-inspector";
 import "@xyflow/react/dist/style.css";
@@ -78,6 +90,8 @@ import "./process.css";
 
 const nodeTypes = { step: ProcessStep };
 const defaultEdgeOptions = { type: "smoothstep", interactionWidth: 20 };
+/** Time the replay dwells on each step. */
+const STEP_MS = 1100;
 
 export function ProcessPage() {
   return (
@@ -94,8 +108,11 @@ function ProcessCanvas() {
     future: [],
   });
   const graph = history.present;
-  const [saved, setSaved] = useState(() => serializeGraph(initialProcess));
-  const [updated, setUpdated] = useState(false);
+  // Replay: `cursor` is how many entries of the recorded run have been reached.
+  const run = useMemo(() => simulateRun(graph), [graph]);
+  const stages = useMemo(() => stageOrder(graph), [graph]);
+  const [cursor, setCursor] = useState(0);
+  const [playing, setPlaying] = useState(false);
   const [inspector, setInspector] = useState<{
     id: string;
     editing: boolean;
@@ -114,19 +131,74 @@ function ProcessCanvas() {
     useReactFlow<StepNode>();
   const { zoom } = useViewport();
   const canvas = useRef<HTMLDivElement>(null);
-  const dirty = saved !== serializeGraph(graph);
-  const inspectedNode = graph.nodes.find((node) => node.id === inspector?.id);
+
+  const finished = cursor >= run.length;
+  const running = playing && !finished;
+  const reached = run.slice(0, cursor);
+  const current = cursor > 0 ? reached[cursor - 1] : undefined;
+  const failedAt = reached.find((entry) => entry.result.status === "Failed");
+
+  // Advance the replay while playing; `running` is false once the end is reached.
+  useEffect(() => {
+    if (!running) return;
+    const timer = window.setTimeout(() => setCursor((value) => value + 1), STEP_MS);
+    return () => window.clearTimeout(timer);
+  }, [running, cursor]);
+
+  // Replay results overlay node data at render time so undo history stays clean.
+  const results: Record<string, RunResult> = {};
+  reached.forEach((entry, index) => {
+    const isCurrent = index === cursor - 1 && running;
+    results[entry.id] = isCurrent
+      ? { status: "Active", duration: entry.result.duration }
+      : entry.result;
+  });
+  const nodes = graph.nodes.map((node) => {
+    const result = results[node.id];
+    return result ? { ...node, data: { ...node.data, ...result } } : node;
+  });
+  const takenEdges = new Set(
+    reached.filter((entry) => entry.result.status !== "Skipped" && entry.via).map((entry) => entry.via!),
+  );
+  const edges = graph.edges.map((edge) => ({
+    ...edge,
+    animated: takenEdges.has(edge.id) && !finished,
+    className: cn(takenEdges.has(edge.id) && "process-edge-taken"),
+  }));
+  const inspectedNode = nodes.find((node) => node.id === inspector?.id);
+
+  function resetRun() {
+    setPlaying(false);
+    setCursor(0);
+  }
 
   function commit(next: Graph) {
-    if (!locked) dispatch({ type: "commit", graph: next });
+    if (locked || running) return;
+    resetRun();
+    dispatch({ type: "commit", graph: next });
   }
 
   function openInspector(id: string, editing = false) {
     setInspector({ id, editing });
   }
 
+  function togglePlay() {
+    if (finished) {
+      setCursor(0);
+      setPlaying(true);
+      return;
+    }
+    setPlaying(!running);
+  }
+
+  function stepForward() {
+    if (finished) return;
+    setPlaying(false);
+    setCursor((value) => value + 1);
+  }
+
   function addStep(afterId?: string) {
-    if (locked) return;
+    if (locked || running) return;
     const source = graph.nodes.find((node) => node.id === afterId);
     const rect = canvas.current?.getBoundingClientRect();
     const position = source
@@ -140,17 +212,18 @@ function ProcessCanvas() {
       type: "step",
       position,
       data: {
-        title: "New action",
-        detail: "Configure this step",
-        category: "action",
-        owner: "Ines Marchetti",
-        status: "Idle",
-        duration: "Not run",
-        icon: "deal",
+        title: "New step",
+        detail: "Describe what happens here",
+        category: "task",
+        stage: source?.data.stage ?? stages[0] ?? "Order",
+        owner: source?.data.owner ?? "Order desk",
+        status: "Pending",
+        duration: "1m",
+        icon: "packing",
       },
     };
     const sourceHandle =
-      source?.data.category === "condition" ? "yes" : undefined;
+      source?.data.category === "decision" ? "yes" : undefined;
     const edges = source
       ? [
           ...graph.edges,
@@ -176,7 +249,7 @@ function ProcessCanvas() {
 
   function duplicate(id: string) {
     const source = graph.nodes.find((node) => node.id === id);
-    if (!source || locked) return;
+    if (!source || locked || running) return;
     const node: StepNode = {
       ...source,
       id: crypto.randomUUID(),
@@ -185,8 +258,7 @@ function ProcessCanvas() {
       data: {
         ...source.data,
         title: `${source.data.title} (copy)`,
-        status: "Idle",
-        duration: "Not run",
+        status: "Pending",
       },
     };
     commit({
@@ -197,17 +269,6 @@ function ProcessCanvas() {
       ],
     });
     openInspector(node.id, true);
-  }
-
-  function updateWorkflow() {
-    setSaved(serializeGraph(graph));
-    setUpdated(true);
-    toast.add({
-      title: "Workflow updated",
-      description:
-        "Demo changes are kept for this page session. No automation is executed.",
-      type: "success",
-    });
   }
 
   function onNodesChange(changes: NodeChange<StepNode>[]) {
@@ -229,55 +290,68 @@ function ProcessCanvas() {
     else dispatch({ type: "preview", graph: next });
   }
 
+  function edgeLabel(connection: Connection) {
+    return connection.sourceHandle === "yes"
+      ? "Yes"
+      : connection.sourceHandle === "no"
+        ? "No"
+        : undefined;
+  }
+
   function connect(connection: Connection) {
     if (!canConnect(graph, connection)) return;
-    const label =
-      connection.sourceHandle === "yes"
-        ? "Yes"
-        : connection.sourceHandle === "no"
-          ? "No"
-          : undefined;
     commit({
       ...graph,
-      edges: addEdge({ ...connection, type: "smoothstep", label }, graph.edges),
+      edges: addEdge(
+        { ...connection, type: "smoothstep", label: edgeLabel(connection) },
+        graph.edges,
+      ),
     });
   }
 
   function onReconnect(edge: Edge, connection: Connection) {
     const otherEdges = graph.edges.filter((item) => item.id !== edge.id);
     if (!canConnect({ ...graph, edges: otherEdges }, connection)) return;
-    const label =
-      connection.sourceHandle === "yes"
-        ? "Yes"
-        : connection.sourceHandle === "no"
-          ? "No"
-          : undefined;
     commit({
       ...graph,
-      edges: reconnectEdge({ ...edge, label }, connection, graph.edges),
+      edges: reconnectEdge(
+        { ...edge, label: edgeLabel(connection) },
+        connection,
+        graph.edges,
+      ),
     });
   }
 
   function onKeyDown(event: KeyboardEvent<HTMLDivElement>) {
     if (
       (event.target as HTMLElement).closest(
-        "input, textarea, select, [contenteditable=true], [role=dialog]",
+        "input, textarea, select, button, [contenteditable=true], [role=dialog]",
       )
     )
       return;
     const modifier = event.metaKey || event.ctrlKey;
     if (modifier && event.key.toLowerCase() === "z") {
       event.preventDefault();
-      if (!locked) dispatch({ type: event.shiftKey ? "redo" : "undo" });
-    } else if (modifier && event.key.toLowerCase() === "s") {
+      if (!locked && !running) {
+        resetRun();
+        dispatch({ type: event.shiftKey ? "redo" : "undo" });
+      }
+    } else if (event.key === " ") {
       event.preventDefault();
-      if (dirty && !locked) updateWorkflow();
+      togglePlay();
+    } else if (event.key === "ArrowRight" && !event.shiftKey) {
+      event.preventDefault();
+      stepForward();
     } else if (event.key === "Escape") setInspector(null);
     else if (!modifier && event.key.toLowerCase() === "v") setTool("select");
     else if (!modifier && event.key.toLowerCase() === "h") setTool("pan");
     else if (!modifier && event.key.toLowerCase() === "f")
       void fitView({ padding: 0.2 });
-    else if (!locked && (event.key === "Delete" || event.key === "Backspace")) {
+    else if (
+      !locked &&
+      !running &&
+      (event.key === "Delete" || event.key === "Backspace")
+    ) {
       const node = graph.nodes.find((item) => item.selected);
       const edge = graph.edges.find((item) => item.selected);
       if (node || edge) {
@@ -289,6 +363,14 @@ function ProcessCanvas() {
     }
   }
 
+  const progressLabel = finished
+    ? failedAt
+      ? `Stopped at “${graph.nodes.find((node) => node.id === failedAt.id)?.data.title}”`
+      : "Reached the end"
+    : current
+      ? `${cursor} of ${run.length} · ${graph.nodes.find((node) => node.id === current.id)?.data.title}`
+      : "Press Play to follow the order from start to finish";
+
   return (
     <div
       className="process flex h-[calc(100svh-4rem)] min-h-128 min-w-0 flex-col overflow-hidden bg-background"
@@ -298,18 +380,14 @@ function ProcessCanvas() {
         <div className="flex items-center gap-2 text-sm">
           <span className="text-muted-foreground">Process</span>
           <ChevronRightIcon className="size-4 text-muted-foreground" />
-          <h1 className="font-semibold">Lead Routing</h1>
+          <h1 className="font-semibold">Order to Delivery</h1>
         </div>
         <Separator orientation="vertical" className="hidden h-5! lg:block" />
         <p className="hidden text-xs text-muted-foreground lg:block">
-          {graph.nodes.length} steps, {graph.edges.length} connections
+          {graph.nodes.length} steps, {graph.edges.length} connections, {stages.length} stages
         </p>
-        <p className="hidden text-xs text-muted-foreground xl:block">
-          {dirty
-            ? "Unsaved changes"
-            : updated
-              ? "Updated just now"
-              : "Edited 2h ago by Ines Marchetti"}
+        <p className="hidden text-xs text-muted-foreground xl:block" role="status">
+          {progressLabel}
         </p>
         <div className="ml-auto flex items-center gap-2">
           <Button
@@ -321,13 +399,37 @@ function ProcessCanvas() {
           >
             <KeyboardIcon />
           </Button>
-          <Button variant="outline" disabled={locked} onClick={() => addStep()}>
+          <Button
+            variant="outline"
+            disabled={locked || running}
+            onClick={() => addStep()}
+          >
             <PlusIcon data-icon="inline-start" />
             Add step
           </Button>
-          <Button disabled={!dirty || locked} onClick={updateWorkflow}>
-            <CheckIcon data-icon="inline-start" />
-            Update
+          <Button onClick={togglePlay} aria-pressed={running}>
+            {running ? <PauseIcon data-icon="inline-start" /> : <PlayIcon data-icon="inline-start" />}
+            {running ? "Pause" : finished ? "Replay" : cursor > 0 ? "Resume" : "Play process"}
+          </Button>
+          <Button
+            variant="outline"
+            size="icon"
+            aria-label="Next step"
+            title="Next step (→)"
+            disabled={finished}
+            onClick={stepForward}
+          >
+            <SkipForwardIcon />
+          </Button>
+          <Button
+            variant="outline"
+            size="icon"
+            aria-label="Reset run"
+            title="Reset run"
+            disabled={cursor === 0}
+            onClick={resetRun}
+          >
+            <RotateCcwIcon />
           </Button>
           <DropdownMenu>
             <DropdownMenuTrigger
@@ -335,7 +437,7 @@ function ProcessCanvas() {
                 <Button
                   variant="ghost"
                   size="icon"
-                  aria-label="Workflow actions"
+                  aria-label="Process actions"
                 />
               }
             >
@@ -371,7 +473,7 @@ function ProcessCanvas() {
               <DropdownMenuSeparator />
               <DropdownMenuGroup>
                 <DropdownMenuItem
-                  disabled={locked}
+                  disabled={locked || running}
                   onClick={() => {
                     commit({
                       ...graph,
@@ -388,14 +490,82 @@ function ProcessCanvas() {
                 >
                   Reset layout
                 </DropdownMenuItem>
+                <DropdownMenuItem
+                  disabled={locked || running}
+                  onClick={() => {
+                    commit(initialProcess);
+                    setInspector(null);
+                    toast.add({ title: "Sample process restored", type: "info" });
+                  }}
+                >
+                  Reset demo
+                </DropdownMenuItem>
               </DropdownMenuGroup>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
       </header>
+
+      {/* Stage strip: where the order is on its way from start to finish. */}
+      <ol
+        className="flex shrink-0 items-stretch gap-1 overflow-x-auto border-b bg-muted/30 px-4 py-2"
+        aria-label="Process stages"
+      >
+        {stages.map((stage, index) => {
+          const stageIds = graph.nodes.filter((node) => node.data.stage === stage).map((node) => node.id);
+          const stageEntries = reached.filter((entry) => stageIds.includes(entry.id));
+          const reachedCount = stageEntries.filter((entry) => entry.result.status !== "Skipped").length;
+          const total = run.filter((entry) => stageIds.includes(entry.id) && entry.result.status !== "Skipped").length;
+          const active = current ? stageIds.includes(current.id) && !finished : false;
+          const failed = stageEntries.some((entry) => entry.result.status === "Failed");
+          const done = total > 0 && reachedCount >= total && !active && !failed;
+          return (
+            <li
+              key={stage}
+              className={cn(
+                "flex min-w-32 flex-1 flex-col gap-1 rounded-md border px-3 py-1.5 text-xs transition-colors",
+                active && "border-primary bg-primary/5",
+                done && "border-emerald-500/40 bg-emerald-500/5",
+                failed && "border-destructive/50 bg-destructive/5",
+                !active && !done && !failed && "border-border",
+              )}
+              aria-current={active ? "step" : undefined}
+            >
+              <div className="flex items-center gap-1.5">
+                <span
+                  className={cn(
+                    "flex size-4 items-center justify-center rounded-full text-[10px] font-semibold",
+                    active && "bg-primary text-primary-foreground",
+                    done && "bg-emerald-600 text-white",
+                    failed && "bg-destructive text-white",
+                    !active && !done && !failed && "bg-muted text-muted-foreground",
+                  )}
+                >
+                  {index + 1}
+                </span>
+                <span className="font-medium">{stage}</span>
+                <span className="ml-auto tabular-nums text-muted-foreground">
+                  {reachedCount}/{total}
+                </span>
+              </div>
+              <div className="h-1 overflow-hidden rounded-full bg-muted">
+                <div
+                  className={cn(
+                    "h-full transition-[width] duration-500",
+                    failed ? "bg-destructive" : done ? "bg-emerald-600" : "bg-primary",
+                  )}
+                  style={{ width: `${total ? (reachedCount / total) * 100 : 0}%` }}
+                />
+              </div>
+            </li>
+          );
+        })}
+      </ol>
+
       <ProcessActions.Provider
         value={{
           locked,
+          running,
           view: (id) => openInspector(id),
           edit: (id) => openInspector(id, true),
           add: addStep,
@@ -406,11 +576,11 @@ function ProcessCanvas() {
         <div
           ref={canvas}
           className="relative min-h-0 flex-1"
-          aria-label="Workflow editor"
+          aria-label="Process editor"
         >
           <ReactFlow<StepNode>
-            nodes={graph.nodes}
-            edges={graph.edges}
+            nodes={nodes}
+            edges={edges}
             nodeTypes={nodeTypes}
             defaultEdgeOptions={defaultEdgeOptions}
             onNodesChange={onNodesChange}
@@ -460,9 +630,9 @@ function ProcessCanvas() {
               });
               dragBefore.current = null;
             }}
-            nodesDraggable={!locked}
-            nodesConnectable={!locked}
-            edgesReconnectable={!locked}
+            nodesDraggable={!locked && !running}
+            nodesConnectable={!locked && !running}
+            edgesReconnectable={!locked && !running}
             deleteKeyCode={null}
             panOnDrag={tool === "pan" ? true : [1, 2]}
             selectionOnDrag={tool === "select"}
@@ -547,8 +717,11 @@ function ProcessCanvas() {
                   size="icon-sm"
                   aria-label="Undo"
                   title="Undo"
-                  disabled={locked || !history.past.length}
-                  onClick={() => dispatch({ type: "undo" })}
+                  disabled={locked || running || !history.past.length}
+                  onClick={() => {
+                    resetRun();
+                    dispatch({ type: "undo" });
+                  }}
                 >
                   <Undo2Icon />
                 </Button>
@@ -557,8 +730,11 @@ function ProcessCanvas() {
                   size="icon-sm"
                   aria-label="Redo"
                   title="Redo"
-                  disabled={locked || !history.future.length}
-                  onClick={() => dispatch({ type: "redo" })}
+                  disabled={locked || running || !history.future.length}
+                  onClick={() => {
+                    resetRun();
+                    dispatch({ type: "redo" });
+                  }}
                 >
                   <Redo2Icon />
                 </Button>
@@ -580,8 +756,14 @@ function ProcessCanvas() {
               key={`${inspectedNode.id}-${inspector.editing}`}
               node={inspectedNode}
               graph={graph}
+              order={(() => {
+                const index = run.findIndex(
+                  (entry) => entry.id === inspectedNode.id && entry.result.status !== "Skipped",
+                );
+                return index >= 0 ? index + 1 : undefined;
+              })()}
               editing={inspector.editing}
-              locked={locked}
+              locked={locked || running}
               onEdit={() => openInspector(inspectedNode.id, true)}
               onClose={() => setInspector(null)}
               onSave={(data) => {
@@ -598,7 +780,11 @@ function ProcessCanvas() {
         </div>
       </ProcessActions.Provider>
       <footer className="flex flex-wrap justify-between gap-1 border-t px-4 py-2 text-[11px] text-muted-foreground">
-        <span>Demo workflow · Changes reset when you leave or reload.</span>
+        <span>
+          Demo process · Play replays one recorded order through every step;
+          decisions take their “Yes” branch and a failed step stops the run.
+          Changes reset when you leave or reload.
+        </span>
         <span>Double-click a step to inspect · Right-click for actions</span>
       </footer>
       <AlertDialog
@@ -623,7 +809,7 @@ function ProcessCanvas() {
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction
               variant="destructive"
-              disabled={locked}
+              disabled={locked || running}
               onClick={() => {
                 if (!deletion) return;
                 commit(
@@ -650,14 +836,16 @@ function ProcessCanvas() {
           <DialogHeader>
             <DialogTitle>Keyboard shortcuts</DialogTitle>
             <DialogDescription>
-              Use these while the workflow canvas is focused.
+              Use these while the process canvas is focused.
             </DialogDescription>
           </DialogHeader>
           <dl className="grid grid-cols-2 gap-3 text-sm">
+            <dt>Play / Pause</dt>
+            <dd>Space</dd>
+            <dt>Next step</dt>
+            <dd>→</dd>
             <dt>Undo / Redo</dt>
             <dd>⌘ / Ctrl + Z / Shift + Z</dd>
-            <dt>Update workflow</dt>
-            <dd>⌘ / Ctrl + S</dd>
             <dt>Select / Pan</dt>
             <dd>V / H</dd>
             <dt>Fit to view</dt>

@@ -3,23 +3,28 @@
 import { createContext, useContext } from "react";
 import { Handle, NodeToolbar, Position, type NodeProps } from "@xyflow/react";
 import {
-  BriefcaseBusinessIcon,
   CheckIcon,
-  CircleIcon,
+  CircleDashedIcon,
   CopyIcon,
   EyeIcon,
+  FlagIcon,
   GitBranchIcon,
+  LoaderCircleIcon,
   MessageSquareIcon,
+  PackageCheckIcon,
   PencilIcon,
   PlusIcon,
-  SearchIcon,
+  ShoppingCartIcon,
   SkipForwardIcon,
+  SnowflakeIcon,
   Trash2Icon,
-  WebhookIcon,
+  TriangleAlertIcon,
+  TruckIcon,
+  WalletIcon,
+  PackageOpenIcon,
   XIcon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -30,10 +35,11 @@ import {
   ContextMenuSeparator,
   ContextMenuTrigger,
 } from "@/components/ui/context-menu";
-import type { StepData, StepNode } from "../types/process";
+import type { StepData, StepIcon, StepNode } from "../types/process";
 
 export const ProcessActions = createContext<{
   locked: boolean;
+  running: boolean;
   view: (id: string) => void;
   edit: (id: string) => void;
   add: (id?: string) => void;
@@ -41,24 +47,59 @@ export const ProcessActions = createContext<{
   remove: (id: string) => void;
 } | null>(null);
 
-export const stepIcons = {
-  webhook: WebhookIcon,
+export const stepIcons: Record<StepIcon, typeof CheckIcon> = {
+  order: ShoppingCartIcon,
+  payment: WalletIcon,
   branch: GitBranchIcon,
-  search: SearchIcon,
+  picking: PackageOpenIcon,
+  packing: PackageCheckIcon,
+  snowflake: SnowflakeIcon,
+  truck: TruckIcon,
+  check: FlagIcon,
+  alert: TriangleAlertIcon,
   message: MessageSquareIcon,
-  deal: BriefcaseBusinessIcon,
+};
+
+export const stepIconLabels: Record<StepIcon, string> = {
+  order: "Order",
+  payment: "Payment",
+  branch: "Decision",
+  picking: "Picking",
+  packing: "Packing",
+  snowflake: "Cold chain",
+  truck: "Delivery",
+  check: "Finish",
+  alert: "Exception",
+  message: "Contact",
+};
+
+export const categoryLabels: Record<StepData["category"], string> = {
+  start: "Start",
+  task: "Task",
+  decision: "Decision",
+  end: "End",
 };
 
 export function StepStatus({ status }: { status: StepData["status"] }) {
   const Icon = {
-    Success: CheckIcon,
+    Done: CheckIcon,
     Failed: XIcon,
     Skipped: SkipForwardIcon,
-    Idle: CircleIcon,
+    Pending: CircleDashedIcon,
+    Active: LoaderCircleIcon,
   }[status];
   return (
-    <Badge variant={status === "Failed" ? "destructive" : "secondary"}>
-      <Icon aria-hidden="true" />
+    <Badge
+      variant={status === "Failed" ? "destructive" : "secondary"}
+      className={cn(
+        status === "Done" && "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300",
+        status === "Active" && "bg-primary/15 text-primary-text",
+      )}
+    >
+      <Icon
+        aria-hidden="true"
+        className={cn(status === "Active" && "animate-spin")}
+      />
       {status}
     </Badge>
   );
@@ -67,6 +108,8 @@ export function StepStatus({ status }: { status: StepData["status"] }) {
 export function ProcessStep({ id, data, selected }: NodeProps<StepNode>) {
   const actions = useContext(ProcessActions)!;
   const Icon = stepIcons[data.icon];
+  const disabled = actions.locked || actions.running;
+  const terminal = data.category === "start" || data.category === "end";
   return (
     <>
       <NodeToolbar
@@ -88,7 +131,7 @@ export function ProcessStep({ id, data, selected }: NodeProps<StepNode>) {
           size="icon-sm"
           aria-label="Edit step"
           title="Edit step"
-          disabled={actions.locked}
+          disabled={disabled}
           onClick={() => actions.edit(id)}
         >
           <PencilIcon />
@@ -98,7 +141,7 @@ export function ProcessStep({ id, data, selected }: NodeProps<StepNode>) {
           size="icon-sm"
           aria-label="Add step after"
           title="Add step after"
-          disabled={actions.locked}
+          disabled={disabled || data.category === "end"}
           onClick={() => actions.add(id)}
         >
           <PlusIcon />
@@ -108,7 +151,7 @@ export function ProcessStep({ id, data, selected }: NodeProps<StepNode>) {
           size="icon-sm"
           aria-label="Duplicate step"
           title="Duplicate step"
-          disabled={actions.locked}
+          disabled={disabled || terminal}
           onClick={() => actions.duplicate(id)}
         >
           <CopyIcon />
@@ -118,7 +161,7 @@ export function ProcessStep({ id, data, selected }: NodeProps<StepNode>) {
           size="icon-sm"
           aria-label="Delete step"
           title="Delete step"
-          disabled={actions.locked}
+          disabled={disabled || data.category === "start"}
           onClick={() => actions.remove(id)}
         >
           <Trash2Icon />
@@ -128,19 +171,26 @@ export function ProcessStep({ id, data, selected }: NodeProps<StepNode>) {
         <ContextMenuTrigger>
           <div
             className={cn(
-              "w-60 rounded-lg border bg-card p-2 text-card-foreground shadow-xs",
+              "w-60 rounded-lg border bg-card p-2 text-card-foreground shadow-xs transition-[box-shadow,opacity]",
               selected && "border-primary ring-2 ring-primary/20",
+              data.status === "Active" && "border-primary shadow-md shadow-primary/20",
+              data.status === "Done" && "border-emerald-500/50",
+              data.status === "Failed" && "border-destructive/60",
+              data.status === "Skipped" && "opacity-55",
+              terminal && "rounded-full px-3",
             )}
           >
-            {data.category !== "trigger" && (
+            {data.category !== "start" && (
               <Handle type="target" position={Position.Left} />
             )}
             <div className="flex items-center gap-2">
               <span
                 className={cn(
                   "flex size-8 shrink-0 items-center justify-center rounded-md border",
-                  data.category === "trigger" &&
-                    "border-primary bg-primary text-primary-foreground",
+                  data.category === "start" && "border-primary bg-primary text-primary-foreground",
+                  data.category === "end" && "border-emerald-600 bg-emerald-600 text-white",
+                  data.category === "decision" && "border-amber-500/50 bg-amber-500/15 text-amber-700 dark:text-amber-300",
+                  terminal && "rounded-full",
                 )}
               >
                 <Icon className="size-4" aria-hidden="true" />
@@ -153,20 +203,14 @@ export function ProcessStep({ id, data, selected }: NodeProps<StepNode>) {
               </div>
             </div>
             <div className="mt-2 flex items-center justify-between gap-2 border-t pt-2">
-              <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground">
-                <Avatar className="size-4" title={data.owner}>
-                  <AvatarFallback>
-                    {data.owner
-                      .split(" ")
-                      .map((part) => part[0])
-                      .join("")}
-                  </AvatarFallback>
-                </Avatar>
-                <span>{data.duration}</span>
+              <div className="flex min-w-0 items-center gap-1.5 text-[10px] text-muted-foreground">
+                <span className="truncate">{data.owner}</span>
+                <span aria-hidden="true">·</span>
+                <span className="shrink-0 tabular-nums">{data.duration}</span>
               </div>
               <StepStatus status={data.status} />
             </div>
-            {data.category === "condition" ? (
+            {data.category === "decision" ? (
               <>
                 <Handle
                   id="yes"
@@ -182,7 +226,9 @@ export function ProcessStep({ id, data, selected }: NodeProps<StepNode>) {
                 />
               </>
             ) : (
-              <Handle type="source" position={Position.Right} />
+              data.category !== "end" && (
+                <Handle type="source" position={Position.Right} />
+              )
             )}
           </div>
         </ContextMenuTrigger>
@@ -193,21 +239,21 @@ export function ProcessStep({ id, data, selected }: NodeProps<StepNode>) {
               View step
             </ContextMenuItem>
             <ContextMenuItem
-              disabled={actions.locked}
+              disabled={disabled}
               onClick={() => actions.edit(id)}
             >
               <PencilIcon />
               Edit step
             </ContextMenuItem>
             <ContextMenuItem
-              disabled={actions.locked}
+              disabled={disabled || data.category === "end"}
               onClick={() => actions.add(id)}
             >
               <PlusIcon />
               Add step after
             </ContextMenuItem>
             <ContextMenuItem
-              disabled={actions.locked}
+              disabled={disabled || terminal}
               onClick={() => actions.duplicate(id)}
             >
               <CopyIcon />
@@ -218,7 +264,7 @@ export function ProcessStep({ id, data, selected }: NodeProps<StepNode>) {
           <ContextMenuGroup>
             <ContextMenuItem
               variant="destructive"
-              disabled={actions.locked}
+              disabled={disabled || data.category === "start"}
               onClick={() => actions.remove(id)}
             >
               <Trash2Icon />

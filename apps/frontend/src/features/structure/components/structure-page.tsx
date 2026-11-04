@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { graphlib, layout } from "@dagrejs/dagre";
 import {
   Background,
@@ -22,10 +22,9 @@ import {
   MinusIcon,
   MoreHorizontalIcon,
   MousePointer2Icon,
-  PlayIcon,
   PlusIcon,
   RotateCcwIcon,
-  SparklesIcon,
+  UserRoundPlusIcon,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -45,14 +44,6 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
   Sheet,
   SheetContent,
   SheetHeader,
@@ -61,193 +52,154 @@ import {
 } from "@/components/ui/sheet";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { toast } from "@/components/ui/toast";
-import { structureSteps } from "@/mocks/structure.mock";
-import { insertStep, removeStep, simulateRun } from "../utils/structure";
-import type { StructureStep, RunResult } from "../types/structure";
+import { structureEmployees } from "@/mocks/structure.mock";
 import {
-  StructureNode,
-  StructureEdge,
-  type StepNode,
-  type StepEdge,
+  directReports,
+  insertEmployee,
+  removeEmployee,
+  reportingLine,
+  totalReports,
+} from "../utils/structure";
+import type { Employee } from "../types/structure";
+import {
+  EmployeeCard,
+  ReportingLine,
+  type EmployeeNode,
+  type ReportingEdge,
 } from "./structure-elements";
-import { StepInspector } from "./step-inspector";
+import { EmployeeInspector } from "./employee-inspector";
 
-const nodeTypes = { step: StructureNode };
-const edgeTypes = { step: StructureEdge };
-const notRun: RunResult = { status: "Not run", detail: "No test run yet" };
-const models = ["Claude Sonnet 5", "Claude Opus 4.6", "Claude Haiku 4.5"];
+const nodeTypes = { employee: EmployeeCard };
+const edgeTypes = { reporting: ReportingLine };
 
-function layoutSteps(steps: StructureStep[]): Record<string, XYPosition> {
+function layoutTree(employees: Employee[]): Record<string, XYPosition> {
   const graph = new graphlib.Graph()
-    .setGraph({ rankdir: "TB", nodesep: 72, ranksep: 72 })
+    .setGraph({ rankdir: "TB", nodesep: 48, ranksep: 72 })
     .setDefaultEdgeLabel(() => ({}));
-  steps.forEach((step) => graph.setNode(step.id, { width: 280, height: 92 }));
-  steps.forEach((step) => {
-    if (step.parent) graph.setEdge(step.parent, step.id);
+  employees.forEach((employee) =>
+    graph.setNode(employee.id, { width: 280, height: 92 }),
+  );
+  employees.forEach((employee) => {
+    if (employee.parent) graph.setEdge(employee.parent, employee.id);
   });
   layout(graph);
   return Object.fromEntries(
-    steps.map((step) => {
-      const node = graph.node(step.id);
-      return [step.id, { x: node.x - 140, y: node.y - 46 }];
+    employees.map((employee) => {
+      const node = graph.node(employee.id);
+      return [employee.id, { x: node.x - 140, y: node.y - 46 }];
     }),
   );
 }
 
 function StructureEditor() {
-  const [steps, setSteps] = useState(structureSteps);
-  const [results, setResults] = useState(() => simulateRun(structureSteps));
+  const [employees, setEmployees] = useState(structureEmployees);
   const [positions, setPositions] = useState<Record<string, XYPosition>>({});
   const [selectedId, setSelectedId] = useState<string>();
   const [editRequested, setEditRequested] = useState(false);
-  const [model, setModel] = useState(models[0]!);
-  const [running, setRunning] = useState(false);
   const [pan, setPan] = useState(true);
   const [help, setHelp] = useState(false);
   const [confirm, setConfirm] = useState<
     { type: "delete"; id: string } | { type: "reset" }
   >();
   const [compact, setCompact] = useState(false);
-  const timer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
-  const { fitView, zoomIn, zoomOut } = useReactFlow<StepNode, StepEdge>();
+  const { fitView, zoomIn, zoomOut } = useReactFlow<EmployeeNode, ReportingEdge>();
   const viewport = useViewport();
-  const automaticPositions = useMemo(() => layoutSteps(steps), [steps]);
-  const selected = steps.find((step) => step.id === selectedId);
+  const automaticPositions = useMemo(() => layoutTree(employees), [employees]);
+  const selected = employees.find((employee) => employee.id === selectedId);
+  const departmentCount = new Set(employees.map((employee) => employee.department)).size;
 
   useEffect(() => {
     const query = window.matchMedia("(max-width: 1023px)");
     const update = () => setCompact(query.matches);
     update();
     query.addEventListener("change", update);
-    return () => {
-      query.removeEventListener("change", update);
-      clearTimeout(timer.current);
-    };
+    return () => query.removeEventListener("change", update);
   }, []);
 
-  function changeSteps(next: StructureStep[]) {
-    setSteps(next);
-    setResults({});
+  function changeEmployees(next: Employee[]) {
+    setEmployees(next);
     setPositions({});
   }
-  function addStep(parent?: string, target?: string) {
-    if (running) return;
-    const id = `step_${crypto.randomUUID().slice(0, 8)}`;
-    const attachTo =
-      parent ??
-      selectedId ??
-      steps.find((step) => !steps.some((child) => child.parent === step.id))
-        ?.id;
+  function addEmployee(parent?: string, target?: string) {
+    const id = `emp_${crypto.randomUUID().slice(0, 8)}`;
+    const attachTo = parent ?? selectedId ?? employees.find((employee) => !employee.parent)?.id;
     if (!attachTo) return;
-    changeSteps(insertStep(steps, id, attachTo, target));
+    changeEmployees(insertEmployee(employees, id, attachTo, target));
+    setEditRequested(true);
     setSelectedId(id);
     toast.add({
-      title: "Step added",
-      description: "Configure the new step in the details panel.",
+      title: "Position added",
+      description: "Fill in the employee in the details panel.",
       type: "success",
     });
   }
-  const nodes: StepNode[] = steps.map((step) => ({
-    id: step.id,
-    type: "step",
+  const nodes: EmployeeNode[] = employees.map((employee) => ({
+    id: employee.id,
+    type: "employee",
     width: 280,
     height: 90,
-    position: positions[step.id] ?? automaticPositions[step.id]!,
-    selected: step.id === selectedId,
+    position: positions[employee.id] ?? automaticPositions[employee.id]!,
+    selected: employee.id === selectedId,
     data: {
-      step,
-      result: results[step.id] ?? notRun,
-      leaf: !steps.some((child) => child.parent === step.id),
-      running,
+      employee,
+      reports: {
+        direct: directReports(employees, employee.id).length,
+        total: totalReports(employees, employee.id),
+      },
+      leaf: !employees.some((report) => report.parent === employee.id),
       edit: () => {
         setEditRequested(true);
-        setSelectedId(step.id);
+        setSelectedId(employee.id);
       },
-      add: () => addStep(step.id),
-      remove: () => setConfirm({ type: "delete", id: step.id }),
+      add: () => addEmployee(employee.id),
+      remove: () => setConfirm({ type: "delete", id: employee.id }),
     },
   }));
-  const edges: StepEdge[] = steps
-    .filter((step) => step.parent)
-    .map((step) => ({
-      id: `${step.parent}-${step.id}`,
-      source: step.parent!,
-      target: step.id,
-      type: "step",
-      label: step.branch,
-      data: { add: () => addStep(step.parent, step.id), running },
+  const edges: ReportingEdge[] = employees
+    .filter((employee) => employee.parent)
+    .map((employee) => ({
+      id: `${employee.parent}-${employee.id}`,
+      source: employee.parent!,
+      target: employee.id,
+      type: "reporting",
+      data: { add: () => addEmployee(employee.parent, employee.id) },
     }));
 
-  function runTest() {
-    if (running) return;
-    setRunning(true);
-    setResults({});
-    const outcomes = simulateRun(steps);
-    const entries = Object.entries(outcomes);
-    let index = 0;
-    function tick() {
-      const current = entries[index++];
-      if (!current) {
-        setRunning(false);
-        const counts = ["Passed", "Failed", "Skipped"].map(
-          (status) =>
-            `${entries.filter(([, value]) => value.status === status).length} ${status.toLowerCase()}`,
-        );
-        toast.add({
-          title: "Demo test complete",
-          description: counts.join(", "),
-          type: "info",
-        });
-        return;
-      }
-      const [id, result] = current;
-      setResults((previous) => ({
-        ...previous,
-        [id]: { status: "Running", detail: "Testing step…" },
-      }));
-      timer.current = setTimeout(
-        () => {
-          setResults((previous) => ({ ...previous, [id]: result }));
-          tick();
-        },
-        result.status === "Skipped" ? 80 : 450,
-      );
-    }
-    tick();
-  }
   async function copyJson() {
     try {
       await navigator.clipboard.writeText(
-        JSON.stringify(
-          { name: "Collections Agent", model, steps, results },
-          null,
-          2,
-        ),
+        JSON.stringify({ name: "Heron Run", employees }, null, 2),
       );
-      toast.add({ title: "Flow copied as JSON", type: "success" });
+      toast.add({ title: "Organisation copied as JSON", type: "success" });
     } catch {
       toast.add({
-        title: "Could not copy the flow",
+        title: "Could not copy the organisation",
         description: "Allow clipboard access and try again.",
         type: "error",
       });
     }
   }
   const inspector = selected && (
-    <StepInspector
-      key={`${selected.id}-${editRequested}-${selected.title}-${selected.detail}-${selected.app}`}
-      step={selected}
-      result={results[selected.id] ?? notRun}
-      nextCount={steps.filter((step) => step.parent === selected.id).length}
-      running={running}
+    <EmployeeInspector
+      key={`${selected.id}-${editRequested}-${selected.name}-${selected.title}-${selected.department}`}
+      employee={selected}
+      manager={employees.find((employee) => employee.id === selected.parent)}
+      line={reportingLine(employees, selected.id)}
+      reports={directReports(employees, selected.id)}
       startEditing={editRequested}
       onSave={(updated) =>
-        changeSteps(
-          steps.map((step) => (step.id === updated.id ? updated : step)),
+        changeEmployees(
+          employees.map((employee) =>
+            employee.id === updated.id ? updated : employee,
+          ),
         )
       }
       onDelete={() => setConfirm({ type: "delete", id: selected.id })}
       onClose={() => setSelectedId(undefined)}
+      onSelect={(id) => {
+        setEditRequested(false);
+        setSelectedId(id);
+      }}
     />
   );
 
@@ -261,14 +213,13 @@ function StructureEditor() {
         <div className="flex min-w-0 items-center gap-2">
           <span className="text-sm text-muted-foreground">Structure</span>
           <ChevronRightIcon className="size-3 text-muted-foreground" />
-          <h1 className="truncate text-sm font-semibold">Collections Agent</h1>
+          <h1 className="truncate text-sm font-semibold">Heron Run organisation</h1>
         </div>
         <div className="flex items-center gap-2 text-xs text-muted-foreground">
           <span>
-            {steps.length} steps, {steps.filter((step) => step.branch).length}{" "}
-            paths
+            {employees.length} employees, {departmentCount} departments
           </span>
-          <span className="hidden sm:inline">· Draft 4 by Hanna Berg</span>
+          <span className="hidden sm:inline">· Updated by Sofia Rahmawati</span>
           <Badge variant="secondary">Demo</Badge>
         </div>
         <div className="ml-auto flex flex-wrap items-center gap-2">
@@ -280,47 +231,9 @@ function StructureEditor() {
           >
             <CircleHelpIcon />
           </Button>
-          <Select
-            value={model}
-            disabled={running}
-            onValueChange={(value) => {
-              if (!value) return;
-              setModel(value);
-              const firstClaude = steps.find((step) => step.app === "Claude");
-              changeSteps(
-                steps.map((step) =>
-                  step.id === firstClaude?.id
-                    ? { ...step, title: value }
-                    : step,
-                ),
-              );
-            }}
-          >
-            <SelectTrigger aria-label="Model">
-              <SparklesIcon />
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectGroup>
-                {models.map((item) => (
-                  <SelectItem key={item} value={item}>
-                    {item}
-                  </SelectItem>
-                ))}
-              </SelectGroup>
-            </SelectContent>
-          </Select>
-          <Button
-            variant="outline"
-            onClick={() => addStep()}
-            disabled={running}
-          >
-            <PlusIcon data-icon="inline-start" />
-            Add step
-          </Button>
-          <Button variant="outline" onClick={runTest} disabled={running}>
-            <PlayIcon data-icon="inline-start" />
-            {running ? "Running…" : "Run test"}
+          <Button variant="outline" onClick={() => addEmployee()}>
+            <UserRoundPlusIcon data-icon="inline-start" />
+            Add employee
           </Button>
           <DropdownMenu>
             <DropdownMenuTrigger
@@ -328,7 +241,7 @@ function StructureEditor() {
                 <Button
                   variant="outline"
                   size="icon"
-                  aria-label="Agent actions"
+                  aria-label="Organisation actions"
                 />
               }
             >
@@ -340,10 +253,7 @@ function StructureEditor() {
                   <CopyIcon />
                   Copy as JSON
                 </DropdownMenuItem>
-                <DropdownMenuItem
-                  disabled={running}
-                  onClick={() => setConfirm({ type: "reset" })}
-                >
+                <DropdownMenuItem onClick={() => setConfirm({ type: "reset" })}>
                   <RotateCcwIcon />
                   Reset demo
                 </DropdownMenuItem>
@@ -353,7 +263,7 @@ function StructureEditor() {
         </div>
       </header>
       <div className="relative min-h-0 flex-1">
-        <ReactFlow<StepNode, StepEdge>
+        <ReactFlow<EmployeeNode, ReportingEdge>
           nodes={nodes}
           edges={edges}
           nodeTypes={nodeTypes}
@@ -364,7 +274,6 @@ function StructureEditor() {
           maxZoom={2}
           panOnDrag={pan}
           selectionOnDrag={!pan}
-          nodesDraggable={!running}
           nodesConnectable={false}
           edgesFocusable={false}
           deleteKeyCode={null}
@@ -378,8 +287,8 @@ function StructureEditor() {
               (change) => change.type === "select",
             );
             if (selections.length) {
-              const selected = selections.find((change) => change.selected);
-              if (selected) setSelectedId(selected.id);
+              const picked = selections.find((change) => change.selected);
+              if (picked) setSelectedId(picked.id);
               else if (selections.some((change) => change.id === selectedId))
                 setSelectedId(undefined);
             }
@@ -430,7 +339,7 @@ function StructureEditor() {
               <Button
                 variant="ghost"
                 size="sm"
-                aria-label="Fit flow to view"
+                aria-label="Fit chart to view"
                 onClick={() => fitView({ padding: 0.12 })}
               >
                 {Math.round(viewport.zoom * 100)}%
@@ -460,15 +369,13 @@ function StructureEditor() {
           </Panel>
           <Panel position="top-left">
             <p className="text-[10px] text-muted-foreground" role="status">
-              {running
-                ? "Running recorded test…"
-                : "Sample workflow · Changes last until refresh"}
+              Sample organisation · Changes last until refresh
             </p>
           </Panel>
         </ReactFlow>
         {selected && !compact && (
           <aside
-            aria-label="Node details"
+            aria-label="Employee details"
             className="absolute inset-y-3 right-3 w-80 overflow-auto rounded-xl border bg-background shadow-lg"
           >
             {inspector}
@@ -482,9 +389,9 @@ function StructureEditor() {
         >
           <SheetContent className="w-full overflow-y-auto sm:max-w-sm">
             <SheetHeader>
-              <SheetTitle>Node details</SheetTitle>
+              <SheetTitle>Employee details</SheetTitle>
               <SheetDescription>
-                Inspect and configure this workflow step.
+                Inspect and edit this position in the organisation.
               </SheetDescription>
             </SheetHeader>
             {compact && inspector}
@@ -494,17 +401,19 @@ function StructureEditor() {
       <Dialog open={help} onOpenChange={setHelp}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Explore the flow</DialogTitle>
+            <DialogTitle>Explore the organisation</DialogTitle>
             <DialogDescription>
               Pan the canvas by dragging its background. Scroll or use the
-              controls to zoom. Select a step to inspect it, drag it to
-              reposition, or use a connector’s plus button to insert a step.
+              controls to zoom. Select an employee to see their manager,
+              reporting line, and direct reports; drag a card to reposition it.
             </DialogDescription>
           </DialogHeader>
           <p className="text-sm text-muted-foreground">
-            Tab focuses steps and controls; arrow keys move a focused step. Run
-            test replays sample outcomes on the Promised path. No external
-            services are called. Copy as JSON exports your current work.
+            The plus under a card adds a direct report; the plus on a line
+            inserts a position between a manager and their report. Removing a
+            position moves its reports up one level. Tab focuses cards and
+            controls; arrow keys move a focused card. Copy as JSON exports the
+            current tree.
           </p>
         </DialogContent>
       </Dialog>
@@ -518,13 +427,13 @@ function StructureEditor() {
           <DialogHeader>
             <DialogTitle>
               {confirm?.type === "delete"
-                ? "Delete this step?"
-                : "Reset this flow?"}
+                ? "Remove this position?"
+                : "Reset the organisation?"}
             </DialogTitle>
             <DialogDescription>
               {confirm?.type === "delete"
-                ? "The next steps will reconnect to the previous step. This cannot be undone."
-                : "Your changes will be replaced by the original sample workflow."}
+                ? "Their direct reports will report to their manager instead. This cannot be undone."
+                : "Your changes will be replaced by the original sample organisation."}
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
@@ -535,18 +444,16 @@ function StructureEditor() {
               variant="destructive"
               onClick={() => {
                 if (confirm?.type === "delete") {
-                  changeSteps(removeStep(steps, confirm.id));
+                  changeEmployees(removeEmployee(employees, confirm.id));
                 } else {
-                  setSteps(structureSteps);
-                  setResults(simulateRun(structureSteps));
+                  setEmployees(structureEmployees);
                   setPositions({});
-                  setModel(models[0]!);
                 }
                 setSelectedId(undefined);
                 setConfirm(undefined);
               }}
             >
-              {confirm?.type === "delete" ? "Delete step" : "Reset demo"}
+              {confirm?.type === "delete" ? "Remove position" : "Reset demo"}
             </Button>
           </DialogFooter>
         </DialogContent>

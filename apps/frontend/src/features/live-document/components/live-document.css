@@ -1,0 +1,195 @@
+.live-prose {
+  min-height: 36rem;
+  outline: none;
+  overflow-wrap: anywhere;
+  font-size: 0.9375rem;
+  line-height: 1.8;
+}
+.live-small .live-prose {
+  font-size: 0.8125rem;
+}
+.live-prose > * + * {
+  margin-top: 1rem;
+}
+.live-prose h1 {
+  font-size: 1.5em;
+  font-weight: 650;
+  line-height: 1.3;
+  letter-spacing: -0.025em;
+}
+.live-prose h2 {
+  margin-top: 2rem;
+  font-size: 1.2em;
+  font-weight: 650;
+  line-height: 1.4;
+}
+.live-prose h3 {
+  margin-top: 1.5rem;
+  font-size: 1.05em;
+  font-weight: 600;
+}
+.live-prose p {
+  min-height: 1.5em;
+}
+.live-prose ul,
+.live-prose ol {
+  padding-left: 1.4rem;
+}
+.live-prose ul {
+  list-style: disc;
+}
+.live-prose ol {
+  list-style: decimal;
+}
+.live-prose li + li {
+  margin-top: 0.25rem;
+}
+.live-prose li p {
+  margin: 0;
+}
+.live-prose blockquote {
+  border-left: 3px solid var(--border);
+  padding-left: 1rem;
+  color: var(--muted-foreground);
+}
+.live-prose pre {
+  overflow-x: auto;
+  border-radius: var(--radius);
+  background: var(--muted);
+  padding: 1rem;
+  font-family: var(--font-mono);
+  font-size: 0.85em;
+}
+.live-prose code {
+  border-radius: 0.2rem;
+  background: var(--muted);
+  padding: 0.1em 0.3em;
+  font-family: var(--font-mono);
+  font-size: 0.85em;
+}
+.live-prose pre code {
+  padding: 0;
+}
+.live-prose a {
+  color: var(--primary-text);
+  text-decoration: underline;
+}
+.live-prose mark {
+  background: color-mix(in oklch, var(--primary) 22%, var(--background));
+  color: var(--foreground);
+}
+.live-prose hr {
+  margin-block: 1.5rem;
+  border-color: var(--border);
+}
+.live-prose ul[data-type="taskList"] {
+  list-style: none;
+  padding: 0;
+}
+.live-prose li[data-type="taskItem"] {
+  display: flex;
+  align-items: baseline;
+  gap: 0.6rem;
+}
+.live-prose li[data-type="taskItem"] > div {
+  flex: 1;
+  min-width: 0;
+}
+.live-prose li[data-type="taskItem"] label {
+  flex-shrink: 0;
+}
+.live-prose input[type="checkbox"] {
+  appearance: none;
+  display: grid;
+  place-content: center;
+  width: 1rem;
+  height: 1rem;
+  margin: 0;
+  border: 1px solid var(--input);
+  border-radius: 4px;
+  background: transparent;
+  cursor: pointer;
+  transform: translateY(0.15em);
+  transition:
+    background-color 150ms,
+    border-color 150ms;
+}
+.dark .live-prose input[type="checkbox"] {
+  background: color-mix(in oklab, var(--input) 30%, transparent);
+}
+.live-prose input[type="checkbox"]::before {
+  content: "";
+  width: 0.75rem;
+  height: 0.75rem;
+  background: var(--primary-foreground);
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 6 9 17l-5-5'/%3E%3C/svg%3E")
+    center / contain no-repeat;
+  transform: scale(0);
+}
+.live-prose input[type="checkbox"]:checked {
+  border-color: var(--primary);
+  background: var(--primary);
+}
+.live-prose input[type="checkbox"]:checked::before {
+  transform: scale(1);
+}
+.live-prose input[type="checkbox"]:focus-visible {
+  border-color: var(--ring);
+  outline: 3px solid color-mix(in oklab, var(--ring) 50%, transparent);
+}
+.live-prose[contenteditable="false"] input[type="checkbox"] {
+  pointer-events: none;
+}
+.live-prose li[data-checked="true"] > div > p {
+  color: var(--muted-foreground);
+  text-decoration: line-through;
+}
+.live-prose .is-empty::before {
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  pointer-events: none;
+  color: var(--muted-foreground);
+}
+
+/* Remote carets and selections rendered by CollaborationCaret. */
+.live-caret {
+  position: relative;
+  margin-inline: -1px;
+  border-left: 2px solid var(--live-user-color);
+  word-break: normal;
+  pointer-events: none;
+}
+.live-caret-label {
+  position: absolute;
+  top: -1.4em;
+  left: -2px;
+  padding: 0.05rem 0.4rem;
+  border-radius: 0.3rem 0.3rem 0.3rem 0;
+  background: var(--live-user-color);
+  color: #fff;
+  font-size: 0.65rem;
+  font-weight: 600;
+  line-height: 1.5;
+  white-space: nowrap;
+  user-select: none;
+}
+.live-selection {
+  background: color-mix(in oklch, var(--live-user-color) 28%, transparent);
+}
+
+/* Comment anchors. */
+.live-comment {
+  border-bottom: 2px solid oklch(78% 0.16 85);
+  background: color-mix(in oklch, oklch(85% 0.17 90) 40%, transparent);
+  cursor: pointer;
+  transition: background-color 150ms;
+}
+.live-comment.is-active {
+  background: color-mix(in oklch, oklch(85% 0.17 90) 75%, transparent);
+}
+@media (prefers-reduced-motion: reduce) {
+  .live-comment {
+    transition: none;
+  }
+}

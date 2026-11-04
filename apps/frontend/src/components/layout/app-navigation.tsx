@@ -21,6 +21,8 @@ import {
   HouseIcon,
   ListTodoIcon,
   LockKeyholeIcon,
+  MapPinIcon,
+  MapPinnedIcon,
   NotebookPenIcon,
   NetworkIcon,
   PanelsTopLeftIcon,
@@ -33,6 +35,7 @@ import {
   ShoppingCartIcon,
   SparklesIcon,
   Table2Icon,
+  UsersRoundIcon,
   WandSparklesIcon,
   WorkflowIcon,
 } from "lucide-react";
@@ -115,7 +118,6 @@ const mainNavigation: NavigationSection[] = [
         url: "/dashboard/project",
         icon: <FolderKanbanIcon />,
       },
-      { title: "Task", url: "/dashboard/task", icon: <ListTodoIcon /> },
       {
         title: "File Manager",
         url: "/dashboard/file-manager",
@@ -187,6 +189,22 @@ const mainNavigation: NavigationSection[] = [
         url: "/playground/notes",
         icon: <NotebookPenIcon />,
       },
+      {
+        title: "Map Delivery",
+        url: "/playground/map-delivery",
+        icon: <MapPinnedIcon />,
+      },
+      {
+        title: "Map Location",
+        url: "/playground/map-location",
+        icon: <MapPinIcon />,
+      },
+      {
+        title: "Live Document",
+        url: "/playground/live-document",
+        icon: <UsersRoundIcon />,
+      },
+      { title: "Task", url: "/dashboard/task", icon: <ListTodoIcon /> },
       {
         title: "Whiteboard",
         url: "/whiteboard",
@@ -281,6 +299,7 @@ export function useAppNavigation(): NavigationSection[] {
             { title: "Base", url: "/filter/base" },
             { title: "Advance", url: "/filter/advance" },
             { title: "Group", url: "/filter/group" },
+            { title: "Sidebar", url: "/filter/sidebar" },
           ],
         },
         {

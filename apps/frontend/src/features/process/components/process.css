@@ -32,3 +32,9 @@
 .process .react-flow__attribution a {
   color: var(--muted-foreground);
 }
+
+/* Connections the replayed order has travelled. */
+.process .process-edge-taken .react-flow__edge-path {
+  stroke: var(--primary);
+  stroke-width: 2;
+}
