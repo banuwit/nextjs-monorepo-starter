@@ -1,24 +1,30 @@
 import type {
   AccessMatrix,
-  PermissionActionId,
+  PermissionAction,
   PermissionPage,
   WorkspaceRole,
 } from "../types/access-management";
 
-export function permissionId(pageId: string, actionId: PermissionActionId) {
-  return `${pageId}.${actionId}`;
+/** Required on every page, always shown first and in this order. */
+export const standardActions: readonly PermissionAction[] = [
+  { id: "view", name: "View" },
+  { id: "create", name: "Create" },
+  { id: "edit", name: "Edit" },
+  { id: "delete", name: "Delete" },
+];
+
+/** Standard actions followed by the page's custom ones. */
+export function listPageActions(page: PermissionPage) {
+  return [...standardActions, ...(page.extraActions ?? [])];
 }
 
-/** Number of permissions a page supports, i.e. its applicable actions. */
-export function countPagePermissions(page: PermissionPage) {
-  return Object.keys(page.permissions).length;
+export function permissionId(pageId: string, actionId: string) {
+  return `${pageId}.${actionId}`;
 }
 
 export function listPermissionIds(pages: readonly PermissionPage[]) {
   return pages.flatMap((page) =>
-    (Object.keys(page.permissions) as PermissionActionId[]).map((actionId) =>
-      permissionId(page.id, actionId),
-    ),
+    listPageActions(page).map((action) => permissionId(page.id, action.id)),
   );
 }
 

@@ -1,17 +1,15 @@
-// Data contoh untuk dashboard Manufacturing; belum terhubung ke API.
-import type { KpiItem } from "@/features/dashboard/manufacturing/types/dashboard";
+// Data contoh untuk dashboard Manufacture; belum terhubung ke API.
+import type { KpiItem } from "@/features/dashboard/manufacture/types/dashboard";
 import type {
-  ManufacturingDowntimeReason,
-  ManufacturingFloorLane,
-  ManufacturingFloorSlot,
-  ManufacturingLine,
-  ManufacturingMachine,
-  ManufacturingOee,
-  ManufacturingShift,
-  ManufacturingWorkOrder,
-} from "@/features/dashboard/manufacturing/types/manufacturing";
+  ManufactureDowntimeReason,
+  ManufactureLine,
+  ManufactureMachine,
+  ManufactureOee,
+  ManufactureShift,
+  ManufactureWorkOrder,
+} from "@/features/dashboard/manufacture/types/manufacture";
 
-export const manufacturingMetrics = [
+export const manufactureMetrics = [
   {
     label: "OEE",
     value: "78.4%",
@@ -42,20 +40,20 @@ export const manufacturingMetrics = [
   },
 ] as const satisfies readonly KpiItem[];
 
-export const manufacturingShifts = [
+export const manufactureShifts = [
   "Morning",
   "Afternoon",
   "Night",
-] as const satisfies readonly ManufacturingShift[];
+] as const satisfies readonly ManufactureShift[];
 
-export const manufacturingOee = {
+export const manufactureOee = {
   availability: 91,
   performance: 88,
   quality: 98,
   target: 85,
-} as const satisfies ManufacturingOee;
+} as const satisfies ManufactureOee;
 
-export const manufacturingLines: ManufacturingLine[] = [
+export const manufactureLines: ManufactureLine[] = [
   {
     id: "L1",
     name: "Line 1 · Assembly",
@@ -163,7 +161,7 @@ export const manufacturingLines: ManufacturingLine[] = [
   },
 ];
 
-export const manufacturingMachines: ManufacturingMachine[] = [
+export const manufactureMachines: ManufactureMachine[] = [
   {
     id: "M-01",
     name: "Screw press A",
@@ -265,34 +263,11 @@ export const manufacturingMachines: ManufacturingMachine[] = [
   },
 ];
 
-/** Floor plan: 14 columns deep by 10 rows wide, one lane per production line. */
-export const manufacturingFloorSize = { cols: 14, rows: 10 } as const;
-
-export const manufacturingFloorLanes: ManufacturingFloorLane[] = [
-  { lineId: "L1", label: "Line 1 · Assembly", y: 0, d: 2 },
-  { lineId: "L2", label: "Line 2 · Assembly", y: 2, d: 2 },
-  { lineId: "L3", label: "Line 3 · Packaging", y: 4, d: 2 },
-  { lineId: "L4", label: "Line 4 · Painting", y: 6, d: 2 },
-  { lineId: "L5", label: "Line 5 · Testing", y: 8, d: 2 },
-];
-
-export const manufacturingFloorPlan: ManufacturingFloorSlot[] = [
-  { machineId: "M-01", x: 1, y: 0.25, w: 3, d: 1.5, h: 1.8 },
-  { machineId: "M-02", x: 7, y: 0.25, w: 3, d: 1.5, h: 1.8 },
-  { machineId: "M-03", x: 1, y: 2.25, w: 3, d: 1.5, h: 2.4 },
-  { machineId: "M-04", x: 7, y: 2.25, w: 3, d: 1.5, h: 2.4 },
-  { machineId: "M-05", x: 1, y: 4.25, w: 4, d: 1.5, h: 1.4 },
-  { machineId: "M-06", x: 8, y: 4.25, w: 3, d: 1.5, h: 2.0 },
-  { machineId: "M-07", x: 1, y: 6.25, w: 4, d: 1.5, h: 2.2 },
-  { machineId: "M-08", x: 8, y: 6.25, w: 3.5, d: 1.5, h: 2.8 },
-  { machineId: "M-09", x: 4, y: 8.25, w: 4, d: 1.5, h: 1.2 },
-];
-
 /**
  * Deterministic drift applied to the next sensor reading. Cycling through a
  * fixed table keeps the simulation identical on every visit.
  */
-export const manufacturingReadingDeltas = [
+export const manufactureReadingDeltas = [
   { temp: 0.4, vibration: 0.05 },
   { temp: -0.3, vibration: -0.02 },
   { temp: 0.6, vibration: 0.08 },
@@ -320,9 +295,9 @@ export const manufacturingReadingDeltas = [
 ] as const;
 
 /** Units completed per 5-second tick across running lines. */
-export const manufacturingUnitsPerTick = 0.57;
+export const manufactureUnitsPerTick = 0.57;
 
-export const manufacturingDowntime: ManufacturingDowntimeReason[] = [
+export const manufactureDowntime: ManufactureDowntimeReason[] = [
   { reason: "Changeover", minutes: 142 },
   { reason: "Material shortage", minutes: 96 },
   { reason: "Robot fault", minutes: 74 },
@@ -332,7 +307,7 @@ export const manufacturingDowntime: ManufacturingDowntimeReason[] = [
   { reason: "Other", minutes: 12 },
 ];
 
-export const manufacturingWorkOrders: ManufacturingWorkOrder[] = [
+export const manufactureWorkOrders: ManufactureWorkOrder[] = [
   {
     id: "WO-2231",
     title: "Replace robot cell 1 servo drive",

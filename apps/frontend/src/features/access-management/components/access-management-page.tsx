@@ -4,7 +4,6 @@ import {
   CircleCheckIcon,
   CircleDotIcon,
   EyeIcon,
-  LockIcon,
   PencilIcon,
   PlusIcon,
 } from "lucide-react";
@@ -29,7 +28,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Toaster, toast } from "@/components/ui/toast";
 import {
   initialAccessMatrix,
-  permissionActions,
   permissionPages,
 } from "@/mocks/access-management.mock";
 import type { NewRoleValues } from "../schemas/new-role.schema";
@@ -43,7 +41,7 @@ import {
   toggleGrant,
 } from "../utils/access-matrix";
 import { NewRoleDialog } from "./new-role-dialog";
-import { PermissionMatrixTable } from "./permission-matrix-table";
+import { RolePermissionList } from "./role-permission-list";
 
 const permissionIds = listPermissionIds(permissionPages);
 const totalPermissions = permissionIds.length;
@@ -176,25 +174,23 @@ export function AccessManagementPage() {
           )}
 
           <Tabs
+            orientation="vertical"
             value={activeRoleId}
             onValueChange={(value) => setActiveRoleId(String(value))}
             className="min-w-0 gap-0"
           >
-            <div className="overflow-x-auto border-b px-2">
-              <TabsList variant="line" className="h-11">
+            <div className="w-40 shrink-0 border-r p-2 sm:w-52">
+              <TabsList className="w-full">
                 {draft.roles.map((role) => (
                   <TabsTrigger
                     key={role.id}
                     value={role.id}
-                    className="gap-1.5 px-2"
+                    className="h-8 flex-none gap-1.5 px-2"
                   >
-                    {role.locked && (
-                      <LockIcon aria-hidden="true" className="size-3.5" />
-                    )}
-                    {role.name}
+                    <span className="truncate">{role.name}</span>
                     <Badge
                       variant="outline"
-                      className="h-4.5 min-w-4.5 px-1 tabular-nums text-muted-foreground"
+                      className="ml-auto h-4.5 min-w-4.5 px-1 tabular-nums text-muted-foreground"
                     >
                       {countGrants(draft, role, permissionPages)}
                     </Badge>
@@ -205,21 +201,19 @@ export function AccessManagementPage() {
 
             {draft.roles.map((role) => (
               <TabsContent key={role.id} value={role.id} className="min-w-0">
-                <div className="flex flex-col gap-0.5 border-b px-3 py-2 sm:flex-row sm:items-center sm:justify-between sm:gap-3">
+                <div className="flex flex-col gap-0.5 border-b px-4 py-3">
+                  <h3 className="text-sm font-semibold">{role.name}</h3>
                   <p className="text-xs text-muted-foreground">
                     {role.description}
-                    {role.locked && " Always holds every permission."}
-                  </p>
-                  <p className="text-xs text-muted-foreground">
-                    {role.name} grants{" "}
+                    {role.locked && " Always holds every permission."}{" "}
+                    <span aria-hidden="true">·</span>{" "}
                     {countGrants(draft, role, permissionPages)} of{" "}
-                    {totalPermissions} permissions
+                    {totalPermissions} permissions granted
                   </p>
                 </div>
-                <PermissionMatrixTable
-                  pages={permissionPages}
-                  actions={permissionActions}
+                <RolePermissionList
                   role={role}
+                  pages={permissionPages}
                   saved={saved}
                   matrix={draft}
                   readOnly={readOnly}

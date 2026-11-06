@@ -31,6 +31,7 @@ Urutan prioritas jika terjadi konflik: instruksi pengguna, keputusan **DIKUNCI**
 
 | Area tugas                                                                                                              | Rules                                                                     |
 | ----------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------- |
+| Root repo, `apps/*`, `packages/*`, `package.json`, `pnpm-workspace.yaml`, `turbo.json`, menambah aplikasi/paket          | [structure-monorepo.md](.agents/rules/structure-monorepo.md)              |
 | Membuat file, folder, fitur, atau subfitur di `apps/frontend/src/`                                                      | [structure-folder.md](.agents/rules/frontend/structure-folder.md)         |
 | Halaman/komponen frontend, dashboard shell, tema, warna, layout, Preferences                                            | [preferences.md](.agents/rules/frontend/preferences.md)                   |
 | Tabel, daftar, toolbar grid, `src/components/data-grid/`                                                                | [data-grid.md](.agents/rules/frontend/data-grid.md)                       |

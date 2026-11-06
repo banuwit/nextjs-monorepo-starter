@@ -8,6 +8,7 @@ import type {
   HealthcareDepartment,
   HealthcareDoctor,
   HealthcareFlowPoint,
+  HealthcareTriageLevel,
   HealthcareWard,
 } from "@/features/dashboard/healthcare/types/healthcare";
 
@@ -480,3 +481,41 @@ export const healthcareAlerts = [
     detail: "2 patients already waiting for imaging.",
   },
 ] as const satisfies readonly HealthcareAlert[];
+
+export const healthcareTriage: HealthcareTriageLevel[] = [
+  {
+    level: 1,
+    label: "Resuscitation",
+    waiting: 0,
+    longestWaitMinutes: 0,
+    targetMinutes: 0,
+  },
+  {
+    level: 2,
+    label: "Emergent",
+    waiting: 2,
+    longestWaitMinutes: 6,
+    targetMinutes: 10,
+  },
+  {
+    level: 3,
+    label: "Urgent",
+    waiting: 7,
+    longestWaitMinutes: 41,
+    targetMinutes: 30,
+  },
+  {
+    level: 4,
+    label: "Less urgent",
+    waiting: 9,
+    longestWaitMinutes: 52,
+    targetMinutes: 60,
+  },
+  {
+    level: 5,
+    label: "Non-urgent",
+    waiting: 5,
+    longestWaitMinutes: 38,
+    targetMinutes: 120,
+  },
+];

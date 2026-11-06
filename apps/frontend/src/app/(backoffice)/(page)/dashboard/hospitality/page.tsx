@@ -8,7 +8,7 @@ import {
 export const metadata: Metadata = {
   title: "Hospitality | Dashboard",
   description:
-    "Hotel front desk for today: occupancy trend, arrivals and departures, room status by floor, housekeeping progress, revenue mix, and reservations.",
+    "Hotel front desk for today: rate and occupancy forecast, check-in rush, housekeeping board, guest sentiment, revenue mix, and reservations.",
 };
 
 export default function Page() {

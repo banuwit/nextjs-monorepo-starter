@@ -3,12 +3,12 @@ import { PageHeading } from "@/components/page-heading";
 import { hospitalityMetrics } from "@/mocks/dashboard-hospitality.mock";
 
 import { formatLongDate } from "../utils/format";
-import { HospitalityArrivals } from "./hospitality-arrivals";
-import { HospitalityHousekeeping } from "./hospitality-housekeeping";
-import { HospitalityOccupancyTrend } from "./hospitality-occupancy-trend";
+import { HospitalityArrivalsTimeline } from "./hospitality-arrivals-timeline";
+import { HospitalityForecast } from "./hospitality-forecast";
+import { HospitalityGuestReviews } from "./hospitality-guest-reviews";
+import { HospitalityHousekeepingBoard } from "./hospitality-housekeeping-board";
 import { HospitalityReservations } from "./hospitality-reservations";
 import { HospitalityRevenueMix } from "./hospitality-revenue-mix";
-import { HospitalityRoomGrid } from "./hospitality-room-grid";
 import { KpiStrip } from "./kpi-strip";
 
 export function HospitalityDashboardPage({
@@ -24,27 +24,23 @@ export function HospitalityDashboardPage({
       <PageHeading
         title="Front desk today"
         currentPage="Hospitality"
-        description={`${formatLongDate(today)}. ${greeting} shift: occupancy, arrivals, room status, housekeeping, and reservations.`}
+        description={`${formatLongDate(today)}. ${greeting} shift: rate forecast, check-in rush, housekeeping board, guest sentiment, and reservations.`}
       />
       <KpiStrip label="Tonight" items={hospitalityMetrics} />
       <div className="grid min-w-0 gap-4 xl:grid-cols-3">
         <div className="min-w-0 xl:col-span-2">
-          <HospitalityOccupancyTrend today={today} />
+          <HospitalityForecast today={today} />
         </div>
-        <HospitalityArrivals />
+        <HospitalityArrivalsTimeline hour={hour} />
       </div>
+      <HospitalityHousekeepingBoard />
       <div className="grid min-w-0 gap-4 xl:grid-cols-3">
         <div className="min-w-0 xl:col-span-2">
-          <HospitalityRoomGrid />
-        </div>
-        <HospitalityHousekeeping />
-      </div>
-      <div className="grid min-w-0 gap-4 xl:grid-cols-3">
-        <div className="min-w-0 xl:col-span-2">
-          <HospitalityReservations today={today} />
+          <HospitalityGuestReviews />
         </div>
         <HospitalityRevenueMix />
       </div>
+      <HospitalityReservations today={today} />
     </AppBody>
   );
 }

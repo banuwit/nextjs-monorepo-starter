@@ -56,3 +56,14 @@ export type HealthcareAlert = {
   title: string;
   detail: string;
 };
+
+/** Emergency Severity Index level, 1 = most urgent. */
+export type HealthcareTriageLevel = {
+  level: 1 | 2 | 3 | 4 | 5;
+  label: string;
+  waiting: number;
+  /** Longest current wait in minutes. */
+  longestWaitMinutes: number;
+  /** Target time to be seen, in minutes. */
+  targetMinutes: number;
+};

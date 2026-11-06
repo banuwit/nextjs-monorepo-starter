@@ -2,16 +2,14 @@
 import type { KpiItem } from "@/features/dashboard/hospitality/types/dashboard";
 import type {
   HospitalityArrival,
-  HospitalityFlaggedRoom,
-  HospitalityFloor,
-  HospitalityHousekeepingTeam,
-  HospitalityMovement,
-  HospitalityOccupancyPoint,
+  HospitalityArrivalBucket,
+  HospitalityAttendant,
+  HospitalityForecastDay,
+  HospitalityHousekeepingColumn,
   HospitalityReservation,
+  HospitalityReview,
+  HospitalityReviewSummary,
   HospitalityRevenue,
-  HospitalityRoom,
-  HospitalityRoomState,
-  HospitalityRoomType,
 } from "@/features/dashboard/hospitality/types/hospitality";
 
 export const hospitalityMetrics = [
@@ -45,19 +43,10 @@ export const hospitalityMetrics = [
   },
 ] as const satisfies readonly KpiItem[];
 
-export const hospitalityOccupancyTarget = 80;
+export const hospitalityRoomCount = 150;
 
-// Oldest first; the last entry is tonight. Values stay deterministic so the
-// server and client render the same chart.
-const occupancySeries = [
-  74, 71, 78, 86, 91, 88, 76, 72, 75, 81, 89, 93, 85, 73, 70, 77, 84, 90, 87,
-  79, 74, 76, 82, 88, 92, 86, 78, 79, 83, 84,
-] as const;
-
-const lastYearSeries = [
-  70, 68, 73, 80, 85, 83, 72, 69, 71, 77, 84, 88, 80, 70, 67, 72, 79, 86, 82,
-  75, 70, 72, 78, 83, 87, 81, 74, 73, 78, 79,
-] as const;
+/** Occupancy a night must reach before rate pushes make sense. */
+export const hospitalityOccupancyFloor = 70;
 
 /** ISO day for `n` days before `today` (an ISO timestamp at noon UTC). */
 function daysAgo(today: string, n: number) {
@@ -66,195 +55,207 @@ function daysAgo(today: string, n: number) {
   return date.toISOString().slice(0, 10);
 }
 
-export function hospitalityOccupancySeries(
-  today: string,
-): HospitalityOccupancyPoint[] {
-  const total = occupancySeries.length;
-  return occupancySeries.map((occupancy, index) => ({
-    date: daysAgo(today, total - 1 - index),
+// Fourteen nights around tonight: seven already sold, tonight, and six more
+// on the books. Pairs of occupancy % and ADR stay deterministic so the server
+// and client render the same chart; offset 0 is tonight.
+const forecastSeeds: ReadonlyArray<{
+  offset: number;
+  occupancy: number;
+  adr: number;
+}> = [
+  { offset: -7, occupancy: 78, adr: 1_180_000 },
+  { offset: -6, occupancy: 81, adr: 1_200_000 },
+  { offset: -5, occupancy: 88, adr: 1_260_000 },
+  { offset: -4, occupancy: 92, adr: 1_310_000 },
+  { offset: -3, occupancy: 86, adr: 1_240_000 },
+  { offset: -2, occupancy: 74, adr: 1_150_000 },
+  { offset: -1, occupancy: 79, adr: 1_210_000 },
+  { offset: 0, occupancy: 84, adr: 1_250_000 },
+  { offset: 1, occupancy: 90, adr: 1_320_000 },
+  { offset: 2, occupancy: 94, adr: 1_380_000 },
+  { offset: 3, occupancy: 87, adr: 1_290_000 },
+  { offset: 4, occupancy: 66, adr: 1_120_000 },
+  { offset: 5, occupancy: 61, adr: 1_090_000 },
+  { offset: 6, occupancy: 72, adr: 1_160_000 },
+];
+
+export function hospitalityForecast(today: string): HospitalityForecastDay[] {
+  return forecastSeeds.map(({ offset, occupancy, adr }) => ({
+    date: daysAgo(today, -offset),
+    offset,
     occupancy,
-    lastYear: lastYearSeries[index] ?? 0,
+    adr,
+    roomsToSell:
+      hospitalityRoomCount -
+      Math.round((occupancy / 100) * hospitalityRoomCount),
   }));
 }
 
-export const hospitalityMovement = {
-  arrivals: { total: 42, checkedIn: 18, expected: 24 },
-  departures: { total: 37, checkedOut: 29, pending: 8 },
-} as const satisfies HospitalityMovement;
+/** Expected check-ins per hour from 12:00 to 21:00; 42 arrivals in total. */
+export const hospitalityArrivalBuckets = [
+  { hour: 12, expected: 2 },
+  { hour: 13, expected: 3 },
+  { hour: 14, expected: 7 },
+  { hour: 15, expected: 9 },
+  { hour: 16, expected: 6 },
+  { hour: 17, expected: 5 },
+  { hour: 18, expected: 4 },
+  { hour: 19, expected: 3 },
+  { hour: 20, expected: 2 },
+  { hour: 21, expected: 1 },
+] as const satisfies readonly HospitalityArrivalBucket[];
 
 export const hospitalityArrivals = [
   {
     id: "a1",
-    time: "14:30",
+    eta: "14:30",
     guest: "Rina Marlina",
     roomType: "Deluxe",
+    tier: "Gold",
+    preference: "High floor, feather-free pillows",
     vip: true,
   },
   {
     id: "a2",
-    time: "14:45",
+    eta: "14:45",
     guest: "Agus Prasetyo",
     roomType: "Standard",
+    tier: "Member",
+    preference: "Twin beds, late checkout if available",
     vip: false,
   },
   {
     id: "a3",
-    time: "15:10",
+    eta: "15:10",
     guest: "Dewi Lestari",
     roomType: "Suite",
+    tier: "Gold",
+    preference: "Anniversary stay, sparkling wine on arrival",
     vip: true,
   },
   {
     id: "a4",
-    time: "15:30",
+    eta: "15:30",
     guest: "Bambang Susilo",
     roomType: "Standard",
-    vip: false,
-  },
-  {
-    id: "a5",
-    time: "16:00",
-    guest: "Sari Wulandari",
-    roomType: "Deluxe",
+    tier: "Silver",
+    preference: "Quiet room away from the lift",
     vip: false,
   },
 ] as const satisfies readonly HospitalityArrival[];
 
-const guestNames = [
-  "Hendra Gunawan",
-  "Maya Puspita",
-  "Yudi Kurniawan",
-  "Lina Hartati",
-  "Rizky Ramadhan",
-  "Nadia Safitri",
-  "Fajar Nugroho",
-  "Intan Permata",
-  "Doni Saputra",
-  "Wati Rahayu",
-  "Eko Setiawan",
-  "Citra Anggraini",
-  "Bayu Wicaksono",
-  "Mega Utami",
-  "Taufik Hidayat",
-  "Ayu Kusuma",
-  "Galih Pratama",
-  "Siska Amelia",
-  "Ridwan Kamil",
-  "Novi Andriani",
-  "Arif Budiman",
-  "Putri Maharani",
-  "Dian Sastro",
-  "Irfan Hakim",
-  "Lia Kartika",
-  "Wahyu Santoso",
-  "Ratna Dewi",
-  "Andi Firmansyah",
-  "Nia Ramadhani",
-  "Joko Widodo",
-  "Sinta Dewi",
-  "Reza Rahadian",
-  "Tika Panggabean",
-  "Hadi Sucipto",
-  "Rina Marlina",
-  "Agus Prasetyo",
-  "Dewi Lestari",
-  "Bambang Susilo",
-  "Sari Wulandari",
-  "Yosef Tampubolon",
-] as const;
-
-export const hospitalityFloors: readonly HospitalityFloor[] = [2, 3, 4, 5, 6];
-
-// State per room, written as a compact string so the pattern is easy to read:
-// o = occupied, u = due out, c = vacant clean, d = vacant dirty, x = out of order.
-// Occupied plus due out adds up to 126 of 150 rooms.
-const roomPlan: Record<HospitalityFloor, string> = {
-  2: "ooooouooocoooodooouoocoxoooouo",
-  3: "oooocooouooodooooxooocoooouodo",
-  4: "ouoooocoooodoooouoooxcoooodooo",
-  5: "oooodoooucooooooodooxoooucoooo",
-  6: "ocoooouoooxooodooocooouooooodo",
-};
-
-const stateByCode: Record<string, HospitalityRoomState> = {
-  o: "occupied",
-  u: "due-out",
-  c: "vacant-clean",
-  d: "vacant-dirty",
-  x: "out-of-order",
-};
-
-/** Rooms 01–18 are Standard, 19–27 Deluxe, 28–30 Suite on every floor. */
-function roomTypeFor(index: number): HospitalityRoomType {
-  if (index >= 27) return "Suite";
-  if (index >= 18) return "Deluxe";
-  return "Standard";
-}
-
-function buildRooms(): HospitalityRoom[] {
-  const rooms: HospitalityRoom[] = [];
-  let guestIndex = 0;
-  for (const floor of hospitalityFloors) {
-    const plan = roomPlan[floor];
-    for (let index = 0; index < plan.length; index += 1) {
-      const state = stateByCode[plan[index] ?? "c"] ?? "vacant-clean";
-      const number = `${floor}${String(index + 1).padStart(2, "0")}`;
-      const type = roomTypeFor(index);
-      if (state === "occupied" || state === "due-out") {
-        rooms.push({
-          number,
-          floor,
-          type,
-          state,
-          guest: guestNames[guestIndex % guestNames.length],
-        });
-        guestIndex += 1;
-      } else {
-        rooms.push({ number, floor, type, state });
-      }
-    }
-  }
-  return rooms;
-}
-
-export const hospitalityRooms = buildRooms();
-
-export const hospitalityHousekeeping = [
-  { id: "f2", name: "Floor 2 · Team Melati", cleaned: 22, total: 30 },
-  { id: "f3", name: "Floor 3 · Team Anggrek", cleaned: 19, total: 30 },
-  { id: "f4", name: "Floor 4 · Team Kenanga", cleaned: 27, total: 30 },
-  { id: "f5", name: "Floor 5 · Team Cempaka", cleaned: 14, total: 30 },
-  { id: "f6", name: "Floor 6 · Team Dahlia", cleaned: 24, total: 30 },
-  { id: "public", name: "Lobby & public areas", cleaned: 7, total: 9 },
-] as const satisfies readonly HospitalityHousekeepingTeam[];
-
-export const hospitalityFlaggedRooms = [
+// Room numbers follow floor + index; type codes: STD standard, DLX deluxe,
+// STE suite, FAM family. Attendant initials match `hospitalityAttendants`.
+export const hospitalityHousekeepingBoard = [
   {
-    room: "224",
-    reason: "maintenance",
-    note: "Air conditioning not cooling; technician booked for 15:00.",
+    stage: "dirty",
+    count: 23,
+    rooms: [
+      { number: "204", type: "STD", attendant: "" },
+      { number: "211", type: "STD", attendant: "" },
+      { number: "318", type: "DLX", attendant: "SA" },
+      { number: "327", type: "FAM", attendant: "" },
+      { number: "402", type: "STD", attendant: "DP" },
+      { number: "415", type: "STD", attendant: "" },
+    ],
   },
   {
-    room: "318",
-    reason: "maintenance",
-    note: "Shower drain blocked, room held until cleared.",
+    stage: "cleaning",
+    count: 9,
+    rooms: [
+      { number: "209", type: "STD", attendant: "LW" },
+      { number: "222", type: "DLX", attendant: "LW" },
+      { number: "305", type: "STD", attendant: "SA" },
+      { number: "411", type: "STD", attendant: "DP" },
+      { number: "429", type: "STE", attendant: "RH" },
+      { number: "516", type: "FAM", attendant: "NK" },
+    ],
   },
   {
-    room: "421",
-    reason: "deep-clean",
-    note: "Long stay checked out after 14 nights.",
+    stage: "inspecting",
+    count: 6,
+    rooms: [
+      { number: "219", type: "DLX", attendant: "LW" },
+      { number: "308", type: "STD", attendant: "SA" },
+      { number: "423", type: "DLX", attendant: "DP" },
+      { number: "530", type: "STE", attendant: "RH" },
+      { number: "606", type: "STD", attendant: "NK" },
+      { number: "614", type: "STD", attendant: "NK" },
+    ],
   },
   {
-    room: "521",
-    reason: "maintenance",
-    note: "Balcony door lock jammed.",
+    stage: "ready",
+    count: 112,
+    rooms: [
+      { number: "201", type: "STD", attendant: "LW" },
+      { number: "226", type: "DLX", attendant: "LW" },
+      { number: "320", type: "DLX", attendant: "SA" },
+      { number: "508", type: "STD", attendant: "RH" },
+      { number: "524", type: "DLX", attendant: "RH" },
+      { number: "628", type: "STE", attendant: "NK" },
+    ],
+  },
+] as const satisfies readonly HospitalityHousekeepingColumn[];
+
+export const hospitalityAttendants = [
+  { id: "LW", name: "Lina Wijaya", done: 11, assigned: 14 },
+  { id: "SA", name: "Sri Astuti", done: 9, assigned: 14 },
+  { id: "DP", name: "Dedi Permana", done: 7, assigned: 13 },
+  { id: "RH", name: "Rudi Hartono", done: 10, assigned: 12 },
+  { id: "NK", name: "Nur Kholifah", done: 6, assigned: 12 },
+] as const satisfies readonly HospitalityAttendant[];
+
+export const hospitalityReviewSummary = {
+  rating: 4.6,
+  reviews: 128,
+  needsReply: 5,
+  distribution: [89, 24, 9, 4, 2],
+} as const satisfies HospitalityReviewSummary;
+
+export const hospitalityReviews = [
+  {
+    id: "r1",
+    guest: "Maya Puspita",
+    channel: "Google",
+    stars: 5,
+    quote:
+      "Spotless room and the breakfast spread was the best we've had in Jakarta.",
+    topics: ["Cleanliness", "Breakfast"],
+    when: "09:40",
+    replied: true,
   },
   {
-    room: "611",
-    reason: "deep-clean",
-    note: "Carpet shampoo requested by front desk.",
+    id: "r2",
+    guest: "Hendra Gunawan",
+    channel: "Booking",
+    stars: 3,
+    quote: "Great location, but the air conditioning in 224 rattled all night.",
+    topics: ["Location", "Noise"],
+    when: "08:15",
+    replied: false,
   },
-] as const satisfies readonly HospitalityFlaggedRoom[];
+  {
+    id: "r3",
+    guest: "Nadia Safitri",
+    channel: "TripAdvisor",
+    stars: 5,
+    quote:
+      "Front desk remembered our anniversary and upgraded us without asking.",
+    topics: ["Staff"],
+    when: "Yesterday",
+    replied: true,
+  },
+  {
+    id: "r4",
+    guest: "Fajar Nugroho",
+    channel: "Google",
+    stars: 4,
+    quote: "Wi-Fi dropped during a call, otherwise a smooth business stay.",
+    topics: ["Wi-Fi", "Staff"],
+    when: "Yesterday",
+    replied: false,
+  },
+] as const satisfies readonly HospitalityReview[];
 
 export const hospitalityRevenue = {
   rooms: 157_500_000,

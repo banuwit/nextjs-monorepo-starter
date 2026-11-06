@@ -3,19 +3,19 @@
 import { useEffect, useState } from "react";
 
 import {
-  manufacturingMachines,
-  manufacturingReadingDeltas,
-  manufacturingUnitsPerTick,
-} from "@/mocks/dashboard-manufacturing.mock";
+  manufactureMachines,
+  manufactureReadingDeltas,
+  manufactureUnitsPerTick,
+} from "@/mocks/dashboard-manufacture.mock";
 
-import type { ManufacturingMachine } from "../types/manufacturing";
-import { stepMachines } from "../utils/manufacturing";
+import type { ManufactureMachine } from "../types/manufacture";
+import { stepMachines } from "../utils/manufacture";
 
 const TICK_MS = 5_000;
 
 type LiveState = {
   clock: number;
-  machines: ManufacturingMachine[];
+  machines: ManufactureMachine[];
   tick: number;
   extraUnits: number;
   latestId: string | null;
@@ -24,7 +24,7 @@ type LiveState = {
 function initialState(now: number): LiveState {
   return {
     clock: now,
-    machines: manufacturingMachines,
+    machines: manufactureMachines,
     tick: 0,
     extraUnits: 0,
     latestId: null,
@@ -46,13 +46,13 @@ export function useMachineLive(now: number) {
         const step = stepMachines(
           current.machines,
           current.tick,
-          manufacturingReadingDeltas,
+          manufactureReadingDeltas,
         );
         return {
           clock: Date.now(),
           machines: step.machines,
           tick: current.tick + 1,
-          extraUnits: current.extraUnits + manufacturingUnitsPerTick,
+          extraUnits: current.extraUnits + manufactureUnitsPerTick,
           latestId: step.latestId,
         };
       });

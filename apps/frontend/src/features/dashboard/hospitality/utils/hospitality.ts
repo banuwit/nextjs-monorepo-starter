@@ -4,17 +4,16 @@ import {
   CircleCheckIcon,
   CircleXIcon,
   DoorOpenIcon,
-  SparklesIcon,
-  WrenchIcon,
   type LucideIcon,
 } from "lucide-react";
 
 import type { StatusTone } from "../types/dashboard";
 import type {
-  HospitalityFlagReason,
-  HospitalityOccupancyPoint,
+  HospitalityForecastDay,
+  HospitalityHousekeepingStage,
+  HospitalityLoyaltyTier,
   HospitalityReservationStatus,
-  HospitalityRoomState,
+  HospitalityReviewChannel,
 } from "../types/hospitality";
 
 type Style = { tone: StatusTone; icon: LucideIcon; label: string };
@@ -34,51 +33,83 @@ export const reservationStatusStyles: Record<
   cancelled: { tone: "warning", icon: BanIcon, label: "Cancelled" },
 };
 
-export const flagReasonStyles: Record<HospitalityFlagReason, Style> = {
-  maintenance: { tone: "danger", icon: WrenchIcon, label: "Maintenance" },
-  "deep-clean": { tone: "info", icon: SparklesIcon, label: "Deep clean" },
+/** Loyalty tiers map onto StatusBadge tones so Gold reads warm, Silver cool. */
+export const loyaltyTierTones: Record<HospitalityLoyaltyTier, StatusTone> = {
+  Gold: "warning",
+  Silver: "info",
+  Member: "neutral",
 };
 
-/** Full Tailwind classes per room state; the legend repeats the label in text. */
-export const roomStateStyles: Record<
-  HospitalityRoomState,
-  { label: string; className: string }
+export const reviewChannelTones: Record<HospitalityReviewChannel, StatusTone> =
+  {
+    Google: "info",
+    Booking: "info",
+    TripAdvisor: "success",
+  };
+
+/**
+ * Full Tailwind classes per housekeeping column, tinted like StatusBadge:
+ * dirty is destructive, cleaning amber, inspecting sky, ready emerald.
+ */
+export const housekeepingStageStyles: Record<
+  HospitalityHousekeepingStage,
+  { label: string; header: string; dot: string; meter: string }
 > = {
-  occupied: { label: "Occupied", className: "bg-chart-1" },
-  "due-out": { label: "Due out", className: "bg-chart-4/60" },
-  "vacant-clean": {
-    label: "Vacant clean",
-    className: "bg-muted ring-1 ring-inset ring-border",
+  dirty: {
+    label: "Dirty",
+    header: "bg-destructive/10 text-destructive dark:bg-destructive/20",
+    dot: "bg-destructive",
+    meter: "bg-destructive",
   },
-  "vacant-dirty": { label: "Vacant dirty", className: "bg-amber-500/60" },
-  "out-of-order": {
-    label: "Out of order",
-    className: "bg-destructive/20 ring-1 ring-inset ring-destructive/40",
+  cleaning: {
+    label: "Cleaning",
+    header:
+      "bg-amber-500/15 text-amber-800 dark:bg-amber-500/15 dark:text-amber-300",
+    dot: "bg-amber-500",
+    meter: "bg-amber-500",
+  },
+  inspecting: {
+    label: "Inspecting",
+    header: "bg-sky-500/10 text-sky-800 dark:bg-sky-500/15 dark:text-sky-300",
+    dot: "bg-sky-500",
+    meter: "bg-sky-500",
+  },
+  ready: {
+    label: "Ready",
+    header:
+      "bg-emerald-500/10 text-emerald-800 dark:bg-emerald-500/15 dark:text-emerald-300",
+    dot: "bg-emerald-500",
+    meter: "bg-emerald-500",
   },
 };
 
-export const roomStateOrder: readonly HospitalityRoomState[] = [
-  "occupied",
-  "due-out",
-  "vacant-clean",
-  "vacant-dirty",
-  "out-of-order",
+export const housekeepingStageOrder: readonly HospitalityHousekeepingStage[] = [
+  "dirty",
+  "cleaning",
+  "inspecting",
+  "ready",
 ];
 
-export function summarizeOccupancy(
-  points: readonly HospitalityOccupancyPoint[],
-  target: number,
-) {
-  if (!points.length) return { average: 0, aboveTarget: 0 };
-  const sum = points.reduce((total, point) => total + point.occupancy, 0);
-  return {
-    average: Math.round((sum / points.length) * 10) / 10,
-    aboveTarget: points.filter((point) => point.occupancy >= target).length,
-  };
+export function summarizeForecast(days: readonly HospitalityForecastDay[]) {
+  if (!days.length) return { occupancy: 0, adr: 0 };
+  const occupancy =
+    days.reduce((sum, day) => sum + day.occupancy, 0) / days.length;
+  const adr = days.reduce((sum, day) => sum + day.adr, 0) / days.length;
+  return { occupancy: Math.round(occupancy), adr: Math.round(adr) };
 }
 
 export function sharePercent(count: number, total: number) {
   return total ? Math.round((count / total) * 100) : 0;
+}
+
+/** "RM" from "Rina Marlina"; at most two letters. */
+export function initials(name: string) {
+  return name
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part.charAt(0).toUpperCase())
+    .join("");
 }
 
 const shortDay = new Intl.DateTimeFormat("en-US", {
@@ -89,6 +120,21 @@ const shortDay = new Intl.DateTimeFormat("en-US", {
 
 export function formatShortDay(isoDay: string) {
   return shortDay.format(new Date(`${isoDay}T12:00:00Z`));
+}
+
+const weekday = new Intl.DateTimeFormat("en-US", {
+  weekday: "short",
+  timeZone: "UTC",
+});
+
+/** "Fri" for an ISO day. */
+export function formatWeekday(isoDay: string) {
+  return weekday.format(new Date(`${isoDay}T12:00:00Z`));
+}
+
+/** "14:00" from an hour of day. */
+export function formatHour(hour: number) {
+  return `${String(hour).padStart(2, "0")}:00`;
 }
 
 const idr = new Intl.NumberFormat("id-ID", {
@@ -109,7 +155,7 @@ export function formatIdr(value: number) {
   return idr.format(value);
 }
 
-/** "Rp 253,3 jt" */
+/** "Rp 1,2 jt" */
 export function formatIdrCompact(value: number) {
   return idrCompact.format(value);
 }

@@ -9,6 +9,7 @@ type State = { pipelines: Pipeline[]; leads: Lead[] };
 type Action =
   | { type: "save-lead"; lead: Lead }
   | { type: "delete-lead"; id: string }
+  | { type: "reorder-lead"; id: string; beforeId: string | null }
   | { type: "add-pipeline"; pipeline: Pipeline };
 
 function reducer(state: State, action: Action): State {
@@ -18,12 +19,41 @@ function reducer(state: State, action: Action): State {
       return {
         ...state,
         leads: exists
-          ? state.leads.map((lead) => (lead.id === action.lead.id ? action.lead : lead))
+          ? state.leads.map((lead) =>
+              lead.id === action.lead.id ? action.lead : lead,
+            )
           : [action.lead, ...state.leads],
       };
     }
     case "delete-lead":
-      return { ...state, leads: state.leads.filter((lead) => lead.id !== action.id) };
+      return {
+        ...state,
+        leads: state.leads.filter((lead) => lead.id !== action.id),
+      };
+    case "reorder-lead": {
+      const moving = state.leads.find((lead) => lead.id === action.id);
+      if (!moving) return state;
+      const rest = state.leads.filter((lead) => lead.id !== action.id);
+      const index = action.beforeId
+        ? rest.findIndex((lead) => lead.id === action.beforeId)
+        : -1;
+      // Without a valid anchor the lead goes after its stage mates, i.e. last among its stage.
+      const target =
+        index >= 0
+          ? index
+          : rest.reduce(
+              (last, lead, at) =>
+                lead.pipelineId === moving.pipelineId &&
+                lead.stageId === moving.stageId
+                  ? at + 1
+                  : last,
+              rest.length,
+            );
+      return {
+        ...state,
+        leads: [...rest.slice(0, target), moving, ...rest.slice(target)],
+      };
+    }
     case "add-pipeline":
       return { ...state, pipelines: [...state.pipelines, action.pipeline] };
   }
@@ -44,7 +74,10 @@ export function useLeads() {
     () => ({
       saveLead: (lead: Lead) => dispatch({ type: "save-lead", lead }),
       deleteLead: (id: string) => dispatch({ type: "delete-lead", id }),
-      addPipeline: (pipeline: Pipeline) => dispatch({ type: "add-pipeline", pipeline }),
+      reorderLead: (id: string, beforeId: string | null) =>
+        dispatch({ type: "reorder-lead", id, beforeId }),
+      addPipeline: (pipeline: Pipeline) =>
+        dispatch({ type: "add-pipeline", pipeline }),
     }),
     [],
   );

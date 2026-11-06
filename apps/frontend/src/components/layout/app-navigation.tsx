@@ -98,8 +98,8 @@ const mainNavigation: NavigationSection[] = [
             icon: <HotelIcon />,
           },
           {
-            title: "HR",
-            url: "/dashboard/hr",
+            title: "Human Resource",
+            url: "/dashboard/human-resource",
             icon: <IdCardIcon />,
           },
           {
@@ -108,8 +108,8 @@ const mainNavigation: NavigationSection[] = [
             icon: <TruckIcon />,
           },
           {
-            title: "Manufaktur",
-            url: "/dashboard/manufacturing",
+            title: "Manufacture",
+            url: "/dashboard/manufacture",
             icon: <FactoryIcon />,
           },
           {
@@ -201,6 +201,7 @@ const mainNavigation: NavigationSection[] = [
         url: "/receipt",
         icon: <ReceiptTextIcon />,
       },
+      { title: "Task", url: "/task", icon: <ListTodoIcon /> },
       {
         title: "Workflow",
         url: "/workflow",
@@ -267,7 +268,6 @@ const mainNavigation: NavigationSection[] = [
         url: "/structure",
         icon: <NetworkIcon />,
       },
-      { title: "Task", url: "/task", icon: <ListTodoIcon /> },
       {
         title: "Whiteboard",
         url: "/whiteboard",
@@ -283,8 +283,9 @@ const mainNavigation: NavigationSection[] = [
 ];
 
 export function useAppNavigation(): NavigationSection[] {
+  const [pageSection, ...otherSections] = mainNavigation;
   return [
-    ...mainNavigation,
+    ...(pageSection ? [pageSection] : []),
     {
       title: "Documentation",
       icon: <BookOpenIcon />,
@@ -380,5 +381,6 @@ export function useAppNavigation(): NavigationSection[] {
         },
       ],
     },
+    ...otherSections,
   ];
 }

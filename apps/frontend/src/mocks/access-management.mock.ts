@@ -1,115 +1,86 @@
 import type {
   AccessMatrix,
-  PermissionAction,
   PermissionPage,
 } from "@/features/access-management/types/access-management";
 
-/** Table columns. A page only supports the actions listed in its `permissions`. */
-export const permissionActions = [
-  { id: "view", name: "View" },
-  { id: "create", name: "Create" },
-  { id: "edit", name: "Edit" },
-  { id: "delete", name: "Delete" },
-  { id: "export", name: "Export" },
-  { id: "manage", name: "Manage" },
-] satisfies PermissionAction[];
-
-/** Table rows. Permission ids are `<page id>.<action id>`. */
+/**
+ * Pages in the list. Every page has view, create, edit, and delete; `extraActions`
+ * lists the custom ones. Permission ids are `<page id>.<action id>`.
+ */
 export const permissionPages = [
   {
     id: "members",
     name: "Members",
     description: "Directory of workspace members",
-    permissions: {
-      view: "View the directory of 12 active members",
-      create: "Send invites that expire in 7 days",
-      delete: "Deactivate or remove a member",
-      export: "Download seat and role CSV",
-      manage: "Transfer Owner after handoff approval",
-    },
+    extraActions: [
+      { id: "import", name: "Import" },
+      { id: "export", name: "Export" },
+      { id: "approve", name: "Approve invites" },
+      { id: "transfer", name: "Transfer owner" },
+    ],
   },
   {
     id: "roles",
     name: "Roles",
     description: "Custom roles and what they grant",
-    permissions: {
-      view: "See every role and what it grants",
-      create: "Add custom roles to the workspace",
-      edit: "Change the scopes a role can use",
-      delete: "Remove custom roles with no members",
-    },
   },
   {
     id: "billing",
     name: "Billing",
     description: "Invoices, payment, and the plan",
-    permissions: {
-      view: "View invoices and payment history",
-      create: "Add paid seats",
-      edit: "Update cards and billing contacts",
-      delete: "Release paid seats",
-      manage: "Upgrade, downgrade, or cancel the plan",
-    },
+    extraActions: [
+      { id: "export", name: "Export invoices" },
+      { id: "plan", name: "Change plan" },
+    ],
   },
   {
     id: "projects",
     name: "Projects",
     description: "All workspace projects",
-    permissions: {
-      view: "Browse all 8 workspace projects",
-      create: "Start a project from a template",
-      delete: "Permanently delete a project",
-      manage: "Archive finished projects from lists",
-    },
+    extraActions: [
+      { id: "move", name: "Move" },
+      { id: "archive", name: "Archive" },
+      { id: "export", name: "Export" },
+    ],
   },
   {
     id: "settings",
     name: "Settings",
     description: "Workspace configuration",
-    permissions: {
-      view: "View workspace configuration",
-      edit: "Change the name, logo, and locale",
-      delete: "Remove the workspace after 30 days",
-      manage: "Add and verify custom domains",
-    },
+    extraActions: [{ id: "domains", name: "Manage domains" }],
   },
   {
     id: "audit",
     name: "Audit log",
     description: "Sign-ins and sensitive changes",
-    permissions: {
-      view: "Review sign-ins and sensitive changes",
-      edit: "Keep events for 90 days to 2 years",
-      export: "Download events as CSV or JSON",
-      manage: "Forward events to an external SIEM",
-    },
+    extraActions: [
+      { id: "export", name: "Export" },
+      { id: "stream", name: "Stream to SIEM" },
+    ],
   },
   {
     id: "api-keys",
     name: "API keys",
     description: "Keys scoped to one project",
-    permissions: {
-      view: "See key names and last-used dates",
-      create: "Issue keys scoped to one project",
-      edit: "Rotate a key with a 24-hour overlap",
-      delete: "Disable a key immediately",
-    },
+    extraActions: [{ id: "rotate", name: "Rotate" }],
   },
   {
     id: "sso",
     name: "SSO",
     description: "Identity provider connection",
-    permissions: {
-      view: "View the identity provider connection",
-      create: "Provision members from the directory (SCIM)",
-      edit: "Upload SAML metadata and map attributes",
-      manage: "Require SSO for every member sign-in",
-    },
+    extraActions: [
+      { id: "scim", name: "Manage SCIM" },
+      { id: "enforce", name: "Enforce SSO" },
+    ],
   },
 ] satisfies PermissionPage[];
 
-const allPermissionIds = permissionPages.flatMap((page) =>
-  Object.keys(page.permissions).map((actionId) => `${page.id}.${actionId}`),
+const standardActionIds = ["view", "create", "edit", "delete"];
+
+const allPermissionIds = permissionPages.flatMap((page: PermissionPage) =>
+  [...standardActionIds, ...(page.extraActions ?? []).map(({ id }) => id)].map(
+    (actionId) => `${page.id}.${actionId}`,
+  ),
 );
 
 export const initialAccessMatrix = {
@@ -150,7 +121,7 @@ export const initialAccessMatrix = {
     owner: allPermissionIds,
     admin: allPermissionIds.filter(
       (id) =>
-        !["members.manage", "settings.delete", "billing.manage"].includes(id),
+        !["members.transfer", "settings.delete", "billing.plan"].includes(id),
     ),
     member: [
       "members.view",
@@ -167,7 +138,7 @@ export const initialAccessMatrix = {
       "billing.create",
       "billing.edit",
       "billing.delete",
-      "billing.manage",
+      "billing.plan",
       "projects.view",
     ],
     guest: ["members.view", "projects.view"],

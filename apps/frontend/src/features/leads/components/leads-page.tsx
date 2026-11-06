@@ -53,7 +53,7 @@ const ownerOptions = leadOwners.map((owner) => ({ label: owner, value: owner }))
 const priorityOptions = Object.entries(leadPriorities).map(([value, label]) => ({ label, value }));
 
 export function LeadsPage() {
-  const { pipelines, leads, saveLead, deleteLead, addPipeline } = useLeads();
+  const { pipelines, leads, saveLead, deleteLead, reorderLead, addPipeline } = useLeads();
   const today = useToday();
   const [pipelineId, setPipelineId] = useState(pipelines[0]?.id ?? "");
   const [view, setView] = useState<LeadsView>("kanban");
@@ -138,7 +138,7 @@ export function LeadsPage() {
       >
         <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
           <Tabs value={pipeline.id} onValueChange={(value) => setPipelineId(String(value))} className="min-w-0">
-            <div className="-mx-1 overflow-x-auto px-1">
+            <div className="-mx-1 -my-1 overflow-x-auto overflow-y-hidden px-1 py-1">
               <TabsList aria-label="Pilih pipeline" className="w-fit">
                 {pipelines.map((item) => (
                   <TabsTrigger key={item.id} value={item.id}>
@@ -233,6 +233,7 @@ export function LeadsPage() {
           today={today}
           onOpen={openDetail}
           onMove={requestMove}
+          onReorder={reorderLead}
           onAdd={(stageId) => setForm({ mode: "create", stageId })}
         />
       ) : (

@@ -1,44 +1,61 @@
-# Struktur folder dan pola coding frontend
+# Standar struktur folder frontend
 
-Rules ini menjadi acuan agent saat membuat file, folder, dan kode di `apps/frontend/src/`. Isinya menggabungkan struktur target [PRD Tahap 1 §6, §10, §11, §13](../../../apps/frontend/prd.md) dengan kondisi kode yang benar-benar ada. Ikuti juga [panduan repositori](../../../AGENTS.md), [Panduan Preferences](./preferences.md), [Panduan Data Grid](./data-grid.md), dan [Pola halaman CRUD](./crud-pattern.md).
+Dokumen ini adalah standar struktur folder aplikasi Next.js di `apps/frontend/src/`, dipakai bersama antar-tim agar setiap project memiliki susunan yang **identik** dengan repo acuan `nextjs-monorepo-starter`. Level monorepo (root, `apps/`, `packages/`) diatur di [Standar struktur folder monorepo](../structure-monorepo.md). Ikuti juga [panduan repositori](../../../AGENTS.md), [Panduan Preferences](./preferences.md), [Panduan Data Grid](./data-grid.md), [Panduan komponen Filter](./filter.md), dan [Pola halaman CRUD](./crud-pattern.md).
 
-**Keputusan pengguna, 24 Oktober 2026, diubah 30 Oktober 2026:** setiap fitur yang merupakan halaman (daun, memiliki route sendiri) memiliki lima folder standar, meskipun masih kosong. Folder induk kelompok fitur tidak boleh memiliki folder standar sama sekali; kode yang dipakai beberapa halaman anak disalin ke setiap halaman anak. Keputusan ini menggantikan ketentuan PRD (§0 butir 4 dan tabel §2 "hanya jika diperlukan") khusus untuk folder halaman fitur. Folder global di luar `features/` tetap dibuat hanya ketika ada file nyata.
+- **Wajib**: folder/file harus ada di semua project.
+- **Saat dibutuhkan**: dibuat hanya ketika fiturnya dikerjakan, tetapi nama dan lokasinya harus mengikuti standar ini.
 
-Jika kode dan PRD berbeda, ikuti kode yang ada untuk nama folder/route saat ini (lihat [Perbedaan dengan PRD](#perbedaan-kode-saat-ini-dengan-prd)) dan ikuti PRD untuk batas arsitektur yang ditandai **DIKUNCI**.
+Jika kode dan PRD berbeda, ikuti standar ini untuk nama folder/route dan ikuti PRD untuk batas arsitektur yang ditandai **DIKUNCI**.
 
-## Peta `apps/frontend/src/`
+## Struktur standar
 
 ```text
-src/
-├── app/                    # App Router: route, layout, Route Handler
-│   ├── (auth)/             # Halaman login tanpa shell dashboard (login-1 … login-5)
-│   ├── (backoffice)/       # Halaman dengan shell dashboard; layout.tsx = sidebar/header
-│   │   ├── (page)/          # section sidebar "Page": dashboard/{main,sales,finance,crm,productivity}, ai-chat/, ai-usage/, project/, … (satu folder per menu)
-│   │   ├── (playground)/    # section "Playground": wizard/, draft-preview/, rich-text-editor/, notes/, map-delivery/, … (satu folder per menu)
-│   │   ├── (documentation)/ # section "Documentation": crud/  table/  filter/  chart/
-│   │   └── (account)/       # halaman menu akun di luar sidebar: profile
-│   ├── fonts/              # File font lokal untuk Preferences
-│   ├── layout.tsx          # Root HTML, font, boot script tema, PreferencesProvider
-│   ├── page.tsx            # Redirect root
-│   └── globals.css         # Tailwind v4 + token tema
-├── features/<fitur>/       # UI dan logika khusus fitur (lima folder standar di folder halaman)
-├── components/             # Komponen lintas fitur
-│   ├── ui/                 # Primitive shadcn (Base UI)
-│   ├── layout/             # Sidebar, header, menubar, multi-sidebar, nav, Preferences
-│   ├── crud/               # Empat pola CRUD global (CrudResource, page/dialog/sheet/inline)
-│   ├── data-grid/          # DataGridClient / DataGridServer dan bagiannya
-│   ├── filter/             # FacetedFilter, SelectFilter, ComboboxFilter, SearchFilter
-│   ├── chart/              # ChartCard, ChartLegendToggle
-│   ├── gantt/              # Komponen Gantt bersama
-│   ├── app-body.tsx        # Pembungkus konten halaman
-│   ├── page-heading.tsx    # Breadcrumb + <h1>
-│   └── navigation-breadcrumb.tsx
-├── hooks/                  # Hook lintas fitur (use-mobile, use-highlighted-code)
-├── lib/                    # Integrasi library: utils.ts (cn), preferences-config.ts, highlighter
-├── providers/              # Provider React global (preferences-provider.tsx)
-├── mocks/                  # Data contoh frontend-only (*.mock.ts) + hook mock CRUD
-├── types/                  # Tipe UI lintas fitur (saat ini kosong)
-└── utils/                  # Fungsi murni lintas fitur (saat ini kosong)
+apps/frontend/src/
+├── app/                        # Wajib. App Router: route, layout, Route Handler
+│   ├── layout.tsx              # Wajib. Root HTML, font, boot script tema, PreferencesProvider
+│   ├── page.tsx                # Wajib. Redirect root
+│   ├── globals.css             # Wajib. Tailwind v4 + token tema
+│   ├── favicon.ico, icon.svg, apple-icon.png   # Wajib. Ikon aplikasi (konvensi file Next.js)
+│   ├── fonts/                  # Wajib. File font lokal untuk Preferences
+│   ├── (auth)/                 # Wajib. Halaman tanpa shell dashboard (login)
+│   ├── (backoffice)/           # Wajib. Halaman dengan shell dashboard
+│   │   ├── layout.tsx          # Wajib. Sidebar, header, pembungkus multi-sidebar
+│   │   ├── (page)/             # Wajib. Section sidebar "Page"
+│   │   ├── (playground)/       # Saat dibutuhkan. Section sidebar "Playground"
+│   │   ├── (documentation)/    # Saat dibutuhkan. Section sidebar "Documentation"
+│   │   └── (account)/          # Wajib. Halaman menu akun di luar sidebar (profile, change-password)
+│   └── api/v1/<resource>/route.ts   # Saat dibutuhkan. Route Handler REST
+│
+├── features/                   # Wajib. UI dan logika khusus fitur
+│   └── <fitur>/                # Satu folder per halaman (lihat "Struktur wajib fitur")
+│       ├── components/
+│       ├── hooks/
+│       ├── schemas/
+│       ├── types/
+│       └── utils/
+│
+├── components/                 # Wajib. Komponen lintas fitur
+│   ├── ui/                     # Wajib. Primitive shadcn (Base UI)
+│   ├── layout/                 # Wajib. Sidebar, header, menubar, multi-sidebar, nav, menu search, Preferences
+│   ├── app-body.tsx            # Wajib. Pembungkus konten halaman
+│   ├── app-logo.tsx            # Wajib. Logo aplikasi
+│   ├── page-heading.tsx        # Wajib. Breadcrumb + <h1>
+│   ├── navigation-breadcrumb.tsx   # Wajib
+│   ├── crud/                   # Saat dibutuhkan. Empat pola CRUD global
+│   ├── data-grid/              # Saat dibutuhkan. DataGridClient / DataGridServer
+│   ├── filter/                 # Saat dibutuhkan. Filter toolbar, advanced/, group/
+│   ├── reui/                   # Saat dibutuhkan. Kode vendor ReUI (jangan diedit manual)
+│   ├── chart/                  # Saat dibutuhkan. ChartCard, ChartLegendToggle
+│   ├── gantt/                  # Saat dibutuhkan
+│   └── map/                    # Saat dibutuhkan. Tema MapLibre
+│
+├── hooks/                      # Wajib. Hook lintas fitur (use-mobile, …)
+├── lib/                        # Wajib. Integrasi library: utils.ts (cn), preferences-config.ts
+│   └── api/                    # Saat dibutuhkan. client.ts, server.ts, errors.ts, endpoints/<resource>.ts
+├── providers/                  # Wajib. Provider React global (preferences-provider.tsx)
+├── mocks/                      # Saat dibutuhkan. Data contoh frontend-only (<fitur>.mock.ts) + hook mock CRUD
+├── types/                      # Wajib. Tipe UI lintas fitur (boleh kosong)
+└── utils/                      # Wajib. Fungsi murni lintas fitur (boleh kosong)
 ```
 
 ## Fungsi setiap direktori
@@ -47,16 +64,16 @@ src/
 | ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------- |
 | `src/app/**/page.tsx`        | Entry point tipis: `metadata`, membaca `params`/`searchParams`, lalu merender satu komponen halaman dari `src/features/`.             | UI fitur, state, logika bisnis, query DB, data mock inline             |
 | `src/app/**/layout.tsx`      | Tata letak bersama segmen (root: provider/font; `(backoffice)`: shell dashboard).                                                     | Logika fitur, provider Preferences kedua                               |
-| `src/app/api/**/route.ts`    | Route Handler REST `/api/v1` (target PRD, belum ada).                                                                                 | Komponen React; logika bisnis inti (milik `packages/core`)             |
+| `src/app/api/**/route.ts`    | Route Handler REST `/api/v1`.                                                                                                         | Komponen React; logika bisnis inti (milik `packages/core`)             |
 | `src/features/*/components/` | Komponen halaman (`*-page.tsx`), form, kolom/tabel fitur, widget, card, renderer, CSS/CSS Module, pemetaan ikon khusus fitur.         | Salinan Data Grid, pola CRUD, atau primitive shadcn                    |
 | `src/features/*/hooks/`      | Custom hook fitur (`use-*.ts`). Saat API tersedia: hook TanStack Query yang memanggil `lib/api/endpoints/` dan mengatur invalidation. | Raw `fetch`, SQL/Drizzle, hook lintas fitur                            |
 | `src/features/*/schemas/`    | Schema Zod form/UI dan konfigurasi schema editor/dokumen (`*.schema.ts`). Bila API ada, `extend`/`pick` dari `packages/contracts`.    | Sumber aturan request API baru yang menduplikasi contracts             |
 | `src/features/*/types/`      | Tipe/interface fitur; tipe hasil schema diturunkan dengan `z.infer`.                                                                  | Duplikat DTO response API                                              |
 | `src/features/*/utils/`      | Fungsi murni: formatter, mapper form → payload, reducer, filter, parser, export, konstanta/opsi UI fitur.                             | Komponen React, utilitas umum lintas fitur                             |
 | `src/components/ui/`         | Primitive shadcn; ditambah dengan `pnpm dlx shadcn@latest add <nama>` dari `apps/frontend`.                                           | Logika bisnis atau pengetahuan fitur                                   |
-| `src/components/<grup>/`     | Komponen generik lintas fitur (`crud`, `data-grid`, `filter`, `chart`, `gantt`, `layout`).                                            | Impor dari `@/features/*` atau `@/mocks/*`; endpoint/resource hardcode |
+| `src/components/<grup>/`     | Komponen generik lintas fitur (`crud`, `data-grid`, `filter`, `chart`, `gantt`, `layout`, `map`); `reui/` khusus kode vendor ReUI.    | Impor dari `@/features/*` atau `@/mocks/*`; endpoint/resource hardcode |
 | `src/hooks/`                 | Hook yang dipakai lebih dari satu fitur.                                                                                              | Hook resource seperti `useUsers`                                       |
-| `src/lib/`                   | Integrasi library dan konfigurasi teknis; target PRD: `lib/api/{client,server,errors}.ts` dan `lib/api/endpoints/<resource>.ts`.      | Komponen UI fitur                                                      |
+| `src/lib/`                   | Integrasi library dan konfigurasi teknis; `lib/api/{client,server,errors}.ts` dan `lib/api/endpoints/<resource>.ts` saat API ada.     | Komponen UI fitur                                                      |
 | `src/providers/`             | Provider React global.                                                                                                                | Persistensi domain; provider/state Preferences duplikat                |
 | `src/types/`, `src/utils/`   | Tipe UI dan fungsi murni yang dipakai lintas fitur.                                                                                   | Duplikat DTO contracts; klien auth/session/network                     |
 | `src/mocks/`                 | Data contoh bertipe untuk halaman frontend-only (`<nama>.mock.ts`) dan hook mock CRUD (`use-crud-data.ts`, `use-crud-examples.ts`).   | Pengganti diam-diam API untuk resource yang wajib memakai DB           |
@@ -72,50 +89,47 @@ apps/frontend/src/features/<fitur>/
 └── utils/
 ```
 
-- Kelima folder wajib ada di folder halaman (fitur daun), termasuk ketika belum memiliki file. Buat langsung di filesystem (`mkdir -p .../{components,hooks,schemas,types,utils}`).
-- Jangan membuat `.gitkeep`, file placeholder, atau ekspor kosong untuk mempertahankan folder. Checkout Git baru tidak otomatis membentuk folder kosong, dan pembuatan ulangnya belum diotomatisasi.
-- Aturan berlaku untuk folder terakhir yang menjadi halaman: fitur tingkat atas tanpa subfitur dan setiap subfitur/varian halaman. Contoh: `calendar/`, `dashboard/sales/`, `authentication/auth-1/`, `table/editable/sheet/`, dan `crud/modal/` masing-masing memiliki lima folder tersebut. Folder induk kelompok (`dashboard/`, `authentication/`, `table/`, `table/editable/`, `crud/`, `chart/`, `ai-chat/`) tidak boleh berisi `components/`, `hooks/`, `schemas/`, `types/`, atau `utils/`; isinya hanya folder halaman anak dan dokumen seperti `README.md`.
+- Kelima folder wajib ada di setiap folder halaman (fitur daun yang memiliki route sendiri), termasuk ketika belum memiliki file. Buat langsung di filesystem (`mkdir -p .../{components,hooks,schemas,types,utils}`). Keputusan pengguna, 24 Oktober 2026, diubah 30 Oktober 2026; menggantikan ketentuan PRD §0 butir 4 dan tabel §2 khusus untuk folder halaman fitur.
+- Jangan membuat `.gitkeep`, file placeholder, atau ekspor kosong untuk mempertahankan folder. Checkout Git baru tidak otomatis membentuk folder kosong; periksa kelengkapan lima folder setiap kali menyentuh fitur dan lengkapi dengan `mkdir -p` bila ada yang hilang.
+- Aturan berlaku untuk folder terakhir yang menjadi halaman: fitur tingkat atas tanpa subfitur dan setiap subfitur/varian halaman (mis. `calendar/`, `dashboard/sales/`, `authentication/auth-1/`, `table/editable/sheet/`, `crud/modal/`). Folder induk kelompok (`dashboard/`, `authentication/`, `table/`, `crud/`, `chart/`, `ai-chat/`, …) tidak boleh berisi folder standar; isinya hanya folder halaman anak dan dokumen seperti `README.md`.
 - Folder standar tidak perlu memiliki lima subfolder standar lagi. Buat subfolder di dalamnya hanya untuk mengelompokkan file nyata.
-- Jangan menaruh modul kode langsung di root fitur atau root kelompok fitur. Dokumen seperti `README.md` dan `LICENSE` boleh berada di root (contoh: `authentication/README.md`, `calendar/LICENSE`).
-- Kerangka fitur tanpa halaman seperti `user/`, `menus/`, dan `parameters/` tetap memiliki struktur ini. Keberadaan folder tidak berarti halaman atau fungsinya telah diimplementasikan.
+- Jangan menaruh modul kode langsung di root fitur atau root kelompok fitur. Dokumen seperti `README.md` dan `LICENSE` boleh berada di root.
+- Kerangka fitur tanpa halaman (belum berisi file dan belum memiliki route) tetap memiliki struktur ini. Keberadaan folder tidak berarti halaman atau fungsinya telah diimplementasikan.
+
+## Aturan struktur
 
 ### Route group `(backoffice)` mengikuti sidebar
 
-Di dalam `src/app/(backoffice)/`, setiap `page.tsx` berada di route group yang sama dengan section sidebar tempat menunya tampil di `src/components/layout/app-navigation.tsx`: `(page)` untuk Page, `(playground)` untuk Playground, `(documentation)` untuk Documentation. Halaman dari menu akun yang tidak ada di sidebar (profil) masuk `(account)`. Route group tidak masuk URL. Di dalam group, menu induk dengan submenu menjadi folder induk dengan anak per submenu, dan menu tanpa submenu menjadi folder sendiri sejajar menu lain, dengan urutan mengikuti sidebar. Section Page dan Playground sudah mengikuti pola ini: `(page)/dashboard/{main,sales,finance,crm,productivity}`, `(page)/ai-chat/{page,panel,float}`, `(page)/ai-usage`, `(page)/project`, `(page)/product`, dan seterusnya, sehingga URL-nya `/dashboard/main`, `/ai-chat/page`, `/ai-usage`, `/product`. Section Playground sama: `(playground)/wizard`, `(playground)/task`, `(playground)/compare`, dan seterusnya, dengan URL `/wizard`, `/task`, `/compare`. Section Documentation masih mempertahankan segmen URL lama.
-
-- Saat menambah atau memindahkan menu antar-section, pindahkan juga foldernya ke group section tujuan dan buat foldernya sejajar menu lain di group itu. Mengubah segmen URL halaman yang sudah ada harus atas permintaan pengguna.
-- Urutan menu level atas di `app-navigation.tsx` alfabetis per section (tanpa memperhatikan huruf besar-kecil); satu-satunya pengecualian adalah Dashboard yang selalu pertama di Page. Menu baru disisipkan sesuai abjad.
+- Setiap `page.tsx` di `(backoffice)` berada di route group yang sama dengan section sidebar tempat menunya tampil di `components/layout/app-navigation.tsx`: `(page)`, `(playground)`, `(documentation)`. Halaman dari menu akun yang tidak ada di sidebar (`nav-user.tsx`) masuk `(account)`. Route group tidak masuk URL.
+- Di dalam group, menu induk dengan submenu menjadi folder induk dengan anak per submenu (`(page)/dashboard/{main,sales,…}`, `(page)/ai-chat/{page,panel,float}`); menu tanpa submenu menjadi folder sendiri sejajar menu lain (`(page)/ai-usage`, `(playground)/wizard`). URL-nya `/dashboard/main`, `/ai-chat/page`, `/ai-usage`, `/wizard`.
+- Saat menambah atau memindahkan menu antar-section, pindahkan juga foldernya ke group section tujuan, sejajar menu lain di group itu. Mengubah segmen URL halaman yang sudah ada harus atas permintaan pengguna.
 - Satu URL hanya boleh dimiliki satu group; segmen yang sama (mis. `dashboard/`) boleh ada di beberapa group.
 - Jangan menambah `layout.tsx` di group ini hanya untuk pengelompokan; shell tetap di `(backoffice)/layout.tsx`.
+- Urutan menu level atas di `app-navigation.tsx` alfabetis per section (tanpa memperhatikan huruf besar-kecil); pengecualiannya Dashboard selalu pertama di Page. Di submenu Dashboard, Main selalu pertama dan sisanya alfabetis; submenu lain mempertahankan urutan yang ada. Menu baru disisipkan sesuai abjad.
 - Keputusan pengguna, 6 November 2026: hanya `src/app/` yang dikelompokkan per section; `src/features/` tidak.
 
 ### Hubungan route dan fitur
 
-Satu route biasanya dipetakan ke satu fitur atau subfitur. Nama folder fitur mengikuti segmen route bila memungkinkan:
-
-| Route                                       | Fitur                                                       |
-| ------------------------------------------- | ----------------------------------------------------------- |
-| `/login-1` … `/login-5`                     | `authentication/auth-1` … `auth-5`                          |
-| `/dashboard/sales`                          | `dashboard/sales`                                           |
-| `/ai-chat/float`                            | `ai-chat/float`                                             |
-| `/chart/area`                               | `chart/area`                                                |
-| `/table/editable/sheet`                     | `table/editable/sheet`                                      |
-| `/crud/{new-page,modal,sheet,panel-inline}` | `crud` (induk) + `crud/{new-page,modal,sheet,panel-inline}` |
-| `/scenes-3d`                                | `scenes-3d`                                                 |
-| `/workflow`                                 | `workflow` (juga `activity`, `structure`, `process`) |
-
-- Pengecualian `/dashboard/*`: dashboard analitik (`main`, `finance`, `sales`, `crm`, `productivity`) berada di kelompok `features/dashboard/<nama>`; halaman aplikasi lain (`calendar`, `project`, `task`, `file-manager`, `receipt`, `workflow`, `activity`, `structure`, `process`, `ai-chat/*`, dan seterusnya) berada di `/<nama>`, termasuk profil di `/profile`, memakai folder fitur tingkat atas tanpa awalan `dashboard/`. Nama file halaman dashboard analitik: `<nama>-dashboard-page.tsx`.
-- Nama fitur tidak diberi awalan kelompok visual (misalnya `timeline-` atau `flow-`); gunakan nama pendek yang sama dengan segmen route, dan pakai nama itu juga untuk file halaman, mock (`<fitur>.mock.ts`), dan CSS fitur.
+- Satu route dipetakan ke satu fitur atau subfitur. Nama folder fitur sama dengan segmen route (`/calendar` → `features/calendar`, `/table/editable/sheet` → `features/table/editable/sheet`, `/login-1` → `features/authentication/auth-1`).
+- Dashboard analitik (`/dashboard/<nama>`) berada di kelompok `features/dashboard/<nama>` dengan mock `dashboard-<nama>.mock.ts` dan file halaman `<nama>-dashboard-page.tsx`. Halaman aplikasi lain (`/calendar`, `/project`, `/task`, `/profile`, …) memakai folder fitur tingkat atas tanpa awalan `dashboard/`.
+- Nama fitur tidak diberi awalan kelompok visual (mis. `timeline-`, `flow-`); gunakan nama pendek yang sama dengan segmen route, dan pakai nama itu juga untuk judul menu, file halaman, mock (`<fitur>.mock.ts`), dan CSS fitur. Saat sebuah halaman diganti nama, ganti serentak menu, route, folder fitur, nama file, identifier, dan mock-nya.
 
 ### Subfitur dan kode bersama
 
-- Setiap varian halaman memiliki lima folder standar sendiri (misalnya setiap varian login, chart, dan tabel).
-- Kode yang dipakai beberapa varian dalam satu kelompok disalin ke folder standar masing-masing halaman anak dan diimpor secara relatif; induk kelompok tidak menampung kode bersama. Keputusan pengguna, 30 Oktober 2026. Contoh: `chart/<varian>/components/chart-example-page.tsx` dan `chart/<varian>/utils/format.ts`, `ai-chat/{float,page,panel}/{components,hooks,utils}/{chat-composer,use-timers,stream-text}`, serta `table/editable/{inline,row,sheet}/{schemas,types,utils}/user-editing*`. Perubahan pada satu salinan perlu diterapkan ke salinan lain bila perilakunya harus sama. Kode yang dipakai lintas kelompok tetap dipindahkan ke `src/components/`, `src/hooks/`, `src/types/`, atau `src/utils/`.
+- Setiap varian halaman memiliki lima folder standar sendiri (setiap varian login, chart, tabel, CRUD, filter, dashboard).
+- Kode yang dipakai beberapa varian dalam satu kelompok **disalin** ke folder standar masing-masing halaman anak dan diimpor secara relatif; induk kelompok tidak menampung kode bersama. Keputusan pengguna, 29–30 Oktober 2026. Perubahan pada satu salinan perlu diterapkan ke salinan lain bila perilakunya harus sama.
 - Kode yang dipakai lintas kelompok fitur dipindahkan ke `src/components/`, `src/hooks/`, `src/types/`, atau `src/utils/`; jangan mengimpor modul internal kelompok lain hanya untuk berbagi helper.
-- Empat pola CRUD contoh memakai induk `crud/` dan satu subfitur per route. Keputusan pengguna, 29 Oktober 2026: form, kolom, dan tipe contoh ditulis di masing-masing subfitur, bukan dibagikan lewat induk; sumber data mock tetap satu. Pengecualian ini hanya untuk contoh `/crud/*`.
-- Halaman demo `/filter/{base,advance,group}` juga menyalin skema field, tabel, dan utilitasnya di masing-masing subfitur, bukan di induk `filter/` (keputusan pengguna, 29 Oktober 2026). Komponen filter yang reusable tetap di `src/components/filter/`.
+- Sumber data mock yang sama boleh dipakai beberapa subfitur (contoh: empat pola `/crud/*` memakai satu set mock).
 - Halaman chart: setiap kartu varian berada di file sendiri `<chart>-<varian>-card.tsx`; `<chart>-chart-page.tsx` hanya menyusun kartu.
 - Varian shell/layout baru dibuat di file baru di `src/components/layout/`, bukan dengan menambah percabangan pada komponen shell yang sudah ada.
+
+### Yang tidak dibuat
+
+- `features/*/api/` dan `features/*/patterns/` — endpoint terpusat di `lib/api/endpoints/`, pola CRUD di `components/crud/`.
+- `src/constants/`, `src/stores/`, `src/styles/`, `src/validations/`, `src/server/` — tidak dibuat sebagai direktori persiapan. Bila kebutuhan nyata muncul, jelaskan alasannya kepada pengguna.
+- Folder global kosong bertanda _Saat dibutuhkan_ (`src/lib/api/`, `src/app/api/`, `tests/`) sebelum ada file nyata.
+- Barrel `index.ts` untuk meringkas atau mempertahankan lokasi lama.
+- Paket UI bersama di `packages/` sebelum ada komponen yang benar-benar dibagikan antar-aplikasi.
 
 ## Penamaan file dan ekspor
 
@@ -133,14 +147,13 @@ Satu route biasanya dipetakan ke satu fitur atau subfitur. Nama folder fitur men
 
 - Gunakan `.ts`/`.tsx` untuk file baru, TypeScript strict, tanpa `any` dan non-null assertion tanpa alasan.
 - Hanya `page.tsx`, `layout.tsx`, dan file khusus Next.js lain yang memakai `export default`.
-- Komponen di `src/components/` menerima data aplikasi (misalnya user aktif) lewat props dari `src/app/**/layout.tsx` atau fitur, bukan mengimpor `@/mocks/*`. Contoh: `(backoffice)/layout.tsx` memasok `user` ke header dan sidebar.
+- Komponen di `src/components/` menerima data aplikasi (misalnya user aktif) lewat props dari `src/app/**/layout.tsx` atau fitur, bukan mengimpor `@/mocks/*`.
 - Props yang hanya dipakai satu komponen boleh tetap didefinisikan di file komponen tersebut.
 
 ## Impor dan batas dependensi
 
 - Di dalam satu fitur/subfitur, gunakan impor relatif (`./draft-preview-items`, `../utils/draft-preview`, `../types/draft-preview`).
 - Ke luar fitur, gunakan alias `@/` (`@/components/...`, `@/mocks/...`, `@/lib/utils`). Jangan mengimpor modul internal halaman lain.
-- Impor modul secara langsung; jangan membuat barrel `index.ts` hanya untuk meringkas atau mempertahankan lokasi lama.
 - Dependensi tipe memakai `import type`; jaga agar dependensi runtime tidak melingkar.
 - Arah yang diizinkan:
 
@@ -190,45 +203,53 @@ export function ScrollTablePage() {
 }
 ```
 
-- Setiap `page.tsx` yang dapat dikunjungi mengekspor `metadata: Metadata` (`import type { Metadata } from "next"`) dengan `title` berformat `<Nama> | <Bagian>` (`Dashboard`, `Playground`, atau `Workspace`; chart, table, dan CRUD memakai `<Bagian> · <Varian> | Workspace`) serta satu kalimat `description`. Halaman yang hanya `redirect` tidak memerlukannya.
+- Setiap `page.tsx` yang dapat dikunjungi mengekspor `metadata: Metadata` dengan `title` berformat `<Nama> | <Bagian>` (`Dashboard`, `Playground`, atau `Workspace`; chart, table, dan CRUD memakai `<Bagian> · <Varian> | Workspace`) serta satu kalimat `description`. Halaman yang hanya `redirect` tidak memerlukannya.
 - Tambahkan `"use client"` hanya pada komponen yang memerlukan state, efek, event handler, atau API browser; jaga komponen halaman tetap Server Component bila tidak perlu.
 - Jangan meneruskan callback dari Server Component ke Client Component; kirim data serializable dan definisikan kolom/handler di komponen client fitur.
 - Gunakan token tema, radius, dan ukuran `rem` sesuai [Panduan Preferences](./preferences.md); gunakan Data Grid dan CRUD global sesuai [Panduan Data Grid](./data-grid.md).
-- Halaman baru di shell dashboard didaftarkan di `src/components/layout/app-navigation.tsx` dan pencarian menu `menu-search-tree.ts`.
+- Halaman baru di shell dashboard didaftarkan di `components/layout/app-navigation.tsx`; pencarian menu (`menu-search-tree.ts`) mengikuti otomatis.
 
 ## Data: mock sekarang, API kelak
 
-- Semua halaman saat ini memakai data dari `src/mocks/`. Jangan menulis array dummy di komponen atau `page.tsx`; buat/perluas `*.mock.ts` yang bertipe (`satisfies` atau tipe dari `features/*/types`).
+- Selama belum ada API, semua halaman memakai data dari `src/mocks/`. Jangan menulis array dummy di komponen atau `page.tsx`; buat/perluas `*.mock.ts` yang bertipe (`satisfies` atau tipe dari `features/*/types`).
 - Contoh CRUD menyimpan perubahan di localStorage melalui `mocks/use-crud-data.ts`/`use-crud-examples.ts` dengan aturan Zod di `mocks/crud-model.ts`. Ini pratinjau, bukan otorisasi server; hook ini nanti diganti hook TanStack Query di `features/*/hooks/`.
 - Saat API tersedia (milestone PRD), alur wajibnya: `page.tsx → features/<x>/components → features/<x>/hooks/use-<x>.ts → lib/api/endpoints/<x>.ts → lib/api/client.ts → /api/v1/<x>`. Komponen presentasional tetap dipakai; hanya sumber data yang berpindah ke hook.
 - Transform form → payload berada di `features/*/utils/`; field UI-only (misalnya konfirmasi password) tidak dikirim ke API.
 
-## Yang tidak dibuat
-
-- `features/*/api/` dan `features/*/patterns/` — endpoint terpusat di `lib/api/endpoints/`, pola CRUD di `components/crud/`.
-- `src/constants/`, `src/stores/`, `src/styles/`, `src/validations/`, `src/server/` — jangan dibuat sebagai direktori persiapan. Bila kebutuhan nyata muncul, jelaskan alasannya kepada pengguna.
-- Folder global kosong (`src/config/`, `src/lib/api/`, `tests/`) sebelum ada file nyata.
-- Paket UI bersama di `packages/` sebelum ada komponen yang benar-benar dibagikan antar-aplikasi.
-- Kode Tahap 2/3 di `apps/mobile` atau `apps/backend`.
-
-## Perbedaan kode saat ini dengan PRD
-
-| PRD §6 (target)                                                             | Kode saat ini                                 | Pegangan agent                                                |
-| --------------------------------------------------------------------------- | --------------------------------------------- | ------------------------------------------------------------- |
-| Route group `(dashboard)`                                                   | `(backoffice)`                                | Pakai `(backoffice)`                                          |
-| `components/layouts/`                                                       | `components/layout/`                          | Pakai `components/layout/`                                    |
-| `/login`, `/change-password`                                                | `/login-1` … `/login-5` (pratinjau)           | Ikuti kode; auth nyata menunggu milestone autentikasi         |
-| `/users`, `/countries`, `/menus`, dll.                                      | Dihapus; diganti `/crud/*` (amendemen 21 Okt) | Dibuat ulang pada M4–M5 (amendemen 29 Okt); jangan lebih awal |
-| `lib/api/`, `providers/query-provider.tsx`, `config/`, `tests/`, `app/api/` | Belum ada                                     | Buat saat milestone terkait dikerjakan, bukan lebih awal      |
-| Folder fitur hanya jika diperlukan                                          | Lima folder selalu ada di folder halaman      | Ikuti keputusan pengguna 24 Oktober 2026 (diubah 30 Oktober)  |
-
 ## Langkah saat menambah atau merapikan fitur
 
-1. Tentukan route di `src/app/` dan nama fitur/subfitur yang sesuai; pastikan tidak ada fitur atau komponen global yang sudah memenuhi kebutuhan.
+1. Tentukan route di `src/app/` (group sesuai section sidebar) dan nama fitur/subfitur yang sesuai; pastikan tidak ada fitur atau komponen global yang sudah memenuhi kebutuhan.
 2. Buat kelima folder standar untuk fitur halaman baru dan setiap subfitur halaman. Jangan membuatnya di induk kelompok.
 3. Buat `components/<nama>-page.tsx` dengan `AppBody` + `PageHeading`, lalu `page.tsx` tipis yang merendernya.
 4. Tempatkan schema, tipe, hook, dan utilitas di foldernya; data contoh di `src/mocks/`.
-5. Saat memindahkan file, pertahankan nama ekspor, perilaku, validasi, dan batas Server/Client Component; perbarui semua import (route, mock, fitur lain).
-6. Daftarkan navigasi di `app-navigation.tsx` dan `menu-search-tree.ts` bila halaman tampil di menu.
+5. Saat memindahkan atau mengganti nama file, pertahankan nama ekspor, perilaku, validasi, dan batas Server/Client Component; perbarui semua import (route, mock, fitur lain).
+6. Daftarkan navigasi di `app-navigation.tsx` bila halaman tampil di menu, sesuai urutan alfabetis section-nya.
 7. Periksa tidak ada modul kode di root fitur, impor ke lokasi lama, barrel baru, atau `.gitkeep`.
 8. Jalankan `pnpm --filter frontend check-types` dan `pnpm --filter frontend lint` (warning ikut menggagalkan), lalu laporkan hasil sebenarnya. Untuk perubahan perilaku, cek manual di dev server karena test runner belum dikonfigurasi.
+
+## Checklist kesesuaian
+
+- [ ] Semua folder/file bertanda _Wajib_ ada dengan nama yang sama.
+- [ ] Setiap `page.tsx` di `(backoffice)` berada di group yang sesuai section sidebar-nya; tidak ada `layout.tsx` tambahan di group.
+- [ ] Setiap folder halaman fitur memiliki lima folder standar; induk kelompok tidak memilikinya; tidak ada `.gitkeep`.
+- [ ] Tidak ada folder di luar standar (`constants/`, `stores/`, `styles/`, `validations/`, `server/`, `features/*/api/`, `features/*/patterns/`).
+- [ ] Tidak ada impor `components/* → features/*` atau `components/* → mocks/*`, dan tidak ada barrel `index.ts` baru.
+- [ ] Nama menu, segmen route, folder fitur, file, dan mock memakai nama yang sama.
+- [ ] Menu di `app-navigation.tsx` urut alfabetis per section (Dashboard/Main sebagai pengecualian).
+
+## Status repo acuan (`nextjs-monorepo-starter`)
+
+Bagian ini hanya untuk repo acuan; jangan disalin ke project lain.
+
+- Isi `(backoffice)` saat ini:
+  - `(page)/`: `dashboard/{main,academy,crm,finance,healthcare,hospitality,human-resource,logistics,manufacture,productivity,sales,zoo}` (`dashboard/page.tsx` me-re-export `main`), `access-management/`, `activity/`, `ai-chat/{page,panel,float}`, `ai-usage/`, `calendar/`, `checkout/`, `invoice/`, `leads/`, `product/`, `project/`, `receipt/`, `task/`, `workflow/`.
+  - `(playground)/`: `compare/`, `draft-preview/`, `file-manager/`, `live-document/`, `map-delivery/`, `map-location/`, `notes/`, `process/`, `rich-text-editor/`, `scenes-3d/`, `structure/`, `whiteboard/`, `wizard/`.
+  - `(documentation)/`: `chart/*`, `crud/*`, `filter/*`, `table/*` — masih memakai segmen URL lama (`/chart/area`, `/crud/modal`, …).
+  - `(account)/`: `profile/`, `change-password/`.
+  - `(auth)/`: `login-1` … `login-5` → `features/authentication/auth-1` … `auth-5`.
+- Pengecualian nama yang dipertahankan: route `/notes` memakai fitur `note`.
+- Kelompok yang menyalin kode per varian: `chart/<varian>`, `ai-chat/{float,page,panel}`, `table/editable/{inline,row,sheet}`, `crud/{new-page,modal,sheet,panel-inline}` (satu set mock bersama), `filter/{base,advance,group,sidebar}` (`filter/sidebar` memakai `filter-sidebar.mock.ts`), dan `dashboard/<nama>` (helper `kpi-strip`, `sparkline`, `trend-delta`, `status-badge`, `types/dashboard.ts`).
+- Kerangka fitur tanpa halaman: `user/`, `payment-slip/`.
+- Folder global yang sudah ada selain yang Wajib: `components/{crud,data-grid,filter,reui,chart,gantt,map}`, `src/utils/{editor-link,editor-shortcut}.ts`, `lib/{highlighter.tsx,maplibre.ts}`, `mocks/`.
+- Belum ada (dibuat sesuai milestone PRD): `app/api/`, `lib/api/`, `providers/query-provider.tsx`, `tests/`. Halaman resource `/users`, `/countries`, `/menus`, dll. dibuat ulang pada M4–M5 (amendemen 29 Oktober 2026); sebelum itu `/crud/*` tetap demo mock. Login nyata menunggu milestone autentikasi; `/login-*` dan `/change-password` masih pratinjau UI.
+- Perbedaan dengan PRD §6 yang disengaja: route group `(backoffice)` (bukan `(dashboard)`), `components/layout/` (bukan `components/layouts/`), lima folder selalu ada di folder halaman (bukan "hanya jika diperlukan").

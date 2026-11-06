@@ -1,7 +1,6 @@
 "use client";
 
-import type { ComponentProps } from "react";
-import { CalendarIcon, GripVerticalIcon, MoreHorizontalIcon } from "lucide-react";
+import { CalendarIcon, MoreHorizontalIcon } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -23,7 +22,6 @@ export function LeadCard({
   today,
   onOpen,
   onMove,
-  dragHandleProps,
   isOverlay = false,
 }: {
   lead: Lead;
@@ -31,7 +29,6 @@ export function LeadCard({
   today: string;
   onOpen?: (lead: Lead) => void;
   onMove?: (lead: Lead, stageId: string) => void;
-  dragHandleProps?: ComponentProps<"button">;
   isOverlay?: boolean;
 }) {
   const days = daysInStage(lead, today);
@@ -47,15 +44,6 @@ export function LeadCard({
       )}
     >
       <div className="flex items-start gap-1">
-        <Button
-          variant="ghost"
-          size="icon-xs"
-          className="-ml-1 mt-0.5 cursor-grab touch-none text-muted-foreground active:cursor-grabbing"
-          aria-label={`Seret ${lead.company}`}
-          {...dragHandleProps}
-        >
-          <GripVerticalIcon />
-        </Button>
         <div className="min-w-0 flex-1">
           <button
             type="button"

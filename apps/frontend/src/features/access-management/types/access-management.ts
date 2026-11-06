@@ -6,30 +6,23 @@ export type WorkspaceRole = {
   locked?: boolean;
 };
 
-export type PermissionActionId =
-  | "view"
-  | "create"
-  | "edit"
-  | "delete"
-  | "export"
-  | "manage";
-
-/** A table column: something a role can do on a page. */
+/** One switch on a page. */
 export type PermissionAction = {
-  id: PermissionActionId;
+  /** Unique within its page; the permission id is `<page id>.<action id>`. */
+  id: string;
   name: string;
 };
 
 /**
- * A table row. `permissions` lists only the actions the page supports, each with
- * a description; a missing action is not applicable. The permission id is
- * `<page id>.<action id>` (see `permissionId`).
+ * Every page has the standard actions (view, create, edit, delete). `extraActions`
+ * adds custom ones such as import, export, approval, or move. Extra ids must not
+ * reuse a standard id.
  */
 export type PermissionPage = {
   id: string;
   name: string;
   description: string;
-  permissions: Partial<Record<PermissionActionId, string>>;
+  extraActions?: PermissionAction[];
 };
 
 /** Permission ids granted to each role, keyed by role id. */
