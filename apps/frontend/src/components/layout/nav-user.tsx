@@ -80,11 +80,11 @@ export function NavUser({
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
-          <DropdownMenuItem render={<Link href="/dashboard/profile" />}>
+          <DropdownMenuItem render={<Link href="/profile" />}>
             <User />
             My Profile
           </DropdownMenuItem>
-          <DropdownMenuItem>
+          <DropdownMenuItem render={<Link href="/change-password" />}>
             <KeyRound />
             Change Password
           </DropdownMenuItem>

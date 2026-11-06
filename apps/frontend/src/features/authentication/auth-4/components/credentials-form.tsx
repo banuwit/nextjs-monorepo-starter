@@ -1,7 +1,7 @@
 "use client";
 
 import { useId, useState } from "react";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { EyeIcon, EyeOffIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
@@ -20,16 +20,16 @@ export function CredentialsForm({
   placeholder?: string;
 }) {
   const id = useId();
+  const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
-  const [submitted, setSubmitted] = useState(false);
 
   return (
     <form
       className="flex flex-col gap-4"
-      onChange={() => setSubmitted(false)}
       onSubmit={(event) => {
         event.preventDefault();
-        setSubmitted(true);
+        // UI preview: no authentication yet, so go straight to the dashboard.
+        router.push("/dashboard");
       }}
     >
       <FieldGroup className="gap-4">
@@ -80,23 +80,6 @@ export function CredentialsForm({
       <Button type="submit" className="w-full">
         Sign in
       </Button>
-      {submitted && (
-        <div
-          role="status"
-          className="flex flex-col gap-2 text-center text-sm text-muted-foreground"
-        >
-          <p>
-            This is a UI preview. Your credentials were not sent and no login
-            session was created.
-          </p>
-          <Link
-            href="/dashboard"
-            className="text-primary-text underline underline-offset-4"
-          >
-            Back to dashboard
-          </Link>
-        </div>
-      )}
     </form>
   );
 }

@@ -37,7 +37,7 @@ export function CheckoutDeliveryStep({
             size="sm"
             className="h-auto p-0 text-foreground"
             nativeButton={false}
-            render={<Link href="/dashboard/profile" />}
+            render={<Link href="/profile" />}
           >
             Manage Address
           </Button>

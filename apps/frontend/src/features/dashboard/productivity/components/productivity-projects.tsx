@@ -20,7 +20,7 @@ export function ProductivityProjects({ today }: { today: string }) {
         <CardTitle>Projects</CardTitle>
         <CardDescription>Active work and how close each is to done</CardDescription>
         <CardAction>
-          <Link href="/dashboard/project" className={buttonVariants({ variant: "ghost", size: "sm" })}>
+          <Link href="/project" className={buttonVariants({ variant: "ghost", size: "sm" })}>
             All projects
           </Link>
         </CardAction>

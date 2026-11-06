@@ -18,7 +18,7 @@ export function ProductivityNotes() {
       <CardHeader>
         <CardTitle>Recent notes</CardTitle>
         <CardAction>
-          <Link href="/playground/notes" className={buttonVariants({ variant: "ghost", size: "sm" })}>
+          <Link href="/notes" className={buttonVariants({ variant: "ghost", size: "sm" })}>
             Open notes
           </Link>
         </CardAction>

@@ -12,7 +12,7 @@ Login 1–5 are independent implementations based on the publicly visible previe
 
 The [MIT license](LICENSE) is preserved for the Google mark reused from WIT. Studio. It does not license ReUI Pro blocks. No ReUI source license is asserted for these independent layouts.
 
-All pages are frontend previews. Login 1–5 use native required-field validation and a password visibility toggle. Submitting displays a preview message without sending or storing credentials or creating a session. Social sign-in, password recovery, and account creation open explanatory dialogs. Public registration remains unavailable. The application root redirects to Login 1 (`/login-1`).
+All pages are frontend previews. Login 1–5 use native required-field validation and a password visibility toggle. Submitting redirects straight to `/dashboard` without sending or storing credentials or creating a session. Social sign-in, password recovery, and account creation open explanatory dialogs. Public registration remains unavailable. The application root redirects to Login 1 (`/login-1`).
 
 Login 5 uses a 5/12 testimonial panel and a 7/12 form panel on desktop, with the testimonial hidden below the large breakpoint. Its quote and example brand names are sample content from the ReUI preview, not endorsements of WIT. Studio.
 

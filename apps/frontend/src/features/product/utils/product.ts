@@ -117,7 +117,7 @@ export function getRelatedProducts(product: Product, products: Product[]) {
 
 export function getProductHref(productId: string, colorId?: string) {
   const query = colorId ? `?color=${encodeURIComponent(colorId)}` : "";
-  return `/features/product/${encodeURIComponent(productId)}${query}`;
+  return `/product/${encodeURIComponent(productId)}${query}`;
 }
 
 export function getProductOrderHref(
@@ -130,5 +130,5 @@ export function getProductOrderHref(
     color: colorId,
     size,
   });
-  return `/features/checkout?${query}`;
+  return `/checkout?${query}`;
 }

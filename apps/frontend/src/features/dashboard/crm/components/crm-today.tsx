@@ -26,7 +26,7 @@ export function CrmToday() {
         <CardDescription>{crmMeetings.length} meetings on your calendar</CardDescription>
         <CardAction>
           <Link
-            href="/dashboard/calendar"
+            href="/calendar"
             className={buttonVariants({ variant: "outline", size: "sm" })}
           >
             <CalendarDaysIcon data-icon="inline-start" />

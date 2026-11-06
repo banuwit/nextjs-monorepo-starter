@@ -52,7 +52,7 @@ Komponen di `components/crud/` tidak boleh mengimpor `@/features/*`, `@/mocks/*`
 ## Struktur file contoh
 
 ```text
-src/app/(backoffice)/crud/
+src/app/(backoffice)/(documentation)/crud/
 ├── page.tsx                        # redirect ke /crud/new-page
 ├── modal/page.tsx                  # <ModalPage />
 ├── sheet/page.tsx                  # <SheetPage />

@@ -13,7 +13,10 @@ src/
 ├── app/                    # App Router: route, layout, Route Handler
 │   ├── (auth)/             # Halaman login tanpa shell dashboard (login-1 … login-5)
 │   ├── (backoffice)/       # Halaman dengan shell dashboard; layout.tsx = sidebar/header
-│   │   ├── dashboard/  chart/  table/  crud/  playground/  whiteboard/
+│   │   ├── (page)/          # section sidebar "Page": dashboard/{main,sales,finance,crm,productivity}, ai-chat/, ai-usage/, project/, … (satu folder per menu)
+│   │   ├── (playground)/    # section "Playground": wizard/, draft-preview/, rich-text-editor/, notes/, map-delivery/, … (satu folder per menu)
+│   │   ├── (documentation)/ # section "Documentation": crud/  table/  filter/  chart/
+│   │   └── (account)/       # halaman menu akun di luar sidebar: profile
 │   ├── fonts/              # File font lokal untuk Preferences
 │   ├── layout.tsx          # Root HTML, font, boot script tema, PreferencesProvider
 │   ├── page.tsx            # Redirect root
@@ -76,6 +79,16 @@ apps/frontend/src/features/<fitur>/
 - Jangan menaruh modul kode langsung di root fitur atau root kelompok fitur. Dokumen seperti `README.md` dan `LICENSE` boleh berada di root (contoh: `authentication/README.md`, `calendar/LICENSE`).
 - Kerangka fitur tanpa halaman seperti `user/`, `menus/`, dan `parameters/` tetap memiliki struktur ini. Keberadaan folder tidak berarti halaman atau fungsinya telah diimplementasikan.
 
+### Route group `(backoffice)` mengikuti sidebar
+
+Di dalam `src/app/(backoffice)/`, setiap `page.tsx` berada di route group yang sama dengan section sidebar tempat menunya tampil di `src/components/layout/app-navigation.tsx`: `(page)` untuk Page, `(playground)` untuk Playground, `(documentation)` untuk Documentation. Halaman dari menu akun yang tidak ada di sidebar (profil) masuk `(account)`. Route group tidak masuk URL. Di dalam group, menu induk dengan submenu menjadi folder induk dengan anak per submenu, dan menu tanpa submenu menjadi folder sendiri sejajar menu lain, dengan urutan mengikuti sidebar. Section Page dan Playground sudah mengikuti pola ini: `(page)/dashboard/{main,sales,finance,crm,productivity}`, `(page)/ai-chat/{page,panel,float}`, `(page)/ai-usage`, `(page)/project`, `(page)/product`, dan seterusnya, sehingga URL-nya `/dashboard/main`, `/ai-chat/page`, `/ai-usage`, `/product`. Section Playground sama: `(playground)/wizard`, `(playground)/task`, `(playground)/compare`, dan seterusnya, dengan URL `/wizard`, `/task`, `/compare`. Section Documentation masih mempertahankan segmen URL lama.
+
+- Saat menambah atau memindahkan menu antar-section, pindahkan juga foldernya ke group section tujuan dan buat foldernya sejajar menu lain di group itu. Mengubah segmen URL halaman yang sudah ada harus atas permintaan pengguna.
+- Urutan menu level atas di `app-navigation.tsx` alfabetis per section (tanpa memperhatikan huruf besar-kecil); satu-satunya pengecualian adalah Dashboard yang selalu pertama di Page. Menu baru disisipkan sesuai abjad.
+- Satu URL hanya boleh dimiliki satu group; segmen yang sama (mis. `dashboard/`) boleh ada di beberapa group.
+- Jangan menambah `layout.tsx` di group ini hanya untuk pengelompokan; shell tetap di `(backoffice)/layout.tsx`.
+- Keputusan pengguna, 6 November 2026: hanya `src/app/` yang dikelompokkan per section; `src/features/` tidak.
+
 ### Hubungan route dan fitur
 
 Satu route biasanya dipetakan ke satu fitur atau subfitur. Nama folder fitur mengikuti segmen route bila memungkinkan:
@@ -84,14 +97,14 @@ Satu route biasanya dipetakan ke satu fitur atau subfitur. Nama folder fitur men
 | ------------------------------------------- | ----------------------------------------------------------- |
 | `/login-1` … `/login-5`                     | `authentication/auth-1` … `auth-5`                          |
 | `/dashboard/sales`                          | `dashboard/sales`                                           |
-| `/dashboard/ai-chat/float`                  | `ai-chat/float`                                             |
+| `/ai-chat/float`                            | `ai-chat/float`                                             |
 | `/chart/area`                               | `chart/area`                                                |
 | `/table/editable/sheet`                     | `table/editable/sheet`                                      |
 | `/crud/{new-page,modal,sheet,panel-inline}` | `crud` (induk) + `crud/{new-page,modal,sheet,panel-inline}` |
-| `/playground/scenes-3d`                     | `scenes-3d`                                                 |
-| `/dashboard/workflow`                       | `workflow` (juga `activity`, `structure`, `process`)        |
+| `/scenes-3d`                                | `scenes-3d`                                                 |
+| `/workflow`                                 | `workflow` (juga `activity`, `structure`, `process`) |
 
-- Pengecualian `/dashboard/*`: dashboard analitik (`main`, `finance`, `sales`, `crm`, `productivity`) berada di kelompok `features/dashboard/<nama>`; halaman aplikasi lain di bawah `/dashboard/*` (`calendar`, `project`, `task`, `file-manager`, `profile`, `receipt`, `workflow`, `activity`, `structure`, `process`, `ai-chat/*`) memakai folder fitur tingkat atas tanpa awalan `dashboard/`. Nama file halaman dashboard analitik: `<nama>-dashboard-page.tsx`.
+- Pengecualian `/dashboard/*`: dashboard analitik (`main`, `finance`, `sales`, `crm`, `productivity`) berada di kelompok `features/dashboard/<nama>`; halaman aplikasi lain (`calendar`, `project`, `task`, `file-manager`, `receipt`, `workflow`, `activity`, `structure`, `process`, `ai-chat/*`, dan seterusnya) berada di `/<nama>`, termasuk profil di `/profile`, memakai folder fitur tingkat atas tanpa awalan `dashboard/`. Nama file halaman dashboard analitik: `<nama>-dashboard-page.tsx`.
 - Nama fitur tidak diberi awalan kelompok visual (misalnya `timeline-` atau `flow-`); gunakan nama pendek yang sama dengan segmen route, dan pakai nama itu juga untuk file halaman, mock (`<fitur>.mock.ts`), dan CSS fitur.
 
 ### Subfitur dan kode bersama
