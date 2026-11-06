@@ -1,8 +1,26 @@
 import type {
   AccessMatrix,
-  PermissionGroup,
+  PermissionActionId,
+  PermissionPage,
   WorkspaceRole,
 } from "../types/access-management";
+
+export function permissionId(pageId: string, actionId: PermissionActionId) {
+  return `${pageId}.${actionId}`;
+}
+
+/** Number of permissions a page supports, i.e. its applicable actions. */
+export function countPagePermissions(page: PermissionPage) {
+  return Object.keys(page.permissions).length;
+}
+
+export function listPermissionIds(pages: readonly PermissionPage[]) {
+  return pages.flatMap((page) =>
+    (Object.keys(page.permissions) as PermissionActionId[]).map((actionId) =>
+      permissionId(page.id, actionId),
+    ),
+  );
+}
 
 export function hasGrant(
   matrix: AccessMatrix,
@@ -30,13 +48,10 @@ export function toggleGrant(
 export function countGrants(
   matrix: AccessMatrix,
   role: WorkspaceRole,
-  groups: readonly PermissionGroup[],
+  pages: readonly PermissionPage[],
 ) {
-  return groups.reduce(
-    (total, group) =>
-      total + group.rows.filter((row) => hasGrant(matrix, role, row.id)).length,
-    0,
-  );
+  return listPermissionIds(pages).filter((id) => hasGrant(matrix, role, id))
+    .length;
 }
 
 /** Number of pending edits: new roles count once, plus each switched cell. */

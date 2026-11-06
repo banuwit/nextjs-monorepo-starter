@@ -3,7 +3,7 @@ import { AccessManagementPage } from "@/features/access-management/components/ac
 
 export const metadata: Metadata = {
   title: "Access Management | Dashboard",
-  description: "Map workspace roles to grouped permission scopes in one matrix.",
+  description: "Choose a role, then set which actions it can perform on each page.",
 };
 
 export default function Page() {

@@ -1,226 +1,115 @@
 import type {
   AccessMatrix,
-  PermissionGroup,
+  PermissionAction,
+  PermissionPage,
 } from "@/features/access-management/types/access-management";
 
-export const permissionGroups = [
+/** Table columns. A page only supports the actions listed in its `permissions`. */
+export const permissionActions = [
+  { id: "view", name: "View" },
+  { id: "create", name: "Create" },
+  { id: "edit", name: "Edit" },
+  { id: "delete", name: "Delete" },
+  { id: "export", name: "Export" },
+  { id: "manage", name: "Manage" },
+] satisfies PermissionAction[];
+
+/** Table rows. Permission ids are `<page id>.<action id>`. */
+export const permissionPages = [
   {
     id: "members",
     name: "Members",
-    rows: [
-      {
-        id: "members.read",
-        name: "Read members",
-        description: "View the directory of 12 active members",
-      },
-      {
-        id: "members.invite",
-        name: "Invite members",
-        description: "Send invites that expire in 7 days",
-      },
-      {
-        id: "members.remove",
-        name: "Remove members",
-        description: "Deactivate or remove a member",
-      },
-      {
-        id: "members.export",
-        name: "Export members",
-        description: "Download seat and role CSV",
-      },
-      {
-        id: "members.transfer",
-        name: "Transfer owner",
-        description: "Move Owner after handoff approval",
-      },
-    ],
+    description: "Directory of workspace members",
+    permissions: {
+      view: "View the directory of 12 active members",
+      create: "Send invites that expire in 7 days",
+      delete: "Deactivate or remove a member",
+      export: "Download seat and role CSV",
+      manage: "Transfer Owner after handoff approval",
+    },
   },
   {
     id: "roles",
     name: "Roles",
-    rows: [
-      {
-        id: "roles.read",
-        name: "Read roles",
-        description: "See every role and what it grants",
-      },
-      {
-        id: "roles.create",
-        name: "Create roles",
-        description: "Add custom roles to the workspace",
-      },
-      {
-        id: "roles.edit",
-        name: "Edit role grants",
-        description: "Change the scopes a role can use",
-      },
-      {
-        id: "roles.delete",
-        name: "Delete roles",
-        description: "Remove custom roles with no members",
-      },
-    ],
+    description: "Custom roles and what they grant",
+    permissions: {
+      view: "See every role and what it grants",
+      create: "Add custom roles to the workspace",
+      edit: "Change the scopes a role can use",
+      delete: "Remove custom roles with no members",
+    },
   },
   {
     id: "billing",
     name: "Billing",
-    rows: [
-      {
-        id: "billing.read",
-        name: "Read invoices",
-        description: "View invoices and payment history",
-      },
-      {
-        id: "billing.payment",
-        name: "Manage payment",
-        description: "Update cards and billing contacts",
-      },
-      {
-        id: "billing.plan",
-        name: "Change plan",
-        description: "Upgrade, downgrade, or cancel the plan",
-      },
-      {
-        id: "billing.seats",
-        name: "Manage seats",
-        description: "Add or release paid seats",
-      },
-    ],
+    description: "Invoices, payment, and the plan",
+    permissions: {
+      view: "View invoices and payment history",
+      create: "Add paid seats",
+      edit: "Update cards and billing contacts",
+      delete: "Release paid seats",
+      manage: "Upgrade, downgrade, or cancel the plan",
+    },
   },
   {
     id: "projects",
     name: "Projects",
-    rows: [
-      {
-        id: "projects.read",
-        name: "Read projects",
-        description: "Browse all 8 workspace projects",
-      },
-      {
-        id: "projects.create",
-        name: "Create projects",
-        description: "Start a project from a template",
-      },
-      {
-        id: "projects.archive",
-        name: "Archive projects",
-        description: "Hide finished projects from lists",
-      },
-      {
-        id: "projects.delete",
-        name: "Delete projects",
-        description: "Permanently delete a project",
-      },
-    ],
+    description: "All workspace projects",
+    permissions: {
+      view: "Browse all 8 workspace projects",
+      create: "Start a project from a template",
+      delete: "Permanently delete a project",
+      manage: "Archive finished projects from lists",
+    },
   },
   {
     id: "settings",
     name: "Settings",
-    rows: [
-      {
-        id: "settings.read",
-        name: "Read settings",
-        description: "View workspace configuration",
-      },
-      {
-        id: "settings.profile",
-        name: "Edit profile",
-        description: "Change the name, logo, and locale",
-      },
-      {
-        id: "settings.domains",
-        name: "Manage domains",
-        description: "Add and verify custom domains",
-      },
-      {
-        id: "settings.delete",
-        name: "Delete workspace",
-        description: "Remove the workspace after 30 days",
-      },
-    ],
+    description: "Workspace configuration",
+    permissions: {
+      view: "View workspace configuration",
+      edit: "Change the name, logo, and locale",
+      delete: "Remove the workspace after 30 days",
+      manage: "Add and verify custom domains",
+    },
   },
   {
     id: "audit",
-    name: "Audit",
-    rows: [
-      {
-        id: "audit.read",
-        name: "Read audit log",
-        description: "Review sign-ins and sensitive changes",
-      },
-      {
-        id: "audit.export",
-        name: "Export audit log",
-        description: "Download events as CSV or JSON",
-      },
-      {
-        id: "audit.retention",
-        name: "Set retention",
-        description: "Keep events for 90 days to 2 years",
-      },
-      {
-        id: "audit.stream",
-        name: "Stream to SIEM",
-        description: "Forward events to an external SIEM",
-      },
-    ],
+    name: "Audit log",
+    description: "Sign-ins and sensitive changes",
+    permissions: {
+      view: "Review sign-ins and sensitive changes",
+      edit: "Keep events for 90 days to 2 years",
+      export: "Download events as CSV or JSON",
+      manage: "Forward events to an external SIEM",
+    },
   },
   {
     id: "api-keys",
     name: "API keys",
-    rows: [
-      {
-        id: "api.read",
-        name: "Read keys",
-        description: "See key names and last-used dates",
-      },
-      {
-        id: "api.create",
-        name: "Create keys",
-        description: "Issue keys scoped to one project",
-      },
-      {
-        id: "api.rotate",
-        name: "Rotate keys",
-        description: "Replace a key with a 24-hour overlap",
-      },
-      {
-        id: "api.revoke",
-        name: "Revoke keys",
-        description: "Disable a key immediately",
-      },
-    ],
+    description: "Keys scoped to one project",
+    permissions: {
+      view: "See key names and last-used dates",
+      create: "Issue keys scoped to one project",
+      edit: "Rotate a key with a 24-hour overlap",
+      delete: "Disable a key immediately",
+    },
   },
   {
     id: "sso",
     name: "SSO",
-    rows: [
-      {
-        id: "sso.read",
-        name: "Read SSO setup",
-        description: "View the identity provider connection",
-      },
-      {
-        id: "sso.configure",
-        name: "Configure SAML",
-        description: "Upload metadata and map attributes",
-      },
-      {
-        id: "sso.enforce",
-        name: "Enforce SSO",
-        description: "Require SSO for every member sign-in",
-      },
-      {
-        id: "sso.scim",
-        name: "Manage SCIM",
-        description: "Provision members from the directory",
-      },
-    ],
+    description: "Identity provider connection",
+    permissions: {
+      view: "View the identity provider connection",
+      create: "Provision members from the directory (SCIM)",
+      edit: "Upload SAML metadata and map attributes",
+      manage: "Require SSO for every member sign-in",
+    },
   },
-] satisfies PermissionGroup[];
+] satisfies PermissionPage[];
 
-const allPermissionIds = permissionGroups.flatMap((group) =>
-  group.rows.map((row) => row.id),
+const allPermissionIds = permissionPages.flatMap((page) =>
+  Object.keys(page.permissions).map((actionId) => `${page.id}.${actionId}`),
 );
 
 export const initialAccessMatrix = {
@@ -261,32 +150,33 @@ export const initialAccessMatrix = {
     owner: allPermissionIds,
     admin: allPermissionIds.filter(
       (id) =>
-        !["members.transfer", "settings.delete", "billing.plan"].includes(id),
+        !["members.manage", "settings.delete", "billing.manage"].includes(id),
     ),
     member: [
-      "members.read",
-      "members.invite",
-      "roles.read",
-      "projects.read",
+      "members.view",
+      "members.create",
+      "roles.view",
+      "projects.view",
       "projects.create",
-      "settings.read",
-      "api.read",
+      "settings.view",
+      "api-keys.view",
     ],
     billing: [
-      "members.read",
-      "billing.read",
-      "billing.payment",
-      "billing.plan",
-      "billing.seats",
-      "projects.read",
+      "members.view",
+      "billing.view",
+      "billing.create",
+      "billing.edit",
+      "billing.delete",
+      "billing.manage",
+      "projects.view",
     ],
-    guest: ["members.read", "projects.read"],
+    guest: ["members.view", "projects.view"],
     support: [
-      "members.read",
-      "roles.read",
-      "audit.read",
-      "sso.read",
-      "settings.read",
+      "members.view",
+      "roles.view",
+      "audit.view",
+      "sso.view",
+      "settings.view",
     ],
   },
 } satisfies AccessMatrix;

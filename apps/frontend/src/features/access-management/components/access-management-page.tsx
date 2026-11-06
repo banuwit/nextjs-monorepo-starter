@@ -4,6 +4,7 @@ import {
   CircleCheckIcon,
   CircleDotIcon,
   EyeIcon,
+  LockIcon,
   PencilIcon,
   PlusIcon,
 } from "lucide-react";
@@ -26,10 +27,10 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Toaster, toast } from "@/components/ui/toast";
-import { cn } from "@/lib/utils";
 import {
   initialAccessMatrix,
-  permissionGroups,
+  permissionActions,
+  permissionPages,
 } from "@/mocks/access-management.mock";
 import type { NewRoleValues } from "../schemas/new-role.schema";
 import type { AccessMatrix } from "../types/access-management";
@@ -38,47 +39,30 @@ import {
   countGrants,
   createRoleId,
   isGrantChanged,
+  listPermissionIds,
   toggleGrant,
 } from "../utils/access-matrix";
 import { NewRoleDialog } from "./new-role-dialog";
 import { PermissionMatrixTable } from "./permission-matrix-table";
 
-// Role chip tones mirror the reference; roles created later fall back to plain.
-const roleTones: Record<string, string> = {
-  owner: "border-border bg-muted text-foreground",
-  admin:
-    "border-violet-200 bg-violet-50 text-violet-700 dark:border-violet-400/30 dark:bg-violet-400/15 dark:text-violet-300",
-  billing:
-    "border-amber-200 bg-amber-50 text-amber-800 dark:border-amber-400/30 dark:bg-amber-400/15 dark:text-amber-200",
-  support:
-    "border-violet-200 text-violet-700 dark:border-violet-400/30 dark:text-violet-300",
-};
-
-const totalPermissions = permissionGroups.reduce(
-  (sum, group) => sum + group.rows.length,
-  0,
-);
+const permissionIds = listPermissionIds(permissionPages);
+const totalPermissions = permissionIds.length;
 
 export function AccessManagementPage() {
   const [saved, setSaved] = useState<AccessMatrix>(initialAccessMatrix);
   const [draft, setDraft] = useState<AccessMatrix>(initialAccessMatrix);
   const [readOnly, setReadOnly] = useState(false);
-  const [activeGroupId, setActiveGroupId] = useState("members");
-  const [focusRoleId, setFocusRoleId] = useState("admin");
+  const [activeRoleId, setActiveRoleId] = useState("admin");
   const [newRoleOpen, setNewRoleOpen] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
 
   const changes = countChanges(saved, draft);
   const dirty = changes > 0;
-  const activeGroup = permissionGroups.find(
-    (group) => group.id === activeGroupId,
-  );
-  const focusRole =
-    draft.roles.find((role) => role.id === focusRoleId) ??
-    draft.roles.find((role) => role.id === "admin");
-  const changedGroups = permissionGroups.filter((group) =>
+  const changedPages = permissionPages.filter((page) =>
     draft.roles.some((role) =>
-      group.rows.some((row) => isGrantChanged(saved, draft, role, row.id)),
+      listPermissionIds([page]).some((id) =>
+        isGrantChanged(saved, draft, role, id),
+      ),
     ),
   ).length;
 
@@ -95,7 +79,6 @@ export function AccessManagementPage() {
     granted: boolean,
   ) {
     setDraft((current) => toggleGrant(current, roleId, permissionId, granted));
-    setFocusRoleId(roleId);
   }
 
   function handleCreateRole(values: NewRoleValues) {
@@ -103,7 +86,7 @@ export function AccessManagementPage() {
     setDraft((current) => {
       const base = current.roles.find((role) => role.id === values.baseRoleId);
       const baseGrants = base?.locked
-        ? permissionGroups.flatMap((group) => group.rows.map((row) => row.id))
+        ? permissionIds
         : (current.grants[values.baseRoleId] ?? []);
       return {
         roles: [
@@ -113,7 +96,7 @@ export function AccessManagementPage() {
         grants: { ...current.grants, [id]: baseGrants },
       };
     });
-    setFocusRoleId(id);
+    setActiveRoleId(id);
     setNewRoleOpen(false);
     toast.add({
       title: `Role “${values.name}” created`,
@@ -127,15 +110,15 @@ export function AccessManagementPage() {
     setConfirmOpen(false);
     toast.add({
       title: "Permissions saved",
-      description: "All scopes are up to date.",
+      description: "All pages are up to date.",
       type: "success",
     });
   }
 
   function handleDiscard() {
     setDraft(saved);
-    if (!saved.roles.some((role) => role.id === focusRoleId))
-      setFocusRoleId("admin");
+    if (!saved.roles.some((role) => role.id === activeRoleId))
+      setActiveRoleId("admin");
   }
 
   return (
@@ -193,70 +176,50 @@ export function AccessManagementPage() {
           )}
 
           <Tabs
-            value={activeGroupId}
-            onValueChange={(value) => setActiveGroupId(String(value))}
+            value={activeRoleId}
+            onValueChange={(value) => setActiveRoleId(String(value))}
             className="min-w-0 gap-0"
           >
             <div className="overflow-x-auto border-b px-2">
               <TabsList variant="line" className="h-11">
-                {permissionGroups.map((group) => (
+                {draft.roles.map((role) => (
                   <TabsTrigger
-                    key={group.id}
-                    value={group.id}
+                    key={role.id}
+                    value={role.id}
                     className="gap-1.5 px-2"
                   >
-                    {group.name}
+                    {role.locked && (
+                      <LockIcon aria-hidden="true" className="size-3.5" />
+                    )}
+                    {role.name}
                     <Badge
                       variant="outline"
                       className="h-4.5 min-w-4.5 px-1 tabular-nums text-muted-foreground"
                     >
-                      {group.rows.length}
+                      {countGrants(draft, role, permissionPages)}
                     </Badge>
                   </TabsTrigger>
                 ))}
               </TabsList>
             </div>
 
-            {activeGroup && focusRole && (
-              <div className="flex flex-col gap-2 border-b px-3 py-2 sm:flex-row sm:items-center sm:justify-between">
-                <p className="text-xs text-muted-foreground">
-                  {focusRole.name} grants{" "}
-                  {countGrants(draft, focusRole, [activeGroup])} of{" "}
-                  {activeGroup.rows.length} <span aria-hidden="true">·</span>{" "}
-                  {activeGroup.name} group
-                </p>
-                <div
-                  role="group"
-                  aria-label="Role grants in this group"
-                  className="flex flex-wrap gap-1"
-                >
-                  {draft.roles.map((role) => (
-                    <button
-                      key={role.id}
-                      type="button"
-                      aria-pressed={role.id === focusRole.id}
-                      onClick={() => setFocusRoleId(role.id)}
-                      className={cn(
-                        "inline-flex h-5 items-center gap-1 rounded-md border border-transparent px-1.5 text-xs font-medium outline-none focus-visible:ring-3 focus-visible:ring-ring/50",
-                        roleTones[role.id],
-                        role.id === focusRole.id && "ring-2 ring-ring/40",
-                      )}
-                    >
-                      {role.name}
-                      <span className="tabular-nums">
-                        {countGrants(draft, role, [activeGroup])}/
-                        {activeGroup.rows.length}
-                      </span>
-                    </button>
-                  ))}
+            {draft.roles.map((role) => (
+              <TabsContent key={role.id} value={role.id} className="min-w-0">
+                <div className="flex flex-col gap-0.5 border-b px-3 py-2 sm:flex-row sm:items-center sm:justify-between sm:gap-3">
+                  <p className="text-xs text-muted-foreground">
+                    {role.description}
+                    {role.locked && " Always holds every permission."}
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    {role.name} grants{" "}
+                    {countGrants(draft, role, permissionPages)} of{" "}
+                    {totalPermissions} permissions
+                  </p>
                 </div>
-              </div>
-            )}
-
-            {permissionGroups.map((group) => (
-              <TabsContent key={group.id} value={group.id} className="min-w-0">
                 <PermissionMatrixTable
-                  rows={group.rows}
+                  pages={permissionPages}
+                  actions={permissionActions}
+                  role={role}
                   saved={saved}
                   matrix={draft}
                   readOnly={readOnly}
@@ -277,8 +240,8 @@ export function AccessManagementPage() {
                     <CircleDotIcon data-icon="inline-start" />
                     {changes} unsaved
                   </Badge>
-                  {changedGroups > 0
-                    ? `Pending in ${changedGroups} ${changedGroups === 1 ? "scope" : "scopes"}`
+                  {changedPages > 0
+                    ? `Pending in ${changedPages} ${changedPages === 1 ? "page" : "pages"}`
                     : "New role pending"}
                 </>
               ) : (
@@ -287,7 +250,7 @@ export function AccessManagementPage() {
                     <CircleCheckIcon data-icon="inline-start" />
                     Saved
                   </Badge>
-                  All scopes saved
+                  All pages saved
                 </>
               )}
             </div>

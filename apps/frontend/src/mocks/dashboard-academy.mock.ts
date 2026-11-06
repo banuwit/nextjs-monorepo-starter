@@ -1,0 +1,325 @@
+// Data contoh untuk dashboard Academy; belum terhubung ke API.
+import type {
+  AcademyCourse,
+  AcademyEnrollmentPoint,
+  AcademyFunnelStep,
+  AcademyInstructor,
+  AcademyScoreBucket,
+  AcademySession,
+} from "@/features/dashboard/academy/types/academy";
+import type { KpiItem } from "@/features/dashboard/academy/types/dashboard";
+
+export const academyMetrics = [
+  {
+    label: "Active learners",
+    value: "2,418",
+    delta: { value: "+12%", direction: "up", sentiment: "good" },
+    context: "vs 2,160 last term",
+    trend: [1840, 1910, 2020, 2105, 2160, 2290, 2418],
+  },
+  {
+    label: "Course completion rate",
+    value: "68%",
+    delta: { value: "+4 pts", direction: "up", sentiment: "good" },
+    context: "target 70%",
+    trend: [58, 60, 61, 63, 64, 66, 68],
+  },
+  {
+    label: "Avg quiz score",
+    value: "76.4",
+    delta: { value: "-0.8", direction: "down", sentiment: "bad" },
+    context: "pass mark 70",
+    trend: [74.1, 75.3, 76.8, 77.2, 77.5, 77.2, 76.4],
+  },
+  {
+    label: "Certificates issued",
+    value: "1,132",
+    delta: { value: "+18%", direction: "up", sentiment: "good" },
+    context: "vs 958 last term",
+    trend: [720, 790, 845, 902, 958, 1040, 1132],
+  },
+] as const satisfies readonly KpiItem[];
+
+const weeks = [
+  "W1",
+  "W2",
+  "W3",
+  "W4",
+  "W5",
+  "W6",
+  "W7",
+  "W8",
+  "W9",
+  "W10",
+  "W11",
+  "W12",
+];
+
+// [new, returning, active] per week.
+const enrollmentSeries = [
+  [142, 96, 1840],
+  [168, 104, 1902],
+  [151, 118, 1958],
+  [189, 127, 2031],
+  [204, 131, 2096],
+  [176, 142, 2140],
+  [163, 155, 2185],
+  [221, 149, 2262],
+  [198, 161, 2301],
+  [184, 170, 2346],
+  [212, 166, 2389],
+  [237, 178, 2418],
+] as const;
+
+export const academyEnrollments: AcademyEnrollmentPoint[] =
+  enrollmentSeries.map(([newLearners, returning, active], index) => ({
+    week: weeks[index] ?? "",
+    new: newLearners,
+    returning,
+    active,
+  }));
+
+export const academyFunnel = [
+  { id: "enrolled", label: "Enrolled", count: 3860 },
+  { id: "started", label: "Started", count: 3214 },
+  { id: "halfway", label: "Halfway", count: 2371 },
+  { id: "completed", label: "Completed", count: 1648 },
+  { id: "certified", label: "Certified", count: 1132 },
+] as const satisfies readonly AcademyFunnelStep[];
+
+export const academyInstructors = [
+  {
+    id: "i1",
+    name: "Dewi Anggraini",
+    specialty: "Frontend engineering",
+    courses: 4,
+    rating: 4.8,
+  },
+  {
+    id: "i2",
+    name: "Rizky Pratama",
+    specialty: "Data & analytics",
+    courses: 3,
+    rating: 4.7,
+  },
+  {
+    id: "i3",
+    name: "Sinta Maharani",
+    specialty: "Product design",
+    courses: 2,
+    rating: 4.9,
+  },
+  {
+    id: "i4",
+    name: "Fajar Setiawan",
+    specialty: "Cloud & DevOps",
+    courses: 2,
+    rating: 4.5,
+  },
+  {
+    id: "i5",
+    name: "Nurul Hidayah",
+    specialty: "Business & finance",
+    courses: 2,
+    rating: 4.6,
+  },
+  {
+    id: "i6",
+    name: "Bagas Wicaksono",
+    specialty: "Leadership",
+    courses: 1,
+    rating: 4.3,
+  },
+] as const satisfies readonly AcademyInstructor[];
+
+export const academyCourses: AcademyCourse[] = [
+  {
+    id: "c01",
+    title: "React Fundamentals",
+    category: "Engineering",
+    instructorId: "i1",
+    learners: 612,
+    completion: 74,
+    rating: 4.8,
+    status: "live",
+  },
+  {
+    id: "c02",
+    title: "TypeScript for Teams",
+    category: "Engineering",
+    instructorId: "i1",
+    learners: 448,
+    completion: 69,
+    rating: 4.7,
+    status: "live",
+  },
+  {
+    id: "c03",
+    title: "SQL for Analysts",
+    category: "Data",
+    instructorId: "i2",
+    learners: 530,
+    completion: 81,
+    rating: 4.6,
+    status: "live",
+  },
+  {
+    id: "c04",
+    title: "Data Visualization Essentials",
+    category: "Data",
+    instructorId: "i2",
+    learners: 296,
+    completion: 63,
+    rating: 4.7,
+    status: "live",
+  },
+  {
+    id: "c05",
+    title: "Design Systems in Practice",
+    category: "Design",
+    instructorId: "i3",
+    learners: 374,
+    completion: 72,
+    rating: 4.9,
+    status: "live",
+  },
+  {
+    id: "c06",
+    title: "UX Research Methods",
+    category: "Design",
+    instructorId: "i3",
+    learners: 218,
+    completion: 58,
+    rating: 4.8,
+    status: "live",
+  },
+  {
+    id: "c07",
+    title: "Kubernetes Operations",
+    category: "Engineering",
+    instructorId: "i4",
+    learners: 187,
+    completion: 46,
+    rating: 4.4,
+    status: "live",
+  },
+  {
+    id: "c08",
+    title: "Cloud Cost Management",
+    category: "Engineering",
+    instructorId: "i4",
+    learners: 0,
+    completion: 0,
+    rating: 0,
+    status: "draft",
+  },
+  {
+    id: "c09",
+    title: "Financial Modeling Basics",
+    category: "Business",
+    instructorId: "i5",
+    learners: 341,
+    completion: 77,
+    rating: 4.6,
+    status: "live",
+  },
+  {
+    id: "c10",
+    title: "Negotiation Skills",
+    category: "Business",
+    instructorId: "i5",
+    learners: 263,
+    completion: 84,
+    rating: 4.5,
+    status: "live",
+  },
+  {
+    id: "c11",
+    title: "Leading Remote Teams",
+    category: "Leadership",
+    instructorId: "i6",
+    learners: 152,
+    completion: 61,
+    rating: 4.3,
+    status: "live",
+  },
+  {
+    id: "c12",
+    title: "Accessibility Foundations",
+    category: "Design",
+    instructorId: "i3",
+    learners: 0,
+    completion: 0,
+    rating: 0,
+    status: "draft",
+  },
+  {
+    id: "c13",
+    title: "Python for Automation",
+    category: "Data",
+    instructorId: "i2",
+    learners: 409,
+    completion: 88,
+    rating: 4.5,
+    status: "archived",
+  },
+  {
+    id: "c14",
+    title: "Legacy Angular Migration",
+    category: "Engineering",
+    instructorId: "i1",
+    learners: 96,
+    completion: 92,
+    rating: 4.1,
+    status: "archived",
+  },
+];
+
+export const academySessions = [
+  {
+    id: "s1",
+    time: "09:00",
+    courseId: "c01",
+    seatsBooked: 25,
+    seatsTotal: 25,
+  },
+  {
+    id: "s2",
+    time: "10:30",
+    courseId: "c03",
+    seatsBooked: 18,
+    seatsTotal: 25,
+  },
+  {
+    id: "s3",
+    time: "13:00",
+    courseId: "c05",
+    seatsBooked: 22,
+    seatsTotal: 30,
+  },
+  {
+    id: "s4",
+    time: "15:00",
+    courseId: "c07",
+    seatsBooked: 11,
+    seatsTotal: 20,
+  },
+  {
+    id: "s5",
+    time: "19:00",
+    courseId: "c10",
+    seatsBooked: 27,
+    seatsTotal: 40,
+  },
+] as const satisfies readonly AcademySession[];
+
+export const academyGradingBacklog = 34;
+
+export const academyScoreBuckets: AcademyScoreBucket[] = [
+  { range: "0–49", min: 0, learners: 86 },
+  { range: "50–59", min: 50, learners: 142 },
+  { range: "60–69", min: 60, learners: 268 },
+  { range: "70–79", min: 70, learners: 512 },
+  { range: "80–89", min: 80, learners: 604 },
+  { range: "90–100", min: 90, learners: 321 },
+];

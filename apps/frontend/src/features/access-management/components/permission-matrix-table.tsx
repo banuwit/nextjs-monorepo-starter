@@ -1,7 +1,6 @@
 "use client";
 
 import type { ColumnDef } from "@tanstack/react-table";
-import { LockIcon } from "lucide-react";
 import { createContext, use, useMemo } from "react";
 
 import { DataGridClient } from "@/components/data-grid/data-grid-client";
@@ -11,12 +10,14 @@ import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/utils";
 import type {
   AccessMatrix,
-  PermissionRow,
+  PermissionAction,
+  PermissionPage,
   WorkspaceRole,
 } from "../types/access-management";
-import { hasGrant, isGrantChanged } from "../utils/access-matrix";
+import { hasGrant, isGrantChanged, permissionId } from "../utils/access-matrix";
 
 type MatrixContextValue = {
+  role: WorkspaceRole;
   saved: AccessMatrix;
   matrix: AccessMatrix;
   readOnly: boolean;
@@ -33,23 +34,38 @@ function useMatrix() {
   return value;
 }
 
-function GrantSwitch({
-  role,
-  permission,
+function GrantCell({
+  page,
+  action,
 }: {
-  role: WorkspaceRole;
-  permission: PermissionRow;
+  page: PermissionPage;
+  action: PermissionAction;
 }) {
-  const { saved, matrix, readOnly, onToggle } = useMatrix();
-  const changed = isGrantChanged(saved, matrix, role, permission.id);
+  const { role, saved, matrix, readOnly, onToggle } = useMatrix();
+  const description = page.permissions[action.id];
+
+  if (description === undefined) {
+    return (
+      <div className="flex justify-center text-muted-foreground">
+        <span aria-hidden="true">—</span>
+        <span className="sr-only">
+          {action.name} is not available for {page.name}
+        </span>
+      </div>
+    );
+  }
+
+  const id = permissionId(page.id, action.id);
+  const changed = isGrantChanged(saved, matrix, role, id);
 
   return (
     <div className="flex justify-center">
       <Switch
-        checked={hasGrant(matrix, role, permission.id)}
+        checked={hasGrant(matrix, role, id)}
         disabled={readOnly || role.locked}
-        onCheckedChange={(checked) => onToggle(role.id, permission.id, checked)}
-        aria-label={`${permission.name} for ${role.name}${role.locked ? " (locked)" : ""}${changed ? " (unsaved)" : ""}`}
+        onCheckedChange={(checked) => onToggle(role.id, id, checked)}
+        aria-label={`${action.name} ${page.name} for ${role.name}${role.locked ? " (locked)" : ""}${changed ? " (unsaved)" : ""}`}
+        title={description}
         // Granted reads green; a pending change reads amber until saved or discarded.
         className={cn(
           "data-checked:bg-emerald-500 dark:data-checked:bg-emerald-500",
@@ -62,30 +78,29 @@ function GrantSwitch({
   );
 }
 
-const lockedColumnClass = "bg-muted/60";
+type PermissionMatrixTableProps = MatrixContextValue & {
+  pages: readonly PermissionPage[];
+  actions: readonly PermissionAction[];
+};
 
+/** Pages as rows and actions as columns, for one role. */
 export function PermissionMatrixTable({
-  rows,
+  pages,
+  actions,
   ...context
-}: MatrixContextValue & { rows: PermissionRow[] }) {
-  const { roles } = context.matrix;
-  const lockedIds = useMemo(
-    () => new Set(roles.filter((role) => role.locked).map((role) => role.id)),
-    [roles],
-  );
-
-  const columns = useMemo<ColumnDef<DataGridFeatures, PermissionRow>[]>(
+}: PermissionMatrixTableProps) {
+  const columns = useMemo<ColumnDef<DataGridFeatures, PermissionPage>[]>(
     () => [
       {
         accessorKey: "name",
         header: () => (
           <DataGridHeader
-            title="Permission"
+            title="Page"
             className="font-normal text-muted-foreground"
           />
         ),
         cell: ({ row }) => (
-          <div className="flex min-w-52 flex-col gap-0.5 whitespace-normal">
+          <div className="flex min-w-40 flex-col gap-0.5 whitespace-normal">
             <span className="font-medium">{row.original.name}</span>
             <span className="text-xs text-muted-foreground">
               {row.original.description}
@@ -93,30 +108,26 @@ export function PermissionMatrixTable({
           </div>
         ),
       },
-      ...roles.map<ColumnDef<DataGridFeatures, PermissionRow>>((role) => ({
-        id: role.id,
-        header: () => (
-          <div className="flex h-8 min-w-24 items-center justify-center gap-1.5 font-normal text-muted-foreground">
-            {role.locked && (
-              <LockIcon aria-hidden="true" className="size-3.5" />
-            )}
-            {role.name}
-            {role.locked && <span className="sr-only">(locked)</span>}
-          </div>
-        ),
-        cell: ({ row }) => (
-          <GrantSwitch role={role} permission={row.original} />
-        ),
-      })),
+      ...actions.map<ColumnDef<DataGridFeatures, PermissionPage>>(
+        (action) => ({
+          id: action.id,
+          header: () => (
+            <div className="flex h-8 min-w-20 items-center justify-center font-normal text-muted-foreground">
+              {action.name}
+            </div>
+          ),
+          cell: ({ row }) => <GrantCell page={row.original} action={action} />,
+        }),
+      ),
     ],
-    [roles],
+    [actions],
   );
 
   return (
     <MatrixContext value={context}>
       <DataGridClient
         columns={columns}
-        data={rows}
+        data={[...pages]}
         getRowId={(row) => row.id}
         pagination="none"
         showVisibilityToggle={false}
@@ -124,16 +135,8 @@ export function PermissionMatrixTable({
         columnLines
         bordered={false}
         defaultColumnPinning={{ start: ["name"], end: [] }}
-        tableProps={{ "aria-label": "Role permission matrix" }}
-        getHeaderProps={(columnId) => ({
-          className: cn(
-            "bg-card",
-            lockedIds.has(columnId) && lockedColumnClass,
-          ),
-        })}
-        getCellProps={({ columnId }) => ({
-          className: cn(lockedIds.has(columnId) && lockedColumnClass),
-        })}
+        tableProps={{ "aria-label": `${context.role.name} page permissions` }}
+        getHeaderProps={() => ({ className: "bg-card" })}
       />
     </MatrixContext>
   );
